@@ -18,6 +18,12 @@ enum Orientation
 	BACK_LEFT
 };
 
+enum AnimState
+{
+	IDLE,
+	WALK
+};
+
 /**
  *
  */
@@ -31,8 +37,7 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	UPROPERTY(EditDefaultsOnly)
 		FString TexturePrefix = "TestChar";
 
-	TMap<Orientation, TArray<UTexture2D*>> WalkSprites = {};
-	TMap<Orientation, TArray<UTexture2D*>> IdleSprites = {};
+	TMap<AnimState, TMap<Orientation, TArray<UTexture2D*>>> Sprites = {};
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -43,5 +48,15 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	AActor* BillboardOwner;
 	APlayerCameraManager* Camera;
 
-	Orientation CurrentOrientation = FRONT;
+	Orientation CurrentOrientation = BACK;
+	AnimState CurrentAnimState = IDLE;
+	int CurrentFrame = 0;
+	float spf = 0.2f;	
+	FTimerHandle TimerHandle;
+	void AdvanceFrame();
+	void UpdateSprite();
+
+public:
+	void SetAnimState(AnimState state);
+
 };
