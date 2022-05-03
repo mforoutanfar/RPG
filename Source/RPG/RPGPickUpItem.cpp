@@ -34,13 +34,7 @@ void ARPGPickUpItem::Tick(float DeltaTime)
 
 void ARPGPickUpItem::OnInteracted()
 {
-	if (WasRecentlyRendered())
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Hi!"));
-		Destroy();
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Out of Screen!"));
-	}
+	SetActorScale3D(.75f * GetActorScale3D());
+
+	//SetActorRotation(GetActorRotation() + FRotator(0.0f, 10.0f,0.0f));
 }

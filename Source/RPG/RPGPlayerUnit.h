@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RPGPlayerUnit.generated.h"
 
+DECLARE_DELEGATE_TwoParams(FRecoveryStateChanged, ARPGPlayerUnit*, bool);
+
 /**
  *
 */
@@ -20,7 +22,12 @@ public:
 	*/
 	ARPGPlayerUnit();
 
-	float MeleeDamage = -1.0f;
+	float MeleeDamage = 100.0f;
+	float RangedDamage = 100.0f;
+
+	void AttackTarget(AActor* NearestMeleeTarget, AActor* NearestRangedTarget);
+
+	void InteractWithTarget(AActor* Target);
 
 protected:
 	/**
@@ -43,4 +50,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		FVector ActionLocation;
+
+	bool InRecovery = false;
+	void EnterRecovery(float Duration);
+	void ExitRecovery();
+		
+	FTimerHandle RecoveryTimerHandle;
+
+public:
+	bool IsInRecovery() { return InRecovery; };
+
+	FRecoveryStateChanged RecoveryStateChanged;
 };

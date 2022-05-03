@@ -8,7 +8,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 
-#include "RPG\RPGInteractable.h"
 #include "RPG\RPGPlayerUnit.h"
 
 // Sets default values
@@ -39,11 +38,7 @@ ARPGPlayer::ARPGPlayer()
 		auto Unit = CreateDefaultSubobject<UChildActorComponent>(FName(*Name));
 		auto posY = -(NumberOfUnits - 1) * UnitOffset / 2.0f + i * UnitOffset;
 		Unit->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
-		Units.Add(Unit);
 	}
-
-	CurrentUnit = Units[0];
-
 }
 
 void ARPGPlayer::OnConstruction(const FTransform& Transform)
@@ -53,12 +48,20 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	MeleeBox->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	RangedSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
-	for (auto Unit : Units)
+	TArray<UChildActorComponent*> Components;
+	GetComponents<UChildActorComponent>(Components);
+
+	for (auto Child : Components)
 	{
-		Unit->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		auto ChildActor = Cast<UChildActorComponent>(Unit);
-		ChildActor->SetChildActorClass(UnitClass);		
+		Child->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		Child->SetChildActorClass(UnitClass);
+
+		auto Unit = Cast<ARPGPlayerUnit>(Child->GetChildActor());
+		Unit->RecoveryStateChanged.BindUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+		Units.Add(Unit);
 	}
+
+	SetActiveUnit(FindFirstOutOfRecoveryUnit());
 }
 
 // Called when the game starts or when spawned
@@ -131,41 +134,44 @@ void ARPGPlayer::OnRunReleased()
 
 void ARPGPlayer::OnInteractReleased()
 {
-	//Find nearest interactable object
-	AActor* ClosestInteractableActor = nullptr;
-	float MinDistance = FLT_MAX;
-	TSet<AActor*> OverlappingActors = {};
-	InteractionCollider->GetOverlappingActors(OverlappingActors);
-
-	for (AActor* Actor :  OverlappingActors)
+	if (auto InteractTarget = GetNearestTarget(InteractionCollider))
 	{
-		if (Actor->GetClass()->ImplementsInterface(URPGInteractable::StaticClass()))
+		if (false/*cangenerallyinteractwithtarget*/)
 		{
-			auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
-			if (Distance < MinDistance)
-			{
-				ClosestInteractableActor = Actor;
-				MinDistance = Distance;
-			}
+
 		}
-	}
-	
-	if (ClosestInteractableActor)
-	{
-		Cast<IRPGInteractable>(ClosestInteractableActor)->OnInteracted();
+		else if (ActiveUnit)
+		{
+			ActiveUnit->InteractWithTarget(InteractTarget);
+		}
 	}	
 }
 
 void ARPGPlayer::OnAttackReleased()
 {
-	//Find nearest attackable object
+	if (ActiveUnit)
+	{
+		ActiveUnit->AttackTarget(GetNearestTarget(MeleeBox), GetNearestTarget(RangedSphere));
+	}
+}
+
+AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVisible)
+{
 	AActor* ClosestAttackableActor = nullptr;
 	float MinDistance = FLT_MAX;
 	TSet<AActor*> OverlappingActors = {};
-	MeleeBox->GetOverlappingActors(OverlappingActors);
+	Collider->GetOverlappingActors(OverlappingActors);
 
 	for (AActor* Actor : OverlappingActors)
 	{
+		if (ShouldBeVisible)
+		{
+			if (!Actor->WasRecentlyRendered())
+			{
+				continue;
+			}
+		}
+
 		auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
 		if (Distance < MinDistance)
 		{
@@ -174,12 +180,41 @@ void ARPGPlayer::OnAttackReleased()
 		}
 	}
 
-	if (ClosestAttackableActor)
+	return ClosestAttackableActor;
+}
+
+void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery)
+{
+	if (IsInRecovery)
 	{
-		auto curUnit = Cast<ARPGPlayerUnit>(CurrentUnit->GetChildActor());
-		if (curUnit->MeleeDamage > 0)
+		if (ActiveUnit == Unit)
 		{
-			ClosestAttackableActor->Destroy();
+			SetActiveUnit(FindFirstOutOfRecoveryUnit());
 		}
 	}
+	else
+	{
+		if (!ActiveUnit)
+		{
+			SetActiveUnit(Unit);
+		}
+	}
+}
+
+ARPGPlayerUnit* ARPGPlayer::FindFirstOutOfRecoveryUnit()
+{
+	for (auto Unit : Units)
+	{
+		if (!Unit->IsInRecovery())
+		{
+			return Unit;
+		}
+	}
+
+	return nullptr;
+}
+
+void ARPGPlayer::SetActiveUnit(ARPGPlayerUnit* Unit)
+{
+	ActiveUnit = Unit;
 }

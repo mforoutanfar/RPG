@@ -57,7 +57,15 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<ARPGPlayerUnit> UnitClass;
 
-	TArray<UChildActorComponent*> Units = {};
+	TArray<ARPGPlayerUnit*> Units = {};
 
-	UChildActorComponent* CurrentUnit = nullptr;
+	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
+
+	void OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery);
+
+	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
+
+	void SetActiveUnit(ARPGPlayerUnit* Unit);
+
+	ARPGPlayerUnit* ActiveUnit = nullptr;
 };

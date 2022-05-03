@@ -4,6 +4,7 @@
 #include "RPGPlayerUnit.h"
 
 #include "Components/BoxComponent.h"
+#include "RPG\RPGInteractable.h"
 
 /**
  * Sets default values
@@ -20,6 +21,33 @@ ARPGPlayerUnit::ARPGPlayerUnit()
 	ActionLocation = FVector(0.0f,0.0f,30.0f);
 }
 
+void ARPGPlayerUnit::AttackTarget(AActor* NearestMeleeTarget, AActor* NearestRangedTarget)
+{
+	if (NearestMeleeTarget)
+	{
+		if (MeleeDamage > 0)
+		{
+			NearestMeleeTarget->SetActorScale3D(2.0f * NearestMeleeTarget->GetActorScale3D());
+		}
+		
+		EnterRecovery(10.0f);
+	}
+	else if (NearestRangedTarget)
+	{
+		if (RangedDamage > 0)
+		{
+			NearestRangedTarget->SetActorScale3D(.75f * NearestRangedTarget->GetActorScale3D());
+		}
+
+		EnterRecovery(5.0f);
+	}
+}
+
+void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
+{
+	Cast<IRPGInteractable>(Target)->OnInteracted();
+}
+
 void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 {
 }
@@ -29,8 +57,7 @@ void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 */
 void ARPGPlayerUnit::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
 
 /**
@@ -40,6 +67,19 @@ void ARPGPlayerUnit::BeginPlay()
 void ARPGPlayerUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void ARPGPlayerUnit::EnterRecovery(float Duration)
+{
+	InRecovery = true;
+	GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGPlayerUnit::ExitRecovery, Duration, false);
+	RecoveryStateChanged.ExecuteIfBound(this, true);
+}
+
+void ARPGPlayerUnit::ExitRecovery()
+{
+	InRecovery = false;
+	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
+	RecoveryStateChanged.ExecuteIfBound(this, false);
 }
 
