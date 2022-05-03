@@ -6,8 +6,10 @@
 #include "GameFramework\CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "RPG\RPGInteractable.h"
+#include "RPG\RPGPlayerUnit.h"
 
 // Sets default values
 ARPGPlayer::ARPGPlayer()
@@ -18,10 +20,45 @@ ARPGPlayer::ARPGPlayer()
 	PlayerCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCameraComponent->bUsePawnControlRotation = true;	
 	PlayerCameraComponent->bLockToHmd = false;
-	PlayerCameraComponent->AttachTo(GetRootComponent());
 
 	InteractionCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionCollider"));
-	InteractionCollider->AttachTo(PlayerCameraComponent);
+	InteractionCollider->SetCollisionProfileName(FName("Interactor"));
+
+	MeleeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeBox"));
+	MeleeBox->SetCollisionProfileName(FName("PlayerDamageSource"));
+
+	RangedSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangedSphere"));
+	RangedSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
+
+	float UnitOffset = 100.0f;
+	int NumberOfUnits = 4;
+
+	for (size_t i = 0; i < NumberOfUnits; i++)
+	{
+		auto Name = FString::Printf(TEXT("Unit %d"), i);
+		auto Unit = CreateDefaultSubobject<UChildActorComponent>(FName(*Name));
+		auto posY = -(NumberOfUnits - 1) * UnitOffset / 2.0f + i * UnitOffset;
+		Unit->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
+		Units.Add(Unit);
+	}
+
+	CurrentUnit = Units[0];
+
+}
+
+void ARPGPlayer::OnConstruction(const FTransform& Transform)
+{
+	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	MeleeBox->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	RangedSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+
+	for (auto Unit : Units)
+	{
+		Unit->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		auto ChildActor = Cast<UChildActorComponent>(Unit);
+		ChildActor->SetChildActorClass(UnitClass);		
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,6 +86,7 @@ void ARPGPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnRunPressed);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ARPGPlayer::OnRunReleased);
 	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Released, this, &ARPGPlayer::OnInteractReleased);
+	PlayerInputComponent->BindAction("Attack", EInputEvent::IE_Released, this, &ARPGPlayer::OnAttackReleased);
 }
 
 void ARPGPlayer::OnForwardBackwardPressed(float Value)
@@ -116,4 +154,32 @@ void ARPGPlayer::OnInteractReleased()
 	{
 		Cast<IRPGInteractable>(ClosestInteractableActor)->OnInteracted();
 	}	
+}
+
+void ARPGPlayer::OnAttackReleased()
+{
+	//Find nearest attackable object
+	AActor* ClosestAttackableActor = nullptr;
+	float MinDistance = FLT_MAX;
+	TSet<AActor*> OverlappingActors = {};
+	MeleeBox->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
+		if (Distance < MinDistance)
+		{
+			ClosestAttackableActor = Actor;
+			MinDistance = Distance;
+		}
+	}
+
+	if (ClosestAttackableActor)
+	{
+		auto curUnit = Cast<ARPGPlayerUnit>(CurrentUnit->GetChildActor());
+		if (curUnit->MeleeDamage > 0)
+		{
+			ClosestAttackableActor->Destroy();
+		}
+	}
 }

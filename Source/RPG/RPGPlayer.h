@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "RPGPlayer.generated.h"
 
+class ARPGPlayerUnit;
+
 UCLASS(Blueprintable/*, HideCategories = (Character)*/)
 class RPG_API ARPGPlayer : public ACharacter
 {
@@ -16,9 +18,10 @@ public:
 	ARPGPlayer();
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;	
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -35,12 +38,26 @@ public:
 	void OnRunPressed();
 	void OnRunReleased();
 	void OnInteractReleased();
+	void OnAttackReleased();
 
 private:
+
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* PlayerCameraComponent;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		class UBoxComponent* InteractionCollider;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		class UBoxComponent* MeleeBox;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		class USphereComponent* RangedSphere;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<ARPGPlayerUnit> UnitClass;
+
+	TArray<UChildActorComponent*> Units = {};
+
+	UChildActorComponent* CurrentUnit = nullptr;
 };
