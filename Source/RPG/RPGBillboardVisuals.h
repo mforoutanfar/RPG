@@ -34,9 +34,6 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 
 	URPGBillboardVisuals();
 
-	UPROPERTY(EditDefaultsOnly)
-		FString TexturePrefix = "TestChar";
-
 	TMap<AnimState, TMap<Orientation, TArray<UTexture2D*>>> Sprites = {};
 
 	virtual void BeginPlay() override;
@@ -58,5 +55,8 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 
 public:
 	void SetAnimState(AnimState state);
+
+	UPROPERTY(EditAnywhere)
+		FString TexturePrefix = "TestChar";
 
 };

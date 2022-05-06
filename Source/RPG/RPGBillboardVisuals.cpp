@@ -60,7 +60,7 @@ void URPGBillboardVisuals::PopulateSprites()
 		while (true)
 		{
 			FString AssetName = TexturePrefix + FString("_") + FString(Codes[i]) + FString("_Walk_") + FString::FromInt(index);
-			FString PathToLoad = FString("/Game/Assets/CharTextures/") + AssetName + FString(".") + AssetName;
+			FString PathToLoad = FString("/Game/Assets/CharTextures/") + TexturePrefix + "/" + AssetName + FString(".") + AssetName;
 
 			UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
 
@@ -88,7 +88,7 @@ void URPGBillboardVisuals::PopulateSprites()
 		while (true)
 		{
 			FString AssetName = TexturePrefix + FString("_") + FString(Codes[i]) + FString("_Idle_") + FString::FromInt(index);
-			FString PathToLoad = FString("/Game/Assets/CharTextures/") + AssetName + FString(".") + AssetName;
+			FString PathToLoad = FString("/Game/Assets/CharTextures/") + TexturePrefix + "/" + AssetName + FString(".") + AssetName;
 
 			UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
 
