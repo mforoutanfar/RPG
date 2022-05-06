@@ -166,7 +166,7 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 	{
 		if (ShouldBeVisible)
 		{
-			if (!Actor->WasRecentlyRendered())
+			if (!Actor->WasRecentlyRendered(KINDA_SMALL_NUMBER))
 			{
 				continue;
 			}
