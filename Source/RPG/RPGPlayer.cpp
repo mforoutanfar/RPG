@@ -55,6 +55,7 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	{
 		Child->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		Child->SetChildActorClass(UnitClass);
+		Child->CreateChildActor();
 
 		auto Unit = Cast<ARPGPlayerUnit>(Child->GetChildActor());
 		Unit->RecoveryStateChanged.BindUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
