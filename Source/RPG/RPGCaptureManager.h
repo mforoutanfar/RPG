@@ -78,8 +78,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		int Frames = 8;
 
-	int CurrentFrame = 0;
+	int CurrentFrame = 1;
 	bool TakingShots = false;
+	bool DelayBetweenAngles = false;
 	int CurrentEighth = 0;
 
 	TArray<FString> EighthSuffix = {"F", "FL", "L", "BL", "B", "BR", "R", "FR"};
@@ -88,5 +89,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		float Resolution = 200.0f;
 
-	AnimStates CurrentAnimState = WALK;
+	AnimStates CurrentAnimState = NONE;	 
+
+	int BetweenAnglesCounter = 10;
 };

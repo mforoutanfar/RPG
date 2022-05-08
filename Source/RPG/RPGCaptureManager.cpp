@@ -47,18 +47,34 @@ void ARPGCaptureManager::Tick(float DeltaTime)
 	
 	if (TakingShots)
 	{
-		auto ins = SkeletalMeshComp->GetSingleNodeInstance();
-		auto length = ins->GetLength();
-		SkeletalMeshComp->SetPosition(length*float(CurrentFrame) / Frames);
-		TakeShot();
-		CurrentFrame++;
+		if (!DelayBetweenAngles)
+		{
+			auto ins = SkeletalMeshComp->GetSingleNodeInstance();
+			auto length = ins->GetLength();
+			SkeletalMeshComp->SetPosition(length * float(CurrentFrame) / Frames);
+			TakeShot();
+			CurrentFrame++;
+		}
+
 		if (CurrentFrame > Frames)
 		{	
-			CurrentFrame = 0;
+			if (BetweenAnglesCounter > 0)//delay to allow angle change
+			{
+				DelayBetweenAngles = true;
+				BetweenAnglesCounter--;
+				return;
+			}
+			else
+			{
+				DelayBetweenAngles = false;
+				BetweenAnglesCounter = 10;
+			}
+
+			CurrentFrame = 1;
 
 			if (CurrentEighth < 7)
 			{
-				ChangeAngle(CurrentEighth+1);
+				ChangeAngle(CurrentEighth + 1);
 			}
 			else
 			{
@@ -123,7 +139,18 @@ void ARPGCaptureManager::Init()
 
 void ARPGCaptureManager::TakeShot()
 {	
-	FString FileName = "Corpse_" + EighthSuffix[CurrentEighth] + "_" + AnimStateSuffix[CurrentAnimState] +"_" + FString::Printf(TEXT("%d"), CurrentFrame);
+	int FrameNumber = CurrentFrame - 1;
+
+	if (CurrentAnimState == DIE)//for DIE only for some reason!
+	{
+		FrameNumber = CurrentFrame - 2;
+		if (FrameNumber < 0)
+		{
+			FrameNumber = 7;
+		}
+	}	
+
+	FString FileName = "Corpse_" + EighthSuffix[CurrentEighth] + "_" + AnimStateSuffix[CurrentAnimState] +"_" + FString::Printf(TEXT("%d"), FrameNumber);
 
 	GetHighResScreenshotConfig().SetFilename(FileName);
 	GetWorld()->GetGameViewport()->Viewport->TakeHighResScreenShot();
