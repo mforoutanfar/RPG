@@ -9,12 +9,16 @@
 #include "Components/SphereComponent.h"
 
 #include "RPG\RPGPlayerUnit.h"
+#include "RPG\RPGAttackable.h"
 
 // Sets default values
 ARPGPlayer::ARPGPlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetMesh()->DestroyComponent();
+	GetMesh()->SetActive(false);
 
 	PlayerCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCameraComponent->bUsePawnControlRotation = true;	
@@ -29,7 +33,7 @@ ARPGPlayer::ARPGPlayer()
 	RangedSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangedSphere"));
 	RangedSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
 
-	float UnitOffset = 100.0f;
+	float UnitOffset = 30.0f;
 	int NumberOfUnits = 4;
 
 	for (size_t i = 0; i < NumberOfUnits; i++)
@@ -51,6 +55,7 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	TArray<UChildActorComponent*> Components;
 	GetComponents<UChildActorComponent>(Components);
 
+	int c = 0;
 	for (auto Child : Components)
 	{
 		Child->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
@@ -59,7 +64,9 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 
 		auto Unit = Cast<ARPGPlayerUnit>(Child->GetChildActor());
 		Unit->RecoveryStateChanged.BindUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+		Unit->UnitIndex = c;
 		Units.Add(Unit);
+		c++;
 	}
 
 	SetActiveUnit(FindFirstOutOfRecoveryUnit());
@@ -141,7 +148,7 @@ void ARPGPlayer::OnInteractReleased()
 		{
 
 		}
-		else if (ActiveUnit)
+		else if (ActiveUnit.IsValid())
 		{
 			ActiveUnit->InteractWithTarget(InteractTarget);
 		}
@@ -150,9 +157,9 @@ void ARPGPlayer::OnInteractReleased()
 
 void ARPGPlayer::OnAttackReleased()
 {
-	if (ActiveUnit)
+	if (ActiveUnit.IsValid())
 	{
-		ActiveUnit->AttackTarget(GetNearestTarget(MeleeBox), GetNearestTarget(RangedSphere));
+		ActiveUnit->AttackTarget(Cast<IRPGAttackable>(GetNearestTarget(MeleeBox)), Cast<IRPGAttackable>(GetNearestTarget(RangedSphere)));
 	}
 }
 
@@ -188,14 +195,32 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 {
 	if (IsInRecovery)
 	{
+		//Set next active unit if available
 		if (ActiveUnit == Unit)
 		{
-			SetActiveUnit(FindFirstOutOfRecoveryUnit());
+			ARPGPlayerUnit* NextAvailableUnit = nullptr;
+
+			for (size_t i = 1; i < Units.Num(); i++)
+			{
+				int index = Unit->UnitIndex + i;
+				if (index > Units.Num()-1)
+				{
+					index = 0;
+				}
+
+				if (!Units[index]->IsInRecovery())
+				{
+					NextAvailableUnit = Units[index];
+					break;
+				}
+			}
+
+			SetActiveUnit(NextAvailableUnit);
 		}
 	}
 	else
 	{
-		if (!ActiveUnit)
+		if (!ActiveUnit.IsValid())
 		{
 			SetActiveUnit(Unit);
 		}

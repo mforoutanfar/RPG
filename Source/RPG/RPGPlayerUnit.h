@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "RPGPlayerUnit.generated.h"
 
+class IRPGAttackable;
+
 DECLARE_DELEGATE_TwoParams(FRecoveryStateChanged, ARPGPlayerUnit*, bool);
 
 /**
@@ -25,9 +27,11 @@ public:
 	float MeleeDamage = 100.0f;
 	float RangedDamage = 100.0f;
 
-	void AttackTarget(AActor* NearestMeleeTarget, AActor* NearestRangedTarget);
+	void AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttackable* NearestRangedTarget);
 
 	void InteractWithTarget(AActor* Target);
+
+	int UnitIndex = -1;
 
 protected:
 	/**

@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/BillboardComponent.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPGBillboardVisuals.generated.h"
+
+using namespace CreatureAnimState;
 
 enum Orientation
 {
@@ -18,11 +22,15 @@ enum Orientation
 	BACK_LEFT
 };
 
-enum AnimState
-{
-	IDLE,
-	WALK
-};
+//enum AnimState
+//{
+//	NONE,
+//	IDLE,
+//	WALK,
+//	ATTACK,
+//	HIT,
+//	DIE
+//};
 
 /**
  *
@@ -35,6 +43,9 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	URPGBillboardVisuals();
 
 	TMap<AnimState, TMap<Orientation, TArray<UTexture2D*>>> Sprites = {};
+	TMap<AnimState, bool> ShouldLoopByDefault = {};
+	TMap<AnimState, bool> ShouldReturnToDefault = {};
+	TMap<AnimState, float> AnimSPF= {};
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -46,9 +57,8 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	APlayerCameraManager* Camera;
 
 	Orientation CurrentOrientation = BACK;
-	AnimState CurrentAnimState = IDLE;
+	AnimState CurrentAnimState = NONE;
 	int CurrentFrame = 0;
-	float spf = 0.2f;	
 	FTimerHandle TimerHandle;
 	void AdvanceFrame();
 	void UpdateSprite();
@@ -56,7 +66,11 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 public:
 	void SetAnimState(AnimState state);
 
-	UPROPERTY(EditAnywhere)
-		FString TexturePrefix = "TestChar";
+	void Init(FString texturePrefix);
 
+	UPROPERTY(EditAnywhere)
+		FString TexturePrefix = "";
+
+	void OnOwnerAttacked();
+	void OnOwnerDied();
 };

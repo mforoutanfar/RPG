@@ -6,31 +6,57 @@
 
 URPGBillboardVisuals::URPGBillboardVisuals()
 {
-	//SetComponentTickEnabled(true);
 	PrimaryComponentTick.bCanEverTick = true;
-	//PrimaryComponentTick.bStartWithTickEnabled = true;
+	SetHiddenInGame(false);
+
+	ShouldLoopByDefault.Add(NONE, false);
+	ShouldLoopByDefault.Add(IDLE, true);
+	ShouldLoopByDefault.Add(WALK, true);
+	ShouldLoopByDefault.Add(ATTACK, false);
+	ShouldLoopByDefault.Add(HIT, false);
+	ShouldLoopByDefault.Add(DIE, false);
+
+	ShouldReturnToDefault.Add(NONE, true);
+	ShouldReturnToDefault.Add(IDLE, false);
+	ShouldReturnToDefault.Add(WALK, false);
+	ShouldReturnToDefault.Add(ATTACK, true);
+	ShouldReturnToDefault.Add(HIT, true);
+	ShouldReturnToDefault.Add(DIE, false);
+
+	float DefaultSPF = 0.12f;
+	AnimSPF.Add(NONE, DefaultSPF);
+	AnimSPF.Add(IDLE, DefaultSPF);
+	AnimSPF.Add(WALK, DefaultSPF);
+	AnimSPF.Add(ATTACK, DefaultSPF);
+	AnimSPF.Add(HIT, DefaultSPF);
+	AnimSPF.Add(DIE, DefaultSPF);
 }
+
+
+void URPGBillboardVisuals::Init(FString texturePrefix)//Called by Owner
+{
+	TexturePrefix = texturePrefix;
+	PopulateSprites();
+	BillboardOwner = GetOwner();
+}
+
 
 void URPGBillboardVisuals::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetHiddenInGame(false);
-
-	PopulateSprites();
-
-	SetSprite(Sprites[IDLE][FRONT][0]);
-
-	BillboardOwner = GetOwner();
-
-	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;		
-
-	SetAnimState(WALK);
+	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
 }
 
 void URPGBillboardVisuals::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	if (CurrentAnimState == NONE)
+	{
+		return;
+	}
+
 	UpdateOrientation();
 }
 
@@ -48,81 +74,64 @@ void URPGBillboardVisuals::PopulateSprites()
 		"BL"
 	};
 
-	Sprites.Add(IDLE, {});
-	Sprites.Add(WALK, {});
-
-	//Walk Sprites
-	for (size_t i = 0; i < 8; i++)//8 Directions, starting with back, going clockwise
+	TArray<FString> StateCodes =
 	{
-		int index = 0;
-		Sprites[WALK].Add((Orientation)i, {});
+		"NONE",
+		"Idle",
+		"Walk",
+		"ATTACK",
+		"HIT",
+		"DIE",
+	};
 
-		while (true)
+	for (size_t i = 1; i <= 5; i++)//5 animation states
+	{		
+		AnimState State = AnimState(i);
+		Sprites.Add(State, {});
+
+		//Walk Sprites
+		for (size_t j = 0; j < 8; j++)//8 Directions, starting with back, going clockwise
 		{
-			FString AssetName = TexturePrefix + FString("_") + FString(Codes[i]) + FString("_Walk_") + FString::FromInt(index);
-			FString PathToLoad = FString("/Game/Assets/CharTextures/") + TexturePrefix + "/" + AssetName + FString(".") + AssetName;
+			Orientation Orien = (Orientation)j;
+			int index = 0;
+			Sprites[State].Add(Orien, {});
 
-			UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
-
-			if (tmpTexture)
+			while (true)
 			{
-				Sprites[WALK][(Orientation)i].Add(tmpTexture);
-			}
-			else
-			{
-				check(index != 0);
-				break;
-			}
+				FString AssetName = TexturePrefix + FString("_") + FString(Codes[j]) + FString("_") + StateCodes[i] + FString("_") + FString::FromInt(index);
+				FString PathToLoad = FString("/Game/Assets/CharTextures/") + TexturePrefix + "/" + AssetName + FString(".") + AssetName;
 
-			index++;
-		}
+				UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
 
-	}
+				if (tmpTexture)
+				{
+					Sprites[State][Orien].Add(tmpTexture);
+				}
+				else
+				{
+					check(index != 0);
+					break;
+				}
 
-	//Idle Sprites
-	for (size_t i = 0; i < 8; i++)//8 Directions, starting with back, going clockwise
-	{
-		int index = 0;
-		Sprites[IDLE].Add((Orientation)i, {});
-
-		while (true)
-		{
-			FString AssetName = TexturePrefix + FString("_") + FString(Codes[i]) + FString("_Idle_") + FString::FromInt(index);
-			FString PathToLoad = FString("/Game/Assets/CharTextures/") + TexturePrefix + "/" + AssetName + FString(".") + AssetName;
-
-			UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
-
-			if (tmpTexture)
-			{
-				Sprites[IDLE][(Orientation)i].Add(tmpTexture);
-			}
-			else
-			{
-				check(index != 0);
-				break;
+				index++;
 			}
 
-			index++;
 		}
 	}
 }
 
 void URPGBillboardVisuals::SetAnimState(AnimState state)
 {
-	if (CurrentAnimState != state)
-	{
-		CurrentAnimState = state;
-		CurrentFrame = 0;
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 
-		auto numberOfFrames = Sprites[CurrentAnimState][CurrentOrientation].Num();
-		if (numberOfFrames > 1)//Has Animation
-		{
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPGBillboardVisuals::AdvanceFrame, spf, true);
-		}
-		else
-		{
-			TimerHandle.Invalidate();
-		}
+	CurrentAnimState = state;
+	CurrentFrame = -1;
+	AdvanceFrame();
+
+	auto numberOfFrames = Sprites[CurrentAnimState][CurrentOrientation].Num();
+	if (numberOfFrames > 1)//Has Animation
+	{
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPGBillboardVisuals::AdvanceFrame, AnimSPF[CurrentAnimState], true);
 	}
 }
 
@@ -132,6 +141,19 @@ void URPGBillboardVisuals::AdvanceFrame()
 	if (CurrentFrame >= Sprites[CurrentAnimState][CurrentOrientation].Num())
 	{
 		CurrentFrame = 0;
+
+		if (!ShouldLoopByDefault[CurrentAnimState])
+		{
+			if (ShouldReturnToDefault[CurrentAnimState])
+			{
+				SetAnimState(IDLE);
+			}
+			else
+			{
+				GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+				CurrentFrame = Sprites[CurrentAnimState][CurrentOrientation].Num()-1;
+			}
+		}		
 	}
 	UpdateSprite();
 }
@@ -169,4 +191,14 @@ void URPGBillboardVisuals::UpdateOrientation()
 void URPGBillboardVisuals::UpdateSprite()
 {
 	SetSprite(Sprites[CurrentAnimState][CurrentOrientation][CurrentFrame]);
+}
+
+void URPGBillboardVisuals::OnOwnerAttacked()
+{
+	SetAnimState(HIT);
+}
+
+void URPGBillboardVisuals::OnOwnerDied()
+{
+	SetAnimState(DIE);
 }

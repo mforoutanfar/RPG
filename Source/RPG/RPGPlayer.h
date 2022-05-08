@@ -67,5 +67,5 @@ private:
 
 	void SetActiveUnit(ARPGPlayerUnit* Unit);
 
-	ARPGPlayerUnit* ActiveUnit = nullptr;
+	TWeakObjectPtr<ARPGPlayerUnit> ActiveUnit = nullptr;
 };

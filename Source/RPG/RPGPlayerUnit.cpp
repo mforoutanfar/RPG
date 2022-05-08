@@ -5,6 +5,8 @@
 
 #include "Components/BoxComponent.h"
 #include "RPG\RPGInteractable.h"
+#include "RPG\RPGAttackable.h"
+
 
 /**
  * Sets default values
@@ -15,19 +17,24 @@ ARPGPlayerUnit::ARPGPlayerUnit()
 	PrimaryActorTick.bCanEverTick = true;
 
 	HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
+	HitBox->SetupAttachment(RootComponent);
 	HitBox->SetCollisionProfileName(FName("PlayerHitBox"));
 	HitBox->ComponentTags.Add(FName("HitBox"));
 
 	ActionLocation = FVector(0.0f,0.0f,30.0f);
 }
 
-void ARPGPlayerUnit::AttackTarget(AActor* NearestMeleeTarget, AActor* NearestRangedTarget)
+void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttackable* NearestRangedTarget)
 {
+	FRPGAttackData attackData;
+	attackData.PhysicalDamage = 30.0f;
+	attackData.Attacker = this;
+
 	if (NearestMeleeTarget)
 	{
 		if (MeleeDamage > 0)
 		{
-			NearestMeleeTarget->SetActorScale3D(2.0f * NearestMeleeTarget->GetActorScale3D());
+			NearestMeleeTarget->OnAttacked(attackData);
 		}
 		
 		EnterRecovery(10.0f);
@@ -36,10 +43,10 @@ void ARPGPlayerUnit::AttackTarget(AActor* NearestMeleeTarget, AActor* NearestRan
 	{
 		if (RangedDamage > 0)
 		{
-			NearestRangedTarget->SetActorScale3D(.75f * NearestRangedTarget->GetActorScale3D());
+			NearestRangedTarget->OnAttacked(attackData);
 		}
 
-		EnterRecovery(5.0f);
+		EnterRecovery(10.0f);
 	}
 }
 
@@ -67,6 +74,7 @@ void ARPGPlayerUnit::BeginPlay()
 void ARPGPlayerUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 void ARPGPlayerUnit::EnterRecovery(float Duration)
