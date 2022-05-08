@@ -95,7 +95,17 @@ void ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	}
 }
 
-void ARPGCreature::OnInteracted()
+InteractableCat ARPGCreature::GetInteractableType()
+{
+	if (Dead)
+	{
+		return InteractableCat::CORPSE;
+	}
+
+	return InteractableCat::NONE;
+}
+
+void ARPGCreature::OnInteracted(bool Successful)
 {
 	if (Dead)
 	{

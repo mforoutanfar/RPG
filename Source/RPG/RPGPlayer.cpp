@@ -8,8 +8,12 @@
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 
-#include "RPG\RPGPlayerUnit.h"
-#include "RPG\RPGAttackable.h"
+
+#include "RPGAttackable.h"
+#include "RPGInteractable.h"
+
+#include "RPGPlayerUnit.h"
+#include "RPGRandomAudioComponent.h"
 
 // Sets default values
 ARPGPlayer::ARPGPlayer()
@@ -32,6 +36,9 @@ ARPGPlayer::ARPGPlayer()
 
 	RangedSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangedSphere"));
 	RangedSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
+
+	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	float UnitOffset = 30.0f;
 	int NumberOfUnits = 4;
@@ -144,15 +151,48 @@ void ARPGPlayer::OnInteractReleased()
 {
 	if (auto InteractTarget = GetNearestTarget(InteractionCollider))
 	{
-		if (false/*cangenerallyinteractwithtarget*/)
-		{
-
-		}
-		else if (ActiveUnit.IsValid())
+		if (ActiveUnit.IsValid())
 		{
 			ActiveUnit->InteractWithTarget(InteractTarget);
 		}
+		else
+		{
+			auto Interactable = Cast<IRPGInteractable>(InteractTarget);
+			auto Type = Interactable->GetInteractableType();
+
+			if (Type == ITEM)
+			{
+				Units[0]->InteractWithTarget(InteractTarget);
+			}
+		}
 	}	
+}
+
+bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
+{
+	auto Type = Target->GetInteractableType();
+	switch (Type)
+	{
+		case InteractableCategory::MISC:
+		case InteractableCategory::NONE:
+		case InteractableCategory::ITEM:
+		{
+			return false;
+			break;
+		}
+		case InteractableCategory::DOOR:
+		case InteractableCategory::CHEST:
+		case InteractableCategory::CORPSE:
+		{
+			return true;
+			break;
+		}
+		default:
+		{
+			return false;
+			break;
+		}		
+	}
 }
 
 void ARPGPlayer::OnAttackReleased()

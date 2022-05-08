@@ -4,9 +4,13 @@
 #include "RPGPlayerUnit.h"
 
 #include "Components/BoxComponent.h"
-#include "RPG\RPGInteractable.h"
-#include "RPG\RPGAttackable.h"
+#include "RPGInteractable.h"
+#include "RPGAttackable.h"
 
+#include "GameFramework\CharacterMovementComponent.h"
+#include "RPGRandomAudioComponent.h"
+#include "RPGInventory.h"
+#include "RPGPickupItem.h"
 
 /**
  * Sets default values
@@ -20,6 +24,11 @@ ARPGPlayerUnit::ARPGPlayerUnit()
 	HitBox->SetupAttachment(RootComponent);
 	HitBox->SetCollisionProfileName(FName("PlayerHitBox"));
 	HitBox->ComponentTags.Add(FName("HitBox"));
+
+	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
+	AudioComponent->SetupAttachment(RootComponent);
+
+	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
 
 	ActionLocation = FVector(0.0f,0.0f,30.0f);
 }
@@ -52,7 +61,22 @@ void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttack
 
 void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 {
-	Cast<IRPGInteractable>(Target)->OnInteracted();
+	auto Interactable = Cast<IRPGInteractable>(Target);
+	auto Type = Interactable->GetInteractableType();
+
+	if (Type == ITEM)
+	{
+		auto Item = Cast<ARPGPickUpItem>(Target);
+
+		bool Successful = Inventory->AddItem(Item->ItemInformation);
+		Interactable->OnInteracted(Successful);
+
+		//TODO: Put here because pickupItem is destroyed along with its audio component! 
+		if (Successful)
+		{
+			AudioComponent->PlayRandom("cash");
+		}
+	}
 }
 
 void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)

@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPGInteractable.generated.h"
+
+using namespace InteractableCategory;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -22,5 +26,7 @@ class RPG_API IRPGInteractable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnInteracted() = 0;
+	virtual void OnInteracted(bool Successful) = 0;
+
+	virtual InteractableCat GetInteractableType() = 0;
 };

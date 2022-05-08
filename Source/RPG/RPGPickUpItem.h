@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RPGFunctionLibrary.h"
 #include  "RPG\RPGInteractable.h"
+
 #include "RPGPickUpItem.generated.h"
+
+using namespace ItemCategory;
 
 /**
  *
@@ -21,11 +25,15 @@ public:
 	*/
 	ARPGPickUpItem();
 
+	FRPGItemInfo ItemInformation;
+
 protected:
 	/**
 	 * Called when the game starts or when spawned
 	*/
 	virtual void BeginPlay() override;
+
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 public:	
 	/**
@@ -34,6 +42,16 @@ public:
 	*/
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnInteracted() override;
+	virtual void OnInteracted(bool Successful) override;
 
+	virtual InteractableCat GetInteractableType() override;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	class UBillboardComponent* ItemPicture;
+
+	UPROPERTY(EditDefaultsOnly)
+		class USphereComponent* HitBox;
+
+	class URPGRandomAudioComponent* AudioComponent;
 };

@@ -8,7 +8,7 @@
 
 #include "RPGBillboardVisuals.generated.h"
 
-using namespace CreatureAnimState;
+using namespace AnimationState;
 
 enum Orientation
 {
@@ -57,7 +57,7 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	APlayerCameraManager* Camera;
 
 	Orientation CurrentOrientation = BACK;
-	AnimState CurrentAnimState = NONE;
+	AnimState CurrentAnimState = AnimState::NONE;
 	int CurrentFrame = 0;
 	FTimerHandle TimerHandle;
 	void AdvanceFrame();

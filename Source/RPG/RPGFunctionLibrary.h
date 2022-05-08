@@ -17,7 +17,7 @@ class RPG_API URPGFunctionLibrary : public UBlueprintFunctionLibrary
 };
 
 UENUM(BlueprintType)
-namespace CreatureAnimState
+namespace AnimationState
 {
 	enum AnimState
 	{
@@ -29,3 +29,53 @@ namespace CreatureAnimState
 		DIE
 	};
 }
+
+UENUM(BlueprintType)
+namespace InteractableCategory
+{
+	enum InteractableCat
+	{
+		NONE,
+		ITEM,
+		DOOR,
+		CHEST,
+		CORPSE,
+		MISC
+	};
+}
+
+UENUM(BlueprintType)
+namespace ItemCategory
+{
+	enum ItemCat
+	{
+		NONE,
+		WEAPON,
+		ARMOR,
+		CONSUMABLE,
+		INGREDIENTS,
+		QUEST,
+		MISC
+	};
+}
+
+USTRUCT(BlueprintType)
+struct FRPGItemInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ItemName = "";
+
+	UPROPERTY()
+	int Width = 0;
+
+	UPROPERTY()
+	int Height = 0;
+
+	UPROPERTY()
+	TEnumAsByte<ItemCategory::ItemCat> ItemCategory = ItemCategory::ItemCat::NONE;
+
+	UPROPERTY()
+	int Price = 0;
+};

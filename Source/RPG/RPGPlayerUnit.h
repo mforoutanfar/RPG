@@ -61,6 +61,10 @@ private:
 		
 	FTimerHandle RecoveryTimerHandle;
 
+	class URPGRandomAudioComponent* AudioComponent;
+
+	class URPGInventory* Inventory;
+
 public:
 	bool IsInRecovery() { return InRecovery; };
 

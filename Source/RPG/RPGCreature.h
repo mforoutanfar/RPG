@@ -46,7 +46,8 @@ public:
 
 	virtual void OnAttacked(FRPGAttackData AttackData) override;
 
-	virtual void OnInteracted() override;
+	virtual InteractableCat GetInteractableType() override;
+	virtual void OnInteracted(bool Successful) override;
 
 	float HP = 100.0f;
 };

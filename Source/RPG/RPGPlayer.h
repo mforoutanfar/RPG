@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "RPGPlayer.generated.h"
 
 class ARPGPlayerUnit;
+class IRPGInteractable;
 
 UCLASS(Blueprintable/*, HideCategories = (Character)*/)
 class RPG_API ARPGPlayer : public ACharacter
@@ -38,6 +40,7 @@ public:
 	void OnRunPressed();
 	void OnRunReleased();
 	void OnInteractReleased();
+	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
 	void OnAttackReleased();
 
 private:
@@ -56,6 +59,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<ARPGPlayerUnit> UnitClass;
+
+	class URPGRandomAudioComponent* AudioComponent;
 
 	TArray<ARPGPlayerUnit*> Units = {};
 
