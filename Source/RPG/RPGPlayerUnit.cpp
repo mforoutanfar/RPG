@@ -11,6 +11,7 @@
 #include "RPGRandomAudioComponent.h"
 #include "RPGInventory.h"
 #include "RPGPickupItem.h"
+#include "RPG_EventManager.h"
 
 /**
  * Sets default values
@@ -38,25 +39,28 @@ void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttack
 	FRPGAttackData attackData;
 	attackData.PhysicalDamage = 30.0f;
 	attackData.Attacker = this;
+	FRPGAttackResults Results;
 
 	if (NearestMeleeTarget)
 	{
 		if (MeleeDamage > 0)
 		{
-			NearestMeleeTarget->OnAttacked(attackData);
+			Results = NearestMeleeTarget->OnAttacked(attackData);
 		}
 		
-		EnterRecovery(10.0f);
+		EnterRecovery(2.0f);
 	}
 	else if (NearestRangedTarget)
 	{
 		if (RangedDamage > 0)
 		{
-			NearestRangedTarget->OnAttacked(attackData);
+			Results = NearestRangedTarget->OnAttacked(attackData);
 		}
 
-		EnterRecovery(10.0f);
+		EnterRecovery(2.0f);
 	}
+
+	Attack.ExecuteIfBound(Results);
 }
 
 void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
@@ -105,13 +109,19 @@ void ARPGPlayerUnit::EnterRecovery(float Duration)
 {
 	InRecovery = true;
 	GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGPlayerUnit::ExitRecovery, Duration, false);
-	RecoveryStateChanged.ExecuteIfBound(this, true);
+	RecoveryStateChanged.Broadcast(this, true);
 }
 
 void ARPGPlayerUnit::ExitRecovery()
 {
 	InRecovery = false;
 	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
-	RecoveryStateChanged.ExecuteIfBound(this, false);
+	RecoveryStateChanged.Broadcast(this, false);
+}
+
+void ARPGPlayerUnit::SetSelected(bool IsSelected)
+{
+	Selected = IsSelected;
+	SelectedStateChanged.ExecuteIfBound(IsSelected);
 }
 

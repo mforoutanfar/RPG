@@ -8,12 +8,12 @@
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 
-
 #include "RPGAttackable.h"
 #include "RPGInteractable.h"
 
 #include "RPGPlayerUnit.h"
 #include "RPGRandomAudioComponent.h"
+#include "RPG_EventManager.h"
 
 // Sets default values
 ARPGPlayer::ARPGPlayer()
@@ -41,14 +41,14 @@ ARPGPlayer::ARPGPlayer()
 	AudioComponent->SetupAttachment(RootComponent);
 
 	float UnitOffset = 30.0f;
-	int NumberOfUnits = 4;
 
-	for (size_t i = 0; i < NumberOfUnits; i++)
+	for (size_t i = 0; i < UnitCapacity; i++)
 	{
-		auto Name = FString::Printf(TEXT("Unit %d"), i);
-		auto Unit = CreateDefaultSubobject<UChildActorComponent>(FName(*Name));
-		auto posY = -(NumberOfUnits - 1) * UnitOffset / 2.0f + i * UnitOffset;
-		Unit->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
+		auto Name = FString::Printf(TEXT("UnitPlaceHolder%d"), i);
+		auto UnitPlaceHolder = CreateDefaultSubobject<UChildActorComponent>(FName(*Name));		
+		auto posY = -(UnitCapacity - 1) * UnitOffset / 2.0f + i * UnitOffset;
+		UnitPlaceHolder->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
+		UnitPlaceHolders.Add(UnitPlaceHolder);
 	}
 }
 
@@ -59,30 +59,43 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	MeleeBox->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	RangedSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
-	TArray<UChildActorComponent*> Components;
-	GetComponents<UChildActorComponent>(Components);
-
-	int c = 0;
-	for (auto Child : Components)
+	for (auto Holder : UnitPlaceHolders)
 	{
-		Child->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		Child->SetChildActorClass(UnitClass);
-		Child->CreateChildActor();
+		Holder->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		Holder->SetChildActorClass(UnitClass);
+	}	
+}
 
-		auto Unit = Cast<ARPGPlayerUnit>(Child->GetChildActor());
-		Unit->RecoveryStateChanged.BindUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
-		Unit->UnitIndex = c;
-		Units.Add(Unit);
-		c++;
+//TODO: Get Unit Info as Input
+void ARPGPlayer::AddUnit()
+{
+	if (Units.Num() == UnitCapacity)
+	{
+		//Unit Capactiy Full!
+		return;
 	}
 
-	SetActiveUnit(FindFirstOutOfRecoveryUnit());
+	auto Holder = UnitPlaceHolders[Units.Num()];
+	Holder->CreateChildActor();
+
+	auto Unit = Cast<ARPGPlayerUnit>(Holder->GetChildActor());
+	Unit->UnitIndex = Units.Num();
+	Unit->RecoveryStateChanged.AddUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+	Units.Add(Unit);
+
+	URPG_EventManager::GetInstance()->UnitAdded.ExecuteIfBound(Unit);
 }
 
 // Called when the game starts or when spawned
 void ARPGPlayer::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	for (int i = 0; i < UnitCapacity; i++)
+	{
+		AddUnit();
+		SetSelectedUnit(FindFirstOutOfRecoveryUnit());
+	}
 }
 
 // Called every frame
@@ -103,8 +116,9 @@ void ARPGPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ARPGPlayer::OnJumpReleased);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnRunPressed);
 	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ARPGPlayer::OnRunReleased);
-	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Released, this, &ARPGPlayer::OnInteractReleased);
-	PlayerInputComponent->BindAction("Attack", EInputEvent::IE_Released, this, &ARPGPlayer::OnAttackReleased);
+	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnInteractPressed);
+	PlayerInputComponent->BindAction("Attack", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnAttackPressed);
+	PlayerInputComponent->BindAction("SwitchUnit", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnSwitchUnitPressed);
 }
 
 void ARPGPlayer::OnForwardBackwardPressed(float Value)
@@ -147,13 +161,13 @@ void ARPGPlayer::OnRunReleased()
 	GetCharacterMovement()->MaxWalkSpeed /= 3.0f;
 }
 
-void ARPGPlayer::OnInteractReleased()
+void ARPGPlayer::OnInteractPressed()
 {
 	if (auto InteractTarget = GetNearestTarget(InteractionCollider))
 	{
-		if (ActiveUnit.IsValid())
+		if (SelectedUnit.IsValid())
 		{
-			ActiveUnit->InteractWithTarget(InteractTarget);
+			SelectedUnit->InteractWithTarget(InteractTarget);
 		}
 		else
 		{
@@ -195,11 +209,39 @@ bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
 	}
 }
 
-void ARPGPlayer::OnAttackReleased()
+void ARPGPlayer::OnAttackPressed()
 {
-	if (ActiveUnit.IsValid())
+	if (SelectedUnit.IsValid())
 	{
-		ActiveUnit->AttackTarget(Cast<IRPGAttackable>(GetNearestTarget(MeleeBox)), Cast<IRPGAttackable>(GetNearestTarget(RangedSphere)));
+		auto UnitToAttack = SelectedUnit;
+
+		if (SelectedUnit->IsInRecovery())
+		{
+			UnitToAttack = FindFirstOutOfRecoveryUnit();
+			SetSelectedUnit(UnitToAttack.Get());
+		}
+
+		if (UnitToAttack.IsValid())
+		{
+			UnitToAttack->AttackTarget(Cast<IRPGAttackable>(GetNearestTarget(MeleeBox)), Cast<IRPGAttackable>(GetNearestTarget(RangedSphere)));
+		}
+	}
+}
+
+void ARPGPlayer::OnSwitchUnitPressed()
+{
+	if (!SelectedUnit.IsValid())
+	{
+		SetSelectedUnit(Units[0]);
+	}
+	else
+	{
+		int NextUnitIndex = SelectedUnit->UnitIndex + 1;
+		if (NextUnitIndex > Units.Num()-1)
+		{
+			NextUnitIndex = 0;
+		}
+		SetSelectedUnit(Units[NextUnitIndex]);
 	}
 }
 
@@ -236,7 +278,7 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 	if (IsInRecovery)
 	{
 		//Set next active unit if available
-		if (ActiveUnit == Unit)
+		if (SelectedUnit == Unit)
 		{
 			ARPGPlayerUnit* NextAvailableUnit = nullptr;
 
@@ -255,14 +297,14 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 				}
 			}
 
-			SetActiveUnit(NextAvailableUnit);
+			SetSelectedUnit(NextAvailableUnit);
 		}
 	}
 	else
 	{
-		if (!ActiveUnit.IsValid())
+		if (!SelectedUnit.IsValid())
 		{
-			SetActiveUnit(Unit);
+			SetSelectedUnit(Unit);
 		}
 	}
 }
@@ -280,7 +322,17 @@ ARPGPlayerUnit* ARPGPlayer::FindFirstOutOfRecoveryUnit()
 	return nullptr;
 }
 
-void ARPGPlayer::SetActiveUnit(ARPGPlayerUnit* Unit)
+void ARPGPlayer::SetSelectedUnit(ARPGPlayerUnit* Unit)
 {
-	ActiveUnit = Unit;
+	if (SelectedUnit.IsValid())
+	{
+		SelectedUnit->SetSelected(false);
+	}
+
+	SelectedUnit = Unit;
+
+	if (Unit)
+	{
+		SelectedUnit->SetSelected(true);
+	}
 }

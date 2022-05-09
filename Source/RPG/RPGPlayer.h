@@ -20,10 +20,14 @@ public:
 	ARPGPlayer();
 
 protected:
-	virtual void OnConstruction(const FTransform& Transform) override;	
+	virtual void OnConstruction(const FTransform& Transform) override;
+	void AddUnit();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	const int UnitCapacity = 4;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,11 +43,15 @@ public:
 	void OnJumpReleased();
 	void OnRunPressed();
 	void OnRunReleased();
-	void OnInteractReleased();
+	void OnInteractPressed();
 	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
-	void OnAttackReleased();
+	void OnAttackPressed();
+
+	void OnSwitchUnitPressed();
 
 private:
+
+	TArray<class UChildActorComponent*> UnitPlaceHolders = {};
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* PlayerCameraComponent;
@@ -70,7 +78,7 @@ private:
 
 	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
 
-	void SetActiveUnit(ARPGPlayerUnit* Unit);
+	void SetSelectedUnit(ARPGPlayerUnit* Unit);
 
-	TWeakObjectPtr<ARPGPlayerUnit> ActiveUnit = nullptr;
+	TWeakObjectPtr<ARPGPlayerUnit> SelectedUnit = nullptr;
 };

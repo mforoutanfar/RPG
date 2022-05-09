@@ -6,6 +6,11 @@
 #include "UObject/NoExportTypes.h"
 #include "RPG_EventManager.generated.h"
 
+class ARPGPlayer;
+class ARPGPlayerUnit;
+
+DECLARE_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*);
+
 /**
  * 
  */
@@ -14,9 +19,12 @@ class RPG_API URPG_EventManager : public UObject
 {
 	GENERATED_BODY()
 
-private:
-	static URPG_EventManager* Instance;
+private:	
+	static TWeakObjectPtr<URPG_EventManager> Instance;
 
 public:
-	static URPG_EventManager* GetInstance();
+	UFUNCTION()
+	static TWeakObjectPtr<URPG_EventManager> GetInstance();
+
+	FUnitAdded UnitAdded;
 };

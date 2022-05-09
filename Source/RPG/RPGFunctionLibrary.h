@@ -79,3 +79,24 @@ struct FRPGItemInfo
 	UPROPERTY()
 	int Price = 0;
 };
+
+USTRUCT()
+struct FRPGAttackData
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+		int PhysicalDamage = 0;
+
+	UPROPERTY()
+		TWeakObjectPtr<AActor> Attacker = nullptr;
+};
+
+USTRUCT()
+struct FRPGAttackResults
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY()
+		bool TargetDied = false;
+};

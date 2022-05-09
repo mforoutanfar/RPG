@@ -4,11 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPGPlayerUnit.generated.h"
 
 class IRPGAttackable;
 
-DECLARE_DELEGATE_TwoParams(FRecoveryStateChanged, ARPGPlayerUnit*, bool);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, ARPGPlayerUnit*, bool);
+DECLARE_DELEGATE_OneParam(FAttack, FRPGAttackResults);
+DECLARE_DELEGATE_OneParam(FSelectedStateChanged, bool);
 
 /**
  *
@@ -69,4 +73,10 @@ public:
 	bool IsInRecovery() { return InRecovery; };
 
 	FRecoveryStateChanged RecoveryStateChanged;
+
+	FAttack Attack;
+
+	bool Selected = false;
+	void SetSelected(bool);
+	FSelectedStateChanged SelectedStateChanged;
 };

@@ -44,10 +44,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void OnAttacked(FRPGAttackData AttackData) override;
+	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
 
 	virtual InteractableCat GetInteractableType() override;
 	virtual void OnInteracted(bool Successful) override;
 
+	UPROPERTY(EditAnywhere);
 	float HP = 100.0f;
 };

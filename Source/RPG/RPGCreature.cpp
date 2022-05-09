@@ -8,7 +8,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
-#include "RPGAttackData.h"
+#include "RPGFunctionLibrary.h"
 #include "RPGRandomAudioComponent.h"
 
 // Sets default values
@@ -73,8 +73,10 @@ void ARPGCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
-void ARPGCreature::OnAttacked(FRPGAttackData AttackData)
+FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 {
+	FRPGAttackResults Results;
+
 	if (auto Attacker = AttackData.Attacker.Get())
 	{
 		auto a = Attacker->GetActorLocation();
@@ -88,11 +90,14 @@ void ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	if (HP <= 0)
 	{
 		Die();
+		Results.TargetDied = true;
 	}
 	else
 	{
 		Visuals->OnOwnerAttacked();
 	}
+
+	return Results;
 }
 
 InteractableCat ARPGCreature::GetInteractableType()

@@ -14,8 +14,15 @@ class RPG_API URPG_GameHUD : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class URPG_AvatarWidget> AvatarClass;
+	
 protected:
 	virtual void NativeConstruct() override;
 
+	UPROPERTY(meta = (BindWidget))
+	class UVerticalBox* AvatarsBox;
 
+	void AddAvatar(class ARPGPlayerUnit* Unit);
 };

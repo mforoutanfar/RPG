@@ -3,16 +3,14 @@
 
 #include "RPG_EventManager.h"
 
-URPG_EventManager* URPG_EventManager::Instance(nullptr);
+TWeakObjectPtr<URPG_EventManager> URPG_EventManager::Instance(nullptr);
 
-URPG_EventManager* URPG_EventManager::GetInstance()
+TWeakObjectPtr<URPG_EventManager> URPG_EventManager::GetInstance()
 {
-	if (!Instance)
+	if (!Instance.IsValid())
 	{
-		return nullptr;
+		Instance = NewObject<URPG_EventManager>();
 	}
-	else
-	{
-		return Instance;
-	}	
+
+	return Instance;
 }

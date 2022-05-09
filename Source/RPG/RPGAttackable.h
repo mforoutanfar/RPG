@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "RPG\RPGAttackData.h"
+#include "RPGFunctionLibrary.h"
 
 #include "RPGAttackable.generated.h"
 
@@ -24,5 +24,5 @@ class RPG_API IRPGAttackable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnAttacked(FRPGAttackData AttackData) = 0;
+	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) = 0;
 };
