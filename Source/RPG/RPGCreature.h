@@ -28,7 +28,7 @@ protected:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	class URPGBillboardVisuals* Visuals = nullptr;
 
 	class URPGRandomAudioComponent* AudioComponent;

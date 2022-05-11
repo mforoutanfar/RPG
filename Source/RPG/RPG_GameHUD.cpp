@@ -8,7 +8,7 @@
 #include "RPGCreature.h"
 #include "RPG_EventManager.h"
 #include "RPG_AvatarWidget.h"
-#include "RPG_FollowerWidget.h"
+#include "RPG_SlashWidget.h"
 #include "Components/VerticalBox.h"
 #include "Components/CanvasPanel.h"
 #include "Components/VerticalBoxSlot.h"
@@ -33,9 +33,10 @@ void URPG_GameHUD::OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPG
 {
 	if (DamageWidgetClass)
 	{
-		auto Follower = CreateWidget<URPG_FollowerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
-		Follower->Target = Cast<AActor>(Results.Target);
-		Canvas->AddChildToCanvas(Follower);
+		auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
+		Slash->Target = Cast<AActor>(Results.Target);
+		Slash->AttackResults = Results;
+		Canvas->AddChildToCanvas(Slash);
 	}
 }
 

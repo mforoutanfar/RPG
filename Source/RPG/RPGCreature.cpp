@@ -94,7 +94,12 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 		SetActorRotation(DistVec.Rotation());
 	}
 
-	HP -= AttackData.PhysicalDamage;
+	float DamageDealt = 0.0f;
+	DamageDealt += AttackData.PhysicalDamage;
+	HP -= DamageDealt;
+
+	Results.DamageDealt = DamageDealt;
+
 	AudioComponent->PlayRandom("hit");
 
 	if (HP <= 0)

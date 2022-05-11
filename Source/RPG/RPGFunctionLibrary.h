@@ -94,13 +94,17 @@ public:
 		TWeakObjectPtr<AActor> Attacker = nullptr;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRPGAttackResults
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		bool TargetDied = false;
-	UPROPERTY()
+
+	UPROPERTY(BlueprintReadWrite)
+		float DamageDealt = 0.0f;
+
+	UPROPERTY(BlueprintReadWrite)
 		TWeakObjectPtr<ARPGCreature> Target;
 };

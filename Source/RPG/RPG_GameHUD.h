@@ -21,7 +21,7 @@ public:
 	TSubclassOf<class URPG_AvatarWidget> AvatarClass;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class URPG_FollowerWidget> DamageWidgetClass;
+	TSubclassOf<class URPG_SlashWidget> DamageWidgetClass;
 
 protected:
 	virtual void NativeConstruct() override;
