@@ -16,4 +16,7 @@ class RPG_API ARPG_HUD : public AHUD
 	
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
+		TSubclassOf <class URPG_GameHUD> GameHUDClass;
+
 };

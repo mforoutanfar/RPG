@@ -11,6 +11,10 @@
 #include "RPGFunctionLibrary.h"
 #include "RPGRandomAudioComponent.h"
 
+#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
 // Sets default values
 ARPGCreature::ARPGCreature()
 {
@@ -29,35 +33,40 @@ ARPGCreature::ARPGCreature()
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);	
 
-	//MovementModeChangedDelegate.AddDynamic(this, &ARPGCreature::OnMovementModeChange);
-}
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));	
 
-void ARPGCreature::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
-{
-	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
-	EMovementMode NewMode = Cast<UCharacterMovementComponent>(GetMovementComponent())->MovementMode;
-	switch (NewMode)
-	{
-	case MOVE_None:
-	{
-		Visuals->SetAnimState(IDLE);
-		break;
-	}
-	case MOVE_Walking:
-	case MOVE_NavWalking:
-	{
-		Visuals->SetAnimState(WALK);
-		break;
-	}	
-	default:
-		break;
-	}
+	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
+
+	SightConfig->SightRadius = 7000.0f;
+	SightConfig->LoseSightRadius = 8000.0f;
+	SightConfig->PeripheralVisionAngleDegrees = 142.0f;
+	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	SightConfig->SetMaxAge(45.0f);
+
+	PerceptionComponent->ConfigureSense(*SightConfig);
+
+	PerceptionComponent->SetDominantSense(UAISense_Sight::StaticClass());
+
+	//MovementModeChangedDelegate.AddDynamic(this, &ARPGCreature::OnMovementModeChange);
 }
 
 // Called when the game starts or when spawned
 void ARPGCreature::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ARPGCreature::OnTargetPerceptionUpdated);
+}
+
+void ARPGCreature::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	auto Blackboard = GetController()->FindComponentByClass<UBlackboardComponent>();
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsBool(FName("PlayerInSight"), Stimulus.WasSuccessfullySensed());
+	}
 }
 
 // Called every frame
@@ -76,6 +85,7 @@ void ARPGCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 {
 	FRPGAttackResults Results;
+	Results.Target = this;
 
 	if (auto Attacker = AttackData.Attacker.Get())
 	{

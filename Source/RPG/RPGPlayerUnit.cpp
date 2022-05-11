@@ -60,7 +60,7 @@ void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttack
 		EnterRecovery(2.0f);
 	}
 
-	Attack.ExecuteIfBound(Results);
+	URPG_EventManager::GetInstance()->UnitAttackedEnemy.Broadcast(this, Results);
 }
 
 void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
@@ -102,26 +102,18 @@ void ARPGPlayerUnit::BeginPlay()
 void ARPGPlayerUnit::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ARPGPlayerUnit::EnterRecovery(float Duration)
 {
 	InRecovery = true;
 	GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGPlayerUnit::ExitRecovery, Duration, false);
-	RecoveryStateChanged.Broadcast(this, true);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, true);
 }
 
 void ARPGPlayerUnit::ExitRecovery()
 {
 	InRecovery = false;
 	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
-	RecoveryStateChanged.Broadcast(this, false);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, false);
 }
-
-void ARPGPlayerUnit::SetSelected(bool IsSelected)
-{
-	Selected = IsSelected;
-	SelectedStateChanged.ExecuteIfBound(IsSelected);
-}
-

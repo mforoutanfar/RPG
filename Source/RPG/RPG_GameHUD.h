@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPG_GameHUD.generated.h"
 
 /**
@@ -18,11 +20,18 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class URPG_AvatarWidget> AvatarClass;
 	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class URPG_FollowerWidget> DamageWidgetClass;
+
 protected:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* Canvas;
+
+	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* AvatarsBox;
 
-	void AddAvatar(class ARPGPlayerUnit* Unit);
+	void AddAvatar(TWeakObjectPtr<class ARPGPlayerUnit> Unit);
+	void OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPGAttackResults Results);
 };

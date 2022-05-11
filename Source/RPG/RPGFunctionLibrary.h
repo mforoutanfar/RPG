@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "RPGFunctionLibrary.generated.h"
 
+class ARPGCreature;
+
 /**
  * 
  */
@@ -99,4 +101,6 @@ struct FRPGAttackResults
 public:
 	UPROPERTY()
 		bool TargetDied = false;
+	UPROPERTY()
+		TWeakObjectPtr<ARPGCreature> Target;
 };

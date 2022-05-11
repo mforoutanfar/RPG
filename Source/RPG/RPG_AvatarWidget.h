@@ -41,10 +41,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		class UImage* SelectedIndicator;
 
-	void OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State);
-	void OnAttack(FRPGAttackResults Results);
-
-	void OnSelectedStateChanged(bool Selected);
+	void OnRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool State);
+	void OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit>, FRPGAttackResults Results);
+	void OnSelectedUnitChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit);
 
 	void ResetAvatar();
 
@@ -75,6 +74,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+
+	TWeakObjectPtr<ARPGPlayerUnit> ReferencedUnit = nullptr;
+
 public:
-	void BindToPlayer(ARPGPlayerUnit* Unit);
+	void Init(TWeakObjectPtr<ARPGPlayerUnit> Unit);
 };

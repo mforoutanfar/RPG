@@ -4,12 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPG_EventManager.generated.h"
 
 class ARPGPlayer;
 class ARPGPlayerUnit;
 
-DECLARE_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FUnitAdded, TWeakObjectPtr<ARPGPlayerUnit>);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, TWeakObjectPtr<ARPGPlayerUnit>, bool);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FUnitAttackedEnemy, TWeakObjectPtr<ARPGPlayerUnit>, FRPGAttackResults);
+DECLARE_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, TWeakObjectPtr<ARPGPlayerUnit>);
 
 /**
  * 
@@ -27,4 +32,7 @@ public:
 	static TWeakObjectPtr<URPG_EventManager> GetInstance();
 
 	FUnitAdded UnitAdded;
+	FUnitAttackedEnemy UnitAttackedEnemy;
+	FRecoveryStateChanged RecoveryStateChanged;
+	FSelectedUnitChanged SelectedUnitChanged;
 };

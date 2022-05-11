@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AISense_Sight.h"
 
 #include "RPGAttackable.h"
 #include "RPGInteractable.h"
@@ -39,6 +41,9 @@ ARPGPlayer::ARPGPlayer()
 
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);
+
+	SightSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("SightSource"));
+	SightSource->RegisterForSense(UAISense_Sight::StaticClass());
 
 	float UnitOffset = 30.0f;
 
@@ -80,10 +85,10 @@ void ARPGPlayer::AddUnit()
 
 	auto Unit = Cast<ARPGPlayerUnit>(Holder->GetChildActor());
 	Unit->UnitIndex = Units.Num();
-	Unit->RecoveryStateChanged.AddUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 	Units.Add(Unit);
 
-	URPG_EventManager::GetInstance()->UnitAdded.ExecuteIfBound(Unit);
+	URPG_EventManager::GetInstance()->UnitAdded.Broadcast(Unit);
 }
 
 // Called when the game starts or when spawned
@@ -273,7 +278,7 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 	return ClosestAttackableActor;
 }
 
-void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery)
+void ARPGPlayer::OnUnitRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool IsInRecovery)
 {
 	if (IsInRecovery)
 	{
@@ -304,7 +309,7 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 	{
 		if (!SelectedUnit.IsValid())
 		{
-			SetSelectedUnit(Unit);
+			SetSelectedUnit(Unit.Get());
 		}
 	}
 }
@@ -324,15 +329,6 @@ ARPGPlayerUnit* ARPGPlayer::FindFirstOutOfRecoveryUnit()
 
 void ARPGPlayer::SetSelectedUnit(ARPGPlayerUnit* Unit)
 {
-	if (SelectedUnit.IsValid())
-	{
-		SelectedUnit->SetSelected(false);
-	}
-
 	SelectedUnit = Unit;
-
-	if (Unit)
-	{
-		SelectedUnit->SetSelected(true);
-	}
+	URPG_EventManager::GetInstance()->SelectedUnitChanged.Broadcast(Unit);
 }

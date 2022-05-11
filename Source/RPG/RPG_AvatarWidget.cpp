@@ -5,16 +5,19 @@
 #include "RPGPlayerUnit.h"
 #include "RPGPlayer.h"
 #include "Components/Image.h"
+#include "RPG_EventManager.h"
 
-void URPG_AvatarWidget::BindToPlayer(ARPGPlayerUnit* Unit)
+void URPG_AvatarWidget::Init(TWeakObjectPtr<ARPGPlayerUnit> Unit)
 {
-	Unit->RecoveryStateChanged.AddUObject(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
-	Unit->Attack.BindUObject(this, &URPG_AvatarWidget::OnAttack);
-	Unit->SelectedStateChanged.BindUObject(this, &URPG_AvatarWidget::OnSelectedStateChanged);
+	ReferencedUnit = Unit;
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddUObject(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
+	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddUObject(this, &URPG_AvatarWidget::OnUnitAttackedEnemy);
+	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddUObject(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 }
 
 void URPG_AvatarWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
 	RecoveryIndicator->SetBrushTintColor(SafeColor);
 	SelectedIndicator->SetBrushTintColor(DeselectedColor);
 }
@@ -33,10 +36,13 @@ URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer
 	}
 }
 
-
-
-void URPG_AvatarWidget::OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State)
+void URPG_AvatarWidget::OnRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool State)
 {
+	if (ReferencedUnit != Unit)
+	{
+		return;
+	}
+
 	if (State)
 	{
 		RecoveryIndicator->SetBrushTintColor(RecoveryColor);
@@ -48,8 +54,13 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State)
 	}
 }
 
-void URPG_AvatarWidget::OnAttack(FRPGAttackResults Results)
+void URPG_AvatarWidget::OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPGAttackResults Results)
 {
+	if (ReferencedUnit != Unit)
+	{
+		return;
+	}
+
 	if (Results.TargetDied)
 	{
 		Portrait->SetBrushFromTexture(AvatarMap[HAPPY]);
@@ -60,13 +71,12 @@ void URPG_AvatarWidget::OnAttack(FRPGAttackResults Results)
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
-
 	GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
 }
 
-void URPG_AvatarWidget::OnSelectedStateChanged(bool Selected)
+void URPG_AvatarWidget::OnSelectedUnitChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit)
 {
-	if (Selected)
+	if (ReferencedUnit == Unit)
 	{
 		SelectedIndicator->SetBrushTintColor(SelectedColor);
 	}

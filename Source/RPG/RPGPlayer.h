@@ -70,11 +70,14 @@ private:
 
 	class URPGRandomAudioComponent* AudioComponent;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	class UAIPerceptionStimuliSourceComponent* SightSource;
+
 	TArray<ARPGPlayerUnit*> Units = {};
 
 	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
 
-	void OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery);
+	void OnUnitRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool IsInRecovery);
 
 	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
 
