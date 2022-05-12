@@ -7,12 +7,12 @@
 #include "Components/Image.h"
 #include "RPG_EventManager.h"
 
-void URPG_AvatarWidget::Init(TWeakObjectPtr<ARPGPlayerUnit> Unit)
+void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 {
 	ReferencedUnit = Unit;
-	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddUObject(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
-	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddUObject(this, &URPG_AvatarWidget::OnUnitAttackedEnemy);
-	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddUObject(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
+	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddDynamic(this, &URPG_AvatarWidget::OnUnitAttackedEnemy);
+	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 }
 
 void URPG_AvatarWidget::NativeConstruct()
@@ -36,9 +36,9 @@ URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer
 	}
 }
 
-void URPG_AvatarWidget::OnRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool State)
+void URPG_AvatarWidget::OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State)
 {
-	if (ReferencedUnit != Unit)
+	if (ReferencedUnit.Get() != Unit)
 	{
 		return;
 	}
@@ -54,9 +54,9 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Un
 	}
 }
 
-void URPG_AvatarWidget::OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPGAttackResults Results)
+void URPG_AvatarWidget::OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results)
 {
-	if (ReferencedUnit != Unit)
+	if (ReferencedUnit.Get() != Unit)
 	{
 		return;
 	}
@@ -74,9 +74,9 @@ void URPG_AvatarWidget::OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit,
 	GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
 }
 
-void URPG_AvatarWidget::OnSelectedUnitChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit)
+void URPG_AvatarWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 {
-	if (ReferencedUnit == Unit)
+	if (ReferencedUnit.Get() == Unit)
 	{
 		SelectedIndicator->SetBrushTintColor(SelectedColor);
 	}

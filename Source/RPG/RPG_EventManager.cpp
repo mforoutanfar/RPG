@@ -5,12 +5,18 @@
 
 TWeakObjectPtr<URPG_EventManager> URPG_EventManager::Instance(nullptr);
 
-TWeakObjectPtr<URPG_EventManager> URPG_EventManager::GetInstance()
+void URPG_EventManager::BeginDestroy()
 {
-	if (!Instance.IsValid())
+	Super::BeginDestroy();
+	Instance.Reset();
+}
+
+URPG_EventManager* URPG_EventManager::GetInstance()
+{
+	if (!Instance.Get())
 	{
 		Instance = NewObject<URPG_EventManager>();
 	}
 
-	return Instance;
+	return Instance.Get();
 }

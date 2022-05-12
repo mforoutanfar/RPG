@@ -77,7 +77,8 @@ private:
 
 	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
 
-	void OnUnitRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool IsInRecovery);
+	UFUNCTION()
+	void OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery);
 
 	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
 

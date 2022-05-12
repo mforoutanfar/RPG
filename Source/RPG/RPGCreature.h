@@ -10,8 +10,6 @@
 
 #include "RPGCreature.generated.h"
 
-
-
 UCLASS()
 class RPG_API ARPGCreature : public ACharacter, public IRPGAttackable, public IRPGInteractable
 {

@@ -85,7 +85,6 @@ void ARPGPlayer::AddUnit()
 
 	auto Unit = Cast<ARPGPlayerUnit>(Holder->GetChildActor());
 	Unit->UnitIndex = Units.Num();
-	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddUObject(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 	Units.Add(Unit);
 
 	URPG_EventManager::GetInstance()->UnitAdded.Broadcast(Unit);
@@ -95,6 +94,8 @@ void ARPGPlayer::AddUnit()
 void ARPGPlayer::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 
 	for (int i = 0; i < UnitCapacity; i++)
 	{
@@ -278,7 +279,7 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 	return ClosestAttackableActor;
 }
 
-void ARPGPlayer::OnUnitRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit, bool IsInRecovery)
+void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery)
 {
 	if (IsInRecovery)
 	{
@@ -309,7 +310,7 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(TWeakObjectPtr<ARPGPlayerUnit> Unit,
 	{
 		if (!SelectedUnit.IsValid())
 		{
-			SetSelectedUnit(Unit.Get());
+			SetSelectedUnit(Unit);
 		}
 	}
 }

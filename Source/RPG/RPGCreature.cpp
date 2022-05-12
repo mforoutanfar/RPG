@@ -58,6 +58,7 @@ ARPGCreature::ARPGCreature()
 void ARPGCreature::BeginPlay()
 {
 	Super::BeginPlay();	
+	SetIsWalking(false);
 }
 
 // Called every frame
@@ -103,12 +104,13 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	FRPGAttackResults Results;
 	Results.Target = this;
 
-	if (auto Attacker = AttackData.Attacker.Get())
-	{
-		auto a = Attacker->GetActorLocation();
-		auto DistVec = Attacker->GetActorLocation() - GetActorLocation();
-		SetActorRotation(DistVec.Rotation());
-	}
+	//Turn Towards Player
+	//if (auto Attacker = AttackData.Attacker.Get())
+	//{
+	//	auto a = Attacker->GetActorLocation();
+	//	auto DistVec = Attacker->GetActorLocation() - GetActorLocation();
+	//	SetActorRotation(DistVec.Rotation());
+	//}
 
 	float DamageDealt = 0.0f;
 	DamageDealt += AttackData.PhysicalDamage;

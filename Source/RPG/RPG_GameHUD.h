@@ -8,6 +8,8 @@
 
 #include "RPG_GameHUD.generated.h"
 
+class ARPGPlayerUnit;
+
 /**
  * 
  */
@@ -32,6 +34,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* AvatarsBox;
 
-	void AddAvatar(TWeakObjectPtr<class ARPGPlayerUnit> Unit);
-	void OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPGAttackResults Results);
+	UFUNCTION()
+	void OnUnitAdded(ARPGPlayerUnit* Unit);
+
+	UFUNCTION()
+	void OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
 };

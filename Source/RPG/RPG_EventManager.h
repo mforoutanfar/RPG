@@ -12,11 +12,11 @@ class ARPGPlayer;
 class ARPGCreature;
 class ARPGPlayerUnit;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FUnitAdded, TWeakObjectPtr<ARPGPlayerUnit>);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FCreatureWalkingStateChanged, TWeakObjectPtr<ARPGCreature>, bool);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, TWeakObjectPtr<ARPGPlayerUnit>, bool);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FUnitAttackedEnemy, TWeakObjectPtr<ARPGPlayerUnit>, FRPGAttackResults);
-DECLARE_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, TWeakObjectPtr<ARPGPlayerUnit>);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*, Unit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCreatureWalkingStateChanged, ARPGCreature*, Creature, bool, State);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, ARPGPlayerUnit*, Unit, bool, State);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUnitAttackedEnemy, ARPGPlayerUnit*, Unit, FRPGAttackResults, Results);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
 
 /**
  * 
@@ -29,13 +29,25 @@ class RPG_API URPG_EventManager : public UObject
 private:	
 	static TWeakObjectPtr<URPG_EventManager> Instance;
 
-public:
-	UFUNCTION()
-	static TWeakObjectPtr<URPG_EventManager> GetInstance();
+protected:
+	virtual void BeginDestroy() override;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	static URPG_EventManager* GetInstance();
+
+	UPROPERTY(BlueprintAssignable)
 	FUnitAdded UnitAdded;
+
+	UPROPERTY(BlueprintAssignable)
 	FUnitAttackedEnemy UnitAttackedEnemy;
+
+	UPROPERTY(BlueprintAssignable)
 	FRecoveryStateChanged RecoveryStateChanged;
+
+	UPROPERTY(BlueprintAssignable)
 	FSelectedUnitChanged SelectedUnitChanged;
+
+	UPROPERTY(BlueprintAssignable)
 	FCreatureWalkingStateChanged CreatureWalkingStateChanged;
 };

@@ -48,11 +48,11 @@ void URPGBillboardVisuals::BeginPlay()
 	Super::BeginPlay();
 
 	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.AddUObject(this, &URPGBillboardVisuals::OnOwnerWalkingStateChanged);
+	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.AddDynamic(this, &URPGBillboardVisuals::OnOwnerWalkingStateChanged);
 	SetAnimState(WALK);
 }
 
-void URPGBillboardVisuals::OnOwnerWalkingStateChanged(TWeakObjectPtr<ARPGCreature> Creature, bool State)
+void URPGBillboardVisuals::OnOwnerWalkingStateChanged(ARPGCreature* Creature, bool State)
 {
 	if (State)
 	{

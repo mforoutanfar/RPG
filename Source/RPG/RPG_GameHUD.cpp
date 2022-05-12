@@ -16,11 +16,11 @@
 
 void URPG_GameHUD::NativeConstruct()
 {
-	URPG_EventManager::GetInstance()->UnitAdded.AddUObject(this, &URPG_GameHUD::AddAvatar);
-	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddUObject(this, &URPG_GameHUD::OnUnitAttackedEnemy);
+	URPG_EventManager::GetInstance()->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
+	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddDynamic(this, &URPG_GameHUD::OnUnitAttackedEnemy);
 }
 
-void URPG_GameHUD::AddAvatar(TWeakObjectPtr<ARPGPlayerUnit> Unit)
+void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 {
 	auto Avatar = CreateWidget<URPG_AvatarWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), AvatarClass);
 	Avatar->Init(Unit);
@@ -29,7 +29,7 @@ void URPG_GameHUD::AddAvatar(TWeakObjectPtr<ARPGPlayerUnit> Unit)
 	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 20.0f));
 }
 
-void URPG_GameHUD::OnUnitAttackedEnemy(TWeakObjectPtr<ARPGPlayerUnit> Unit, FRPGAttackResults Results)
+void URPG_GameHUD::OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results)
 {
 	if (DamageWidgetClass)
 	{
