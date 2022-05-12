@@ -15,6 +15,8 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+#include "RPG_EventManager.h"
+
 // Sets default values
 ARPGCreature::ARPGCreature()
 {
@@ -62,6 +64,31 @@ void ARPGCreature::BeginPlay()
 void ARPGCreature::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//if (FMath::IsNearlyZero(GetVelocity().SizeSquared()))
+	//{
+	//	//TODO: Hack
+	//	SpeedZeroCounter++;
+
+	//	if (Walking && SpeedZeroCounter > 0)
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString("Stop"));
+
+	//		SpeedZeroCounter = 0;
+	//		SetIsWalking(false);
+	//	}
+	//}
+	//else
+	//{
+	//	SpeedZeroCounter = 0;
+
+	//	if (!Walking)
+	//	{
+	//		GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString("Walk"));
+
+	//		SetIsWalking(true);
+	//	}
+	//}
 }
 
 // Called to bind functionality to input
@@ -120,6 +147,13 @@ void ARPGCreature::OnInteracted(bool Successful)
 	{
 		Destroy();
 	}
+}
+
+void ARPGCreature::SetIsWalking(bool IsWalking)
+{
+	Walking = IsWalking;
+	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.Broadcast(this, IsWalking);
+	GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString::Printf(TEXT("%d"), IsWalking));
 }
 
 void ARPGCreature::Die()

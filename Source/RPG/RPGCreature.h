@@ -10,6 +10,8 @@
 
 #include "RPGCreature.generated.h"
 
+
+
 UCLASS()
 class RPG_API ARPGCreature : public ACharacter, public IRPGAttackable, public IRPGInteractable
 {
@@ -41,6 +43,10 @@ protected:
 
 	void Die();
 
+	bool Walking = false;
+
+	int SpeedZeroCounter = 0;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -55,4 +61,7 @@ public:
 
 	UPROPERTY(EditAnywhere);
 	float HP = 100.0f;
+
+	UFUNCTION(BlueprintCallable)
+	void SetIsWalking(bool IsWalking);
 };

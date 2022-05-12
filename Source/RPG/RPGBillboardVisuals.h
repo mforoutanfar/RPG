@@ -48,6 +48,7 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	TMap<AnimState, float> AnimSPF= {};
 
 	virtual void BeginPlay() override;
+	void OnOwnerWalkingStateChanged(TWeakObjectPtr<ARPGCreature> Creature, bool State);
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void PopulateSprites();
@@ -58,6 +59,9 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 
 	Orientation CurrentOrientation = BACK;
 	AnimState CurrentAnimState = AnimState::NONE;
+	AnimState DefaultAnimState = AnimState::IDLE;
+	void SetDefaultAnimState(AnimState state);
+
 	int CurrentFrame = 0;
 	FTimerHandle TimerHandle;
 	void AdvanceFrame();

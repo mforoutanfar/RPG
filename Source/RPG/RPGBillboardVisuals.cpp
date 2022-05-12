@@ -3,20 +3,22 @@
 
 #include "RPGBillboardVisuals.h"
 #include "Camera/CameraComponent.h"
+#include "RPG_EventManager.h"
+#include "RPGCreature.h"
 
 URPGBillboardVisuals::URPGBillboardVisuals()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetHiddenInGame(false);
 
-	ShouldLoopByDefault.Add(NONE, false);
+	ShouldLoopByDefault.Add(AnimState::NONE, false);
 	ShouldLoopByDefault.Add(IDLE, true);
 	ShouldLoopByDefault.Add(WALK, true);
 	ShouldLoopByDefault.Add(ATTACK, false);
 	ShouldLoopByDefault.Add(HIT, false);
 	ShouldLoopByDefault.Add(DIE, false);
 
-	ShouldReturnToDefault.Add(NONE, true);
+	ShouldReturnToDefault.Add(AnimState::NONE, true);
 	ShouldReturnToDefault.Add(IDLE, false);
 	ShouldReturnToDefault.Add(WALK, false);
 	ShouldReturnToDefault.Add(ATTACK, true);
@@ -24,7 +26,7 @@ URPGBillboardVisuals::URPGBillboardVisuals()
 	ShouldReturnToDefault.Add(DIE, false);
 
 	float DefaultSPF = 0.12f;
-	AnimSPF.Add(NONE, DefaultSPF);
+	AnimSPF.Add(AnimState::NONE, DefaultSPF);
 	AnimSPF.Add(IDLE, DefaultSPF);
 	AnimSPF.Add(WALK, DefaultSPF);
 	AnimSPF.Add(ATTACK, DefaultSPF);
@@ -46,14 +48,32 @@ void URPGBillboardVisuals::BeginPlay()
 	Super::BeginPlay();
 
 	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.AddUObject(this, &URPGBillboardVisuals::OnOwnerWalkingStateChanged);
 	SetAnimState(WALK);
+}
+
+void URPGBillboardVisuals::OnOwnerWalkingStateChanged(TWeakObjectPtr<ARPGCreature> Creature, bool State)
+{
+	if (State)
+	{
+		if (DefaultAnimState != WALK)
+		{
+			SetDefaultAnimState(WALK);
+			SetAnimState(WALK);
+		}
+	}
+	else
+	{
+		SetDefaultAnimState(IDLE);
+		SetAnimState(IDLE);
+	}
 }
 
 void URPGBillboardVisuals::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (!CurrentAnimState == NONE)
+	if (!CurrentAnimState == AnimState::NONE)
 	{
 		UpdateOrientation();
 	}
@@ -134,6 +154,11 @@ void URPGBillboardVisuals::SetAnimState(AnimState state)
 	}
 }
 
+void URPGBillboardVisuals::SetDefaultAnimState(AnimState state)
+{
+	DefaultAnimState = state;
+}
+
 void URPGBillboardVisuals::AdvanceFrame()
 {
 	CurrentFrame++;
@@ -145,7 +170,7 @@ void URPGBillboardVisuals::AdvanceFrame()
 		{
 			if (ShouldReturnToDefault[CurrentAnimState])
 			{
-				SetAnimState(IDLE);
+				SetAnimState(DefaultAnimState);
 			}
 			else
 			{

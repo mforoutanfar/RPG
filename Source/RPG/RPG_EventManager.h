@@ -9,9 +9,11 @@
 #include "RPG_EventManager.generated.h"
 
 class ARPGPlayer;
+class ARPGCreature;
 class ARPGPlayerUnit;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FUnitAdded, TWeakObjectPtr<ARPGPlayerUnit>);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FCreatureWalkingStateChanged, TWeakObjectPtr<ARPGCreature>, bool);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, TWeakObjectPtr<ARPGPlayerUnit>, bool);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FUnitAttackedEnemy, TWeakObjectPtr<ARPGPlayerUnit>, FRPGAttackResults);
 DECLARE_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, TWeakObjectPtr<ARPGPlayerUnit>);
@@ -35,4 +37,5 @@ public:
 	FUnitAttackedEnemy UnitAttackedEnemy;
 	FRecoveryStateChanged RecoveryStateChanged;
 	FSelectedUnitChanged SelectedUnitChanged;
+	FCreatureWalkingStateChanged CreatureWalkingStateChanged;
 };
