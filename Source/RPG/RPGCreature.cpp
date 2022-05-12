@@ -153,7 +153,6 @@ void ARPGCreature::SetIsWalking(bool IsWalking)
 {
 	Walking = IsWalking;
 	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.Broadcast(this, IsWalking);
-	GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString::Printf(TEXT("%d"), IsWalking));
 }
 
 void ARPGCreature::Die()
