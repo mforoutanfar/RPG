@@ -44,5 +44,5 @@ public:
 	bool RemoveOnTargetInvalidated = false;
 
 	UPROPERTY(EditDefaultsOnly)
-		FVector2D DesignOffset;
+		FVector DesignOffset;
 };

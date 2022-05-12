@@ -27,9 +27,9 @@ void URPG_FollowerWidget::FollowTarget()
 {
 	if (Target.IsValid())
 	{
-		auto TargetPos = Target.Get()->GetActorLocation();
+		auto TargetPos = Target.Get()->GetActorLocation() + DesignOffset;
 		UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(Target.Get(), 0), TargetPos, PosOnScreen);
-		CanvasSlot->SetPosition((PosOnScreen + DesignOffset)/UWidgetLayoutLibrary::GetViewportScale(this));
+		CanvasSlot->SetPosition((PosOnScreen)/UWidgetLayoutLibrary::GetViewportScale(this));
 	}	
 	else if (RemoveOnTargetInvalidated)
 	{
