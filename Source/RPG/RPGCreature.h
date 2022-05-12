@@ -25,19 +25,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	class URPGBillboardVisuals* Visuals = nullptr;
 
 	class URPGRandomAudioComponent* AudioComponent;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	class UAIPerceptionComponent* PerceptionComponent;
+	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	//class UAIPerceptionComponent* PerceptionComponent;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	class UAISenseConfig_Sight* SightConfig;
+	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	//class UAISenseConfig_Sight* SightConfig;
 
 	bool Dead = false;
 	bool IsDead() { return Dead; }

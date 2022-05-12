@@ -33,21 +33,21 @@ ARPGCreature::ARPGCreature()
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);	
 
-	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));	
+	//PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));	
 
-	SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
+	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
 
-	SightConfig->SightRadius = 7000.0f;
-	SightConfig->LoseSightRadius = 8000.0f;
-	SightConfig->PeripheralVisionAngleDegrees = 142.0f;
-	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	SightConfig->SetMaxAge(45.0f);
+	//SightConfig->SightRadius = 7000.0f;
+	//SightConfig->LoseSightRadius = 8000.0f;
+	//SightConfig->PeripheralVisionAngleDegrees = 142.0f;
+	//SightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	//SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	//SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	//SightConfig->SetMaxAge(45.0f);
 
-	PerceptionComponent->ConfigureSense(*SightConfig);
+	//PerceptionComponent->ConfigureSense(*SightConfig);
 
-	PerceptionComponent->SetDominantSense(UAISense_Sight::StaticClass());
+	//PerceptionComponent->SetDominantSense(UAISense_Sight::StaticClass());
 
 	//MovementModeChangedDelegate.AddDynamic(this, &ARPGCreature::OnMovementModeChange);
 }
@@ -56,17 +56,6 @@ ARPGCreature::ARPGCreature()
 void ARPGCreature::BeginPlay()
 {
 	Super::BeginPlay();	
-
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ARPGCreature::OnTargetPerceptionUpdated);
-}
-
-void ARPGCreature::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	auto Blackboard = GetController()->FindComponentByClass<UBlackboardComponent>();
-	if (Blackboard)
-	{
-		Blackboard->SetValueAsBool(FName("PlayerInSight"), Stimulus.WasSuccessfullySensed());
-	}
 }
 
 // Called every frame

@@ -46,18 +46,17 @@ void URPGBillboardVisuals::BeginPlay()
 	Super::BeginPlay();
 
 	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+	SetAnimState(WALK);
 }
 
 void URPGBillboardVisuals::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (CurrentAnimState == NONE)
+	if (!CurrentAnimState == NONE)
 	{
-		return;
+		UpdateOrientation();
 	}
-
-	UpdateOrientation();
 }
 
 void URPGBillboardVisuals::PopulateSprites()
@@ -131,7 +130,7 @@ void URPGBillboardVisuals::SetAnimState(AnimState state)
 	auto numberOfFrames = Sprites[CurrentAnimState][CurrentOrientation].Num();
 	if (numberOfFrames > 1)//Has Animation
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPGBillboardVisuals::AdvanceFrame, AnimSPF[CurrentAnimState], true);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPGBillboardVisuals::AdvanceFrame, AnimSPF[CurrentAnimState], true);		
 	}
 }
 
