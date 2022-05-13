@@ -26,7 +26,8 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 	Avatar->Init(Unit);
 	AvatarsBox->AddChildToVerticalBox(Avatar);
 
-	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 20.0f));
+	//Cast<UVerticalBoxSlot>(Avatar->Slot)->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 20.0f));
+	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 }
 
 void URPG_GameHUD::OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results)
