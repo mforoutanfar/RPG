@@ -29,12 +29,16 @@ class RPG_API URPG_SlashWidget : public URPG_FollowerWidget
 protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+		UWidget* Slash;
+
 public:
 
-	void Init(AActor* Target, FRPGAttackResults AttackResults);
+	void Init(AActor* InAttacker, AActor* Target, FRPGAttackResults AttackResults);
 
 	UPROPERTY(BlueprintReadOnly)
 	FRPGAttackResults AttackResults;
+	AActor* Attacker;
 
 	UFUNCTION(BlueprintCallable)
 	void MakeProjectileAnimation(UWidget* InWidget, float InitVelocity, float InitAngle, float gravity, float Life);

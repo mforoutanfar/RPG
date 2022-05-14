@@ -3,6 +3,7 @@
 
 #include "RPG_SlashWidget.h"
 #include "Components/CanvasPanelSlot.h"
+#include "RPGPlayerUnit.h"
 
 void URPG_SlashWidget::MakeProjectileAnimation(UWidget* InWidget, float initVelocity, float initAngle, float gravity, float life)
 {
@@ -42,8 +43,18 @@ void URPG_SlashWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	}
 }
 
-void URPG_SlashWidget::Init(AActor* InTarget, FRPGAttackResults InAttackResults)
+void URPG_SlashWidget::Init(AActor* InAttacker, AActor* InTarget, FRPGAttackResults InAttackResults)
 {
 	Target = InTarget;
 	AttackResults = InAttackResults;
+	Attacker = InAttacker;
+
+	if (!Attacker )
+	{
+		Slash->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else if (!Cast<ARPGPlayerUnit>(Attacker))
+	{
+		Slash->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }

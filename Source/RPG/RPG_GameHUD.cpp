@@ -32,18 +32,16 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 
 void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
-	if (auto Creature = Cast<ARPGCreature>(Attacker))
+	if (auto CreatTarget = Cast<ARPGCreature>(Target))
 	{
-		if (Creature->CreatureType != ARPGCreature::CreatureType::PLAYER)
+		if (CreatTarget->CreatureType == ARPGCreature::CreatureType::ENEMY)
 		{
-			return;
-		}
-
-		if (DamageWidgetClass)
-		{
-			auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
-			Slash->Init(Results.Target.Get(), Results);
-			Canvas->AddChildToCanvas(Slash);
+			if (DamageWidgetClass)
+			{
+				auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
+				Slash->Init(Attacker, Results.Target.Get(), Results);
+				Canvas->AddChildToCanvas(Slash);
+			}
 		}
 	}
 }
