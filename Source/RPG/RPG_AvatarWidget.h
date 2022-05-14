@@ -49,13 +49,10 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 
 	UFUNCTION()
 	void OnRecoveryStateChanged(AActor* Unit, bool State);
-	
-	UFUNCTION()
-	void OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
 
 	UFUNCTION()
-	void OnEnemyAttackedUnit(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
-	
+	void OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results);
+		
 	UFUNCTION()
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
 

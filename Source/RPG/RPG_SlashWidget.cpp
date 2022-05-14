@@ -41,3 +41,9 @@ void URPG_SlashWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 		canSlot->SetPosition(NewPosition);
 	}
 }
+
+void URPG_SlashWidget::Init(AActor* InTarget, FRPGAttackResults InAttackResults)
+{
+	Target = InTarget;
+	AttackResults = InAttackResults;
+}

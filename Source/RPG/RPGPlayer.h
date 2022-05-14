@@ -59,12 +59,6 @@ private:
 		class UBoxComponent* InteractionCollider;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		class UBoxComponent* MeleeBox;
-
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		class USphereComponent* RangedSphere;
-
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<ARPGPlayerUnit> UnitClass;
 
 	class URPGRandomAudioComponent* AudioComponent;

@@ -3,21 +3,15 @@
 
 #include "RPGCreature.h"
 
-#include "RPGBillboardVisuals.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
-#include "GameFramework\CharacterMovementComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "RPGFunctionLibrary.h"
 #include "RPGRandomAudioComponent.h"
 
-#include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
-
 #include "RPG_EventManager.h"
 #include "RPGPlayerUnit.h"
+#include "RPGInventory.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -28,81 +22,30 @@ ARPGCreature::ARPGCreature()
 	GetMesh()->DestroyComponent();
 	GetMesh()->SetActive(false);
 
-	Visuals = CreateDefaultSubobject<URPGBillboardVisuals>(FName("Visuals"));	
-	Visuals->SetupAttachment(RootComponent);
-	Visuals->Init(CreatureName.ToString());
+	MeleeSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeSphere"));
+	MeleeSphere->SetupAttachment(RootComponent);
 
 	RangeSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangeSphere"));
 	RangeSphere->SetupAttachment(RootComponent);
-	RangeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 
-	GetCapsuleComponent()->SetCollisionProfileName(FName("EnemyHitBox"));
+	HitBox = GetCapsuleComponent();
 
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
-	AudioComponent->SetupAttachment(RootComponent);	
+	AudioComponent->SetupAttachment(RootComponent);
 
-	//PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));	
-
-	//SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
-
-	//SightConfig->SightRadius = 7000.0f;
-	//SightConfig->LoseSightRadius = 8000.0f;
-	//SightConfig->PeripheralVisionAngleDegrees = 142.0f;
-	//SightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	//SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	//SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	//SightConfig->SetMaxAge(45.0f);
-
-	//PerceptionComponent->ConfigureSense(*SightConfig);
-
-	//PerceptionComponent->SetDominantSense(UAISense_Sight::StaticClass());
-
-	//MovementModeChangedDelegate.AddDynamic(this, &ARPGCreature::OnMovementModeChange);
+	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
 }
 
 // Called when the game starts or when spawned
 void ARPGCreature::BeginPlay()
 {
 	Super::BeginPlay();	
-	SetIsWalking(false);
 }
 
 // Called every frame
 void ARPGCreature::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//if (FMath::IsNearlyZero(GetVelocity().SizeSquared()))
-	//{
-	//	//TODO: Hack
-	//	SpeedZeroCounter++;
-
-	//	if (Walking && SpeedZeroCounter > 0)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString("Stop"));
-
-	//		SpeedZeroCounter = 0;
-	//		SetIsWalking(false);
-	//	}
-	//}
-	//else
-	//{
-	//	SpeedZeroCounter = 0;
-
-	//	if (!Walking)
-	//	{
-	//		GEngine->AddOnScreenDebugMessage(-1, 10000, FColor::Yellow, FString("Walk"));
-
-	//		SetIsWalking(true);
-	//	}
-	//}
-}
-
-// Called to bind functionality to input
-void ARPGCreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
@@ -110,88 +53,63 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	FRPGAttackResults Results;
 	Results.Target = this;
 
-	//Turn Towards Player
-	//if (auto Attacker = AttackData.Attacker.Get())
-	//{
-	//	auto a = Attacker->GetActorLocation();
-	//	auto DistVec = Attacker->GetActorLocation() - GetActorLocation();
-	//	SetActorRotation(DistVec.Rotation());
-	//}
-
 	float DamageDealt = 0.0f;
 	DamageDealt += AttackData.PhysicalDamage;
 	HP -= DamageDealt;
 
 	Results.DamageDealt = DamageDealt;
-
+	
 	AudioComponent->PlayRandom("hit");
+
+	float RecoveryDuration = 1.0f;
 
 	if (HP <= 0)
 	{
 		Die();
 		Results.TargetDied = true;
+		RecoveryDuration = -1.0f;
 	}
-	else
-	{
-		Visuals->OnOwnerAttacked();
-	}
+
+	EnterRecovery(RecoveryDuration);
 
 	return Results;
 }
 
-InteractableCat ARPGCreature::GetInteractableType()
-{
-	if (Dead)
+void ARPGCreature::Attack()
+{	
+	FRPGAttackData AttackData;
+	FRPGAttackResults Results;
+	float RecoveryDuration = 2.0f;
+
+	if (auto NearestMelee = GetNearestAttackTarget(MeleeSphere))
 	{
-		return InteractableCat::CORPSE;
+		AttackData.Attacker = this;
+		AttackData.Target = NearestMelee;
+		AttackData.PhysicalDamage = MeleeDamage;
+
+		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
+		Results = Attackable->OnAttacked(AttackData);
+	}
+	else if (auto NearestRanged = Cast<IRPGAttackable>(GetNearestAttackTarget(RangeSphere)))
+	{
+
+	}
+	else
+	{
+
 	}
 
-	return InteractableCat::NONE;
-}
-
-void ARPGCreature::OnInteracted(bool Successful)
-{
-	if (Dead)
-	{
-		Destroy();
-	}
-}
-
-void ARPGCreature::SetIsWalking(bool IsWalking)
-{
-	Walking = IsWalking;
-	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.Broadcast(this, IsWalking);
+	AudioComponent->PlayRandom("whoosh");
+	EnterRecovery(RecoveryDuration);
+	URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 }
 
 void ARPGCreature::Die()
 {
-	Dead = true;
-	GetCapsuleComponent()->SetCollisionProfileName(FName("Interactable"));
 
-	Visuals->OnOwnerDied();
 }
 
-void ARPGCreature::Attack()
-{
-	auto Target = GetNearestTarget(RangeSphere);
-
-	if (auto Attackable = Cast<IRPGAttackable>(Target))
-	{
-		FRPGAttackData attackData;
-		attackData.PhysicalDamage = 30.0f;
-		attackData.Attacker = this;
-		FRPGAttackResults Results;
-
-		Results = Attackable->OnAttacked(attackData);
-		EnterRecovery(2.0f);
-
-		Visuals->OnOwnerAttack();
-
-		URPG_EventManager::GetInstance()->EnemyAttackedUnit.Broadcast(Cast<ARPGPlayerUnit>(Target), Results);
-	}
-}
-
-AActor* ARPGCreature::GetNearestTarget(UShapeComponent* Collider)
+AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType)
 {
 	AActor* ClosestAttackableActor = nullptr;
 	float MinDistance = FLT_MAX;
@@ -200,6 +118,14 @@ AActor* ARPGCreature::GetNearestTarget(UShapeComponent* Collider)
 
 	for (AActor* Actor : OverlappingActors)
 	{
+		if (auto Creature = Cast<ARPGCreature>(Actor))
+		{
+			if (ExcludeOwnType && Creature->CreatureType == CreatureType)
+			{
+				continue;
+			}
+		}
+
 		auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
 		if (Distance < MinDistance)
 		{
@@ -213,14 +139,20 @@ AActor* ARPGCreature::GetNearestTarget(UShapeComponent* Collider)
 
 void ARPGCreature::EnterRecovery(float Duration)
 {
+	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
+
 	InRecovery = true;
-	GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
+
+	if (Duration >= 0)
+	{
+		GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
+	}
+
 	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, true);
 }
 
 void ARPGCreature::ExitRecovery()
 {
 	InRecovery = false;
-	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
 	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, false);
 }

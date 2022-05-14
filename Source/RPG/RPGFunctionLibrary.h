@@ -91,7 +91,10 @@ public:
 		int PhysicalDamage = 0;
 
 	UPROPERTY()
-		TWeakObjectPtr<AActor> Attacker = nullptr;
+		AActor* Attacker = nullptr;
+
+	UPROPERTY()
+		AActor* Target = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -106,5 +109,5 @@ public:
 		float DamageDealt = 0.0f;
 
 	UPROPERTY(BlueprintReadWrite)
-		TWeakObjectPtr<AActor> Target;
+		TWeakObjectPtr<AActor> Target = nullptr;
 };

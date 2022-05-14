@@ -30,6 +30,9 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
+
+	void Init(AActor* Target, FRPGAttackResults AttackResults);
+
 	UPROPERTY(BlueprintReadOnly)
 	FRPGAttackResults AttackResults;
 

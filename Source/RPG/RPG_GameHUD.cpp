@@ -17,7 +17,7 @@
 void URPG_GameHUD::NativeConstruct()
 {
 	URPG_EventManager::GetInstance()->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
-	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddDynamic(this, &URPG_GameHUD::OnUnitAttackedEnemy);
+	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
 }
 
 void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
@@ -30,13 +30,17 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 }
 
-void URPG_GameHUD::OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results)
+void URPG_GameHUD::OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results)
 {
+	if (Attacker->CreatureType != ARPGCreature::CreatureType::PLAYER)
+	{
+		return;
+	}
+
 	if (DamageWidgetClass)
 	{
 		auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
-		Slash->Target = Cast<AActor>(Results.Target);
-		Slash->AttackResults = Results;
+		Slash->Init(Results.Target.Get(), Results);
 		Canvas->AddChildToCanvas(Slash);
 	}
 }

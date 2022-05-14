@@ -5,77 +5,82 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "RPGAttackable.h"
-#include "RPGInteractable.h"
-#include "Perception/AIPerceptionTypes.h"
 
 #include "RPGCreature.generated.h"
 
 UCLASS()
-class RPG_API ARPGCreature : public ACharacter, public IRPGAttackable, public IRPGInteractable
+class RPG_API ARPGCreature : public ACharacter, public IRPGAttackable
 {
 	GENERATED_BODY()
 
 public:
+
+	enum class CreatureType : uint8
+	{
+		NONE,
+		PLAYER,
+		ENEMY,
+		NPC
+	};
+
+	CreatureType CreatureType = CreatureType::NONE;
+
 	// Sets default values for this character's properties
 	ARPGCreature();
-
-	FName CreatureName = "Corpse";
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
-
-	virtual InteractableCat GetInteractableType() override;
-	virtual void OnInteracted(bool Successful) override;
-
-	UPROPERTY(EditAnywhere);
-	float HP = 100.0f;
-
-	UPROPERTY(EditAnywhere);
-	float PhysicalDamage = 30.0f;
-
-
-	UFUNCTION(BlueprintCallable)
-	void SetIsWalking(bool IsWalking);
-
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	class URPGBillboardVisuals* Visuals = nullptr;
+
+	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
+
+	bool IsInRecovery() { return InRecovery; };
+
+	UFUNCTION(BlueprintCallable)
+	void Attack();
+
+	float MaxHP = 300.0f;
+	float HP = 100.0f;
+
+protected:
+	bool InRecovery = false;
+	void EnterRecovery(float Duration);
+	void ExitRecovery();
+
+	FName CreatureName = "Corpse";
+
+	float MaxMana = 300.0f;
+	float Mana = 300.0f;
+
+	float MeleeDamage = 100.0f;
+
+	float RangedDamage = 100.0f;
 
 	class URPGRandomAudioComponent* AudioComponent;
-
-	UPROPERTY(EditDefaultsOnly)
-	class USphereComponent* RangeSphere = nullptr;
-
-	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	//class UAIPerceptionComponent* PerceptionComponent;
-
-	//UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-	//class UAISenseConfig_Sight* SightConfig;
 
 	bool Dead = false;
 	bool IsDead() { return Dead; }
 	void Die();
 
-	UFUNCTION(BlueprintCallable)
-	void Attack();
-
-	AActor* GetNearestTarget(class UShapeComponent* Collider);
-
-	bool Walking = false;
-
-	int SpeedZeroCounter = 0;
-
-	bool InRecovery = false;
-	void EnterRecovery(float Duration);
-	void ExitRecovery();
+	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true);
 
 	FTimerHandle RecoveryTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* HitBox;
+
+	UPROPERTY(EditDefaultsOnly)
+		class USphereComponent* MeleeSphere = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+		class USphereComponent* RangeSphere = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		FVector ActionLocation;
+
+	class URPGInventory* Inventory;
+
 };

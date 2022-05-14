@@ -11,12 +11,12 @@
 class ARPGPlayer;
 class ARPGCreature;
 class ARPGPlayerUnit;
+class IRPGAttackable;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCreatureWalkingStateChanged, ARPGCreature*, Creature, bool, State);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Unit, bool, State);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FUnitAttackedEnemy, ARPGPlayerUnit*, Unit, FRPGAttackResults, Results);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEnemyAttackedUnit, ARPGPlayerUnit*, Unit, FRPGAttackResults, Results);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, ARPGCreature*, Attacker, AActor*, Target, FRPGAttackResults, Results);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
 
 /**
@@ -41,10 +41,7 @@ public:
 	FUnitAdded UnitAdded;
 
 	UPROPERTY(BlueprintAssignable)
-	FUnitAttackedEnemy UnitAttackedEnemy;
-
-	UPROPERTY(BlueprintAssignable)
-	FEnemyAttackedUnit EnemyAttackedUnit;
+	FAttackOccured AttackOccured;
 
 	UPROPERTY(BlueprintAssignable)
 	FRecoveryStateChanged RecoveryStateChanged;

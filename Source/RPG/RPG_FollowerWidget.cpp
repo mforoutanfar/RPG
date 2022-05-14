@@ -35,4 +35,15 @@ void URPG_FollowerWidget::FollowTarget()
 	{
 		RemoveFromParent();
 	}
+	else
+	{
+		FVector2D Result;
+
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(Result);
+		}
+
+		CanvasSlot->SetPosition(FVector2D(GSystemResolution.ResX, GSystemResolution.ResY) / 2.0f);
+	}
 }

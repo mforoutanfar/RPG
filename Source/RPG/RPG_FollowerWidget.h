@@ -28,7 +28,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* Canvas;
+	class UCanvasPanel* Canvas = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UWidget* FollowerVisuals;

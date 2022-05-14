@@ -38,5 +38,5 @@ protected:
 	void OnUnitAdded(ARPGPlayerUnit* Unit);
 
 	UFUNCTION()
-	void OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
+	void OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results);
 };

@@ -33,12 +33,6 @@ ARPGPlayer::ARPGPlayer()
 	InteractionCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionCollider"));
 	InteractionCollider->SetCollisionProfileName(FName("Interactor"));
 
-	MeleeBox = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeBox"));
-	MeleeBox->SetCollisionProfileName(FName("PlayerDamageSource"));
-
-	RangedSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangedSphere"));
-	RangedSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
-
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);
 
@@ -61,8 +55,6 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 {
 	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	MeleeBox->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	RangedSphere->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	for (auto Holder : UnitPlaceHolders)
 	{
@@ -229,7 +221,7 @@ void ARPGPlayer::OnAttackPressed()
 
 		if (UnitToAttack.IsValid())
 		{
-			UnitToAttack->AttackTarget(Cast<IRPGAttackable>(GetNearestTarget(MeleeBox)), Cast<IRPGAttackable>(GetNearestTarget(RangedSphere)));
+			UnitToAttack->Attack();
 		}
 	}
 }
