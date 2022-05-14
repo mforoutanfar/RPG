@@ -81,5 +81,5 @@ public:
 	void OnOwnerDied();
 
 	UFUNCTION()
-	void OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results);
+	void OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results);
 };

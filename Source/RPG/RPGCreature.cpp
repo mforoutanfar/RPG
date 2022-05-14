@@ -12,6 +12,7 @@
 #include "RPG_EventManager.h"
 #include "RPGPlayerUnit.h"
 #include "RPGInventory.h"
+#include "RPG_Projectile.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -83,25 +84,36 @@ void ARPGCreature::Attack()
 
 	if (auto NearestMelee = GetNearestAttackTarget(MeleeSphere))
 	{
+		AudioComponent->PlayRandom("whoosh");
+
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
 		AttackData.PhysicalDamage = MeleeDamage;
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
 		Results = Attackable->OnAttacked(AttackData);
+
+		URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 	}
-	else if (auto NearestRanged = Cast<IRPGAttackable>(GetNearestAttackTarget(RangeSphere)))
+	else 
 	{
+		if (auto NearestRanged = GetNearestAttackTarget(RangeSphere))
+		{
+			AudioComponent->PlayRandom("arrow_shot");
 
+			auto ModifActionLocation = GetActorRotation().RotateVector(ActionLocation);
+			auto PointOfAction = GetActorLocation() + ModifActionLocation;
+			auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
+			auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjectileClass, PointOfAction, Direction);
+		}
+		else
+		{
+			AudioComponent->PlayRandom("whoosh");
+			URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
+		}
 	}
-	else
-	{
 
-	}
-
-	AudioComponent->PlayRandom("whoosh");
 	EnterRecovery(RecoveryDuration);
-	URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 }
 
 void ARPGCreature::Die()

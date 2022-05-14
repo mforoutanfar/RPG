@@ -258,7 +258,7 @@ void URPGBillboardVisuals::OnOwnerDied()
 }
 
 
-void URPGBillboardVisuals::OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
 	if (Attacker == GetOwner())
 	{

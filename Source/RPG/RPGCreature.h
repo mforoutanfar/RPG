@@ -48,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float HP = 300.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
+
 protected:
 	bool InRecovery = false;
 	void EnterRecovery(float Duration);

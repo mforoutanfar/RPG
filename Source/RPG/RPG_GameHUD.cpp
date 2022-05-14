@@ -30,18 +30,21 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 }
 
-void URPG_GameHUD::OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
-	if (Attacker->CreatureType != ARPGCreature::CreatureType::PLAYER)
+	if (auto Creature = Cast<ARPGCreature>(Attacker))
 	{
-		return;
-	}
+		if (Creature->CreatureType != ARPGCreature::CreatureType::PLAYER)
+		{
+			return;
+		}
 
-	if (DamageWidgetClass)
-	{
-		auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
-		Slash->Init(Results.Target.Get(), Results);
-		Canvas->AddChildToCanvas(Slash);
+		if (DamageWidgetClass)
+		{
+			auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
+			Slash->Init(Results.Target.Get(), Results);
+			Canvas->AddChildToCanvas(Slash);
+		}
 	}
 }
 

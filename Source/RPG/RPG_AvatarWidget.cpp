@@ -55,7 +55,7 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 	}
 }
 
-void URPG_AvatarWidget::OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
 	//TODO: Shouldn't Access Unit Directly
 	auto Unit = ReferencedUnit.Get();
