@@ -37,4 +37,9 @@ public:
 	int SpeedZeroCounter = 0;
 
 	bool Walking = false;
+
+	virtual void Die() override;
+
+protected:
+
 };

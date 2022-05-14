@@ -25,4 +25,6 @@ class RPG_API IRPGAttackable
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) = 0;
+
+	bool AttackableEnabled = true;
 };

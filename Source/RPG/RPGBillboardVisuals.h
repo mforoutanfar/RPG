@@ -49,15 +49,11 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void OnOwnerWalkingStateChanged(ARPGCreature* Creature, bool State);
-
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void PopulateSprites();
 	void UpdateOrientation();
 
-	AActor* BillboardOwner;
 	APlayerCameraManager* Camera;
 
 	Orientation CurrentOrientation = BACK;
@@ -71,6 +67,10 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	void UpdateSprite();
 
 public:
+
+	UFUNCTION()
+		void OnOwnerWalkingStateChanged(ARPGCreature* Creature, bool State);
+
 	void SetAnimState(AnimState state);
 
 	void Init(FString texturePrefix);
@@ -78,7 +78,8 @@ public:
 	UPROPERTY(EditAnywhere)
 		FString TexturePrefix = "";
 
-	void OnOwnerAttacked();
-	void OnOwnerAttack();
 	void OnOwnerDied();
+
+	UFUNCTION()
+	void OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results);
 };

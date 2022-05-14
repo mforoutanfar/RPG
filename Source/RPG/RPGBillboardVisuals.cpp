@@ -38,8 +38,8 @@ URPGBillboardVisuals::URPGBillboardVisuals()
 void URPGBillboardVisuals::Init(FString texturePrefix)//Called by Owner
 {
 	TexturePrefix = texturePrefix;
-	PopulateSprites();
-	BillboardOwner = GetOwner();
+	PopulateSprites();	
+	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPGBillboardVisuals::OnAttackOccured);
 }
 
 
@@ -48,8 +48,7 @@ void URPGBillboardVisuals::BeginPlay()
 	Super::BeginPlay();
 
 	Camera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
-	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.AddDynamic(this, &URPGBillboardVisuals::OnOwnerWalkingStateChanged);
-	SetAnimState(WALK);
+	//SetAnimState(WALK);
 }
 
 void URPGBillboardVisuals::OnOwnerWalkingStateChanged(ARPGCreature* Creature, bool State)
@@ -141,6 +140,44 @@ void URPGBillboardVisuals::PopulateSprites()
 
 void URPGBillboardVisuals::SetAnimState(AnimState state)
 {
+	FString string;
+	switch (state)
+	{
+	case AnimationState::NONE:
+	{
+		string = "NONE";
+		break;
+	}	
+	case AnimationState::IDLE:
+	{
+		string = "IDLE";
+		break;
+	}
+	case AnimationState::WALK:
+	{
+		string = "WALK";
+		break;
+	}
+	case AnimationState::ATTACK:
+	{
+		string = "ATTACK";
+		break;
+	}
+	case AnimationState::HIT:
+	{
+		string = "HIT";
+		break;
+	}
+	case AnimationState::DIE:
+	{
+		string = "DIE";
+		break;
+	}
+	default:
+		break;
+	}
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, string);
+
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 
 	CurrentAnimState = state;
@@ -184,12 +221,12 @@ void URPGBillboardVisuals::AdvanceFrame()
 
 void URPGBillboardVisuals::UpdateOrientation()
 {
-	auto pos = BillboardOwner->GetActorLocation();
+	auto pos = GetOwner()->GetActorLocation();
 	auto camPos = Camera->GetCameraLocation();
 	auto diff = camPos - pos;
 	auto diffProj = FVector2D(diff.X, diff.Y);
 	diffProj.Normalize();
-	auto forward = BillboardOwner->GetActorForwardVector();
+	auto forward = GetOwner()->GetActorForwardVector();
 	auto forwardProj = FVector2D(forward.X, forward.Y);
 	forwardProj.Normalize();	
 
@@ -208,8 +245,6 @@ void URPGBillboardVisuals::UpdateOrientation()
 		CurrentOrientation = Orientation(eighth);
 		UpdateSprite();
 	}
-
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("%d"), eighth));
 }
 
 void URPGBillboardVisuals::UpdateSprite()
@@ -217,17 +252,27 @@ void URPGBillboardVisuals::UpdateSprite()
 	SetSprite(Sprites[CurrentAnimState][CurrentOrientation][CurrentFrame]);
 }
 
-void URPGBillboardVisuals::OnOwnerAttacked()
-{
-	SetAnimState(HIT);
-}
-
-void URPGBillboardVisuals::OnOwnerAttack()
-{
-	SetAnimState(ATTACK);
-}
-
 void URPGBillboardVisuals::OnOwnerDied()
 {
 	SetAnimState(DIE);
+}
+
+
+void URPGBillboardVisuals::OnAttackOccured(ARPGCreature* Attacker, AActor* Target, FRPGAttackResults Results)
+{
+	if (Attacker == GetOwner())
+	{
+		SetAnimState(ATTACK);
+	}
+	else if (Target == GetOwner())
+	{
+		if (Results.TargetDied)
+		{
+			SetAnimState(DIE);
+		}
+		else
+		{
+			SetAnimState(HIT);
+		}		
+	}
 }

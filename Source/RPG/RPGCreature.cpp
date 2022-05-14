@@ -106,7 +106,8 @@ void ARPGCreature::Attack()
 
 void ARPGCreature::Die()
 {
-
+	Dead = true;
+	AttackableEnabled = false;
 }
 
 AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType)
@@ -118,6 +119,14 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 
 	for (AActor* Actor : OverlappingActors)
 	{
+		if (auto Attackable = Cast<IRPGAttackable>(Actor))
+		{
+			if (!Attackable->AttackableEnabled)
+			{
+				continue;
+			}
+		}
+
 		if (auto Creature = Cast<ARPGCreature>(Actor))
 		{
 			if (ExcludeOwnType && Creature->CreatureType == CreatureType)

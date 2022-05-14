@@ -21,7 +21,6 @@ ARPGUnit::ARPGUnit()
 
 	Visuals = CreateDefaultSubobject<URPGBillboardVisuals>(FName("Visuals"));
 	Visuals->SetupAttachment(RootComponent);
-	Visuals->Init(CreatureName.ToString());
 
 	MeleeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 	RangeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
@@ -45,6 +44,7 @@ ARPGUnit::ARPGUnit()
 void ARPGUnit::BeginPlay()
 {
 	Super::BeginPlay();
+	Visuals->Init(CreatureName.ToString());
 	SetIsWalking(false);
 }
 
@@ -69,5 +69,15 @@ void ARPGUnit::OnInteracted(bool Successful)
 void ARPGUnit::SetIsWalking(bool IsWalking)
 {
 	Walking = IsWalking;
-	URPG_EventManager::GetInstance()->CreatureWalkingStateChanged.Broadcast(this, IsWalking);
+	Visuals->OnOwnerWalkingStateChanged(this, IsWalking);
 }
+
+void ARPGUnit::Die()
+{
+	Super::Die();
+	if (Controller)
+	{
+		Controller->UnPossess();
+	}
+}
+

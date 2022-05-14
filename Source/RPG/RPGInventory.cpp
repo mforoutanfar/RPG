@@ -43,7 +43,7 @@ bool URPGInventory::AddItem(FRPGItemInfo ItemInfo)
 		{
 			if (DoesItemFit(Width, Height, j, i))
 			{
-				URPGInventoryItem* Item = NewObject<URPGInventoryItem>();
+				URPGInventoryItem* Item = CreateDefaultSubobject<URPGInventoryItem>("Item");
 				Item->ItemInformation = ItemInfo;
 				Items.Add(Item);
 

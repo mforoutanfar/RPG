@@ -40,10 +40,13 @@ public:
 	bool IsInRecovery() { return InRecovery; };
 
 	UFUNCTION(BlueprintCallable)
-	void Attack();
+	virtual void Attack();
 
+	UPROPERTY(EditAnywhere)
 	float MaxHP = 300.0f;
-	float HP = 100.0f;
+
+	UPROPERTY(EditAnywhere)
+	float HP = 300.0f;
 
 protected:
 	bool InRecovery = false;
@@ -63,7 +66,7 @@ protected:
 
 	bool Dead = false;
 	bool IsDead() { return Dead; }
-	void Die();
+	virtual void Die();
 
 	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true);
 

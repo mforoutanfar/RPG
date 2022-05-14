@@ -13,7 +13,7 @@ void URPG_EventManager::BeginDestroy()
 
 URPG_EventManager* URPG_EventManager::GetInstance()
 {
-	if (!Instance.Get())
+	if (!Instance.IsValid())
 	{
 		Instance = NewObject<URPG_EventManager>();
 	}
