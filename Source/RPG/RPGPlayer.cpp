@@ -279,7 +279,7 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 	return ClosestAttackableActor;
 }
 
-void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery)
+void ARPGPlayer::OnUnitRecoveryStateChanged(AActor* Unit, bool IsInRecovery)
 {
 	if (IsInRecovery)
 	{
@@ -290,7 +290,7 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 
 			for (size_t i = 1; i < Units.Num(); i++)
 			{
-				int index = Unit->UnitIndex + i;
+				int index = Cast<ARPGPlayerUnit>(Unit)->UnitIndex + i;
 				if (index > Units.Num()-1)
 				{
 					index = 0;
@@ -310,7 +310,7 @@ void ARPGPlayer::OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecov
 	{
 		if (!SelectedUnit.IsValid())
 		{
-			SetSelectedUnit(Unit);
+			SetSelectedUnit(Cast<ARPGPlayerUnit>(Unit));
 		}
 	}
 }

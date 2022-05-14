@@ -106,5 +106,5 @@ public:
 		float DamageDealt = 0.0f;
 
 	UPROPERTY(BlueprintReadWrite)
-		TWeakObjectPtr<ARPGCreature> Target;
+		TWeakObjectPtr<AActor> Target;
 };

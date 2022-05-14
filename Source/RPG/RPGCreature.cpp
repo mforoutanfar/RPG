@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "RPGFunctionLibrary.h"
 #include "RPGRandomAudioComponent.h"
@@ -16,6 +17,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 
 #include "RPG_EventManager.h"
+#include "RPGPlayerUnit.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -29,6 +31,10 @@ ARPGCreature::ARPGCreature()
 	Visuals = CreateDefaultSubobject<URPGBillboardVisuals>(FName("Visuals"));	
 	Visuals->SetupAttachment(RootComponent);
 	Visuals->Init(CreatureName.ToString());
+
+	RangeSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangeSphere"));
+	RangeSphere->SetupAttachment(RootComponent);
+	RangeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 
 	GetCapsuleComponent()->SetCollisionProfileName(FName("EnemyHitBox"));
 
@@ -165,4 +171,56 @@ void ARPGCreature::Die()
 	Visuals->OnOwnerDied();
 }
 
+void ARPGCreature::Attack()
+{
+	auto Target = GetNearestTarget(RangeSphere);
 
+	if (auto Attackable = Cast<IRPGAttackable>(Target))
+	{
+		FRPGAttackData attackData;
+		attackData.PhysicalDamage = 30.0f;
+		attackData.Attacker = this;
+		FRPGAttackResults Results;
+
+		Results = Attackable->OnAttacked(attackData);
+		EnterRecovery(2.0f);
+
+		Visuals->OnOwnerAttack();
+
+		URPG_EventManager::GetInstance()->EnemyAttackedUnit.Broadcast(Cast<ARPGPlayerUnit>(Target), Results);
+	}
+}
+
+AActor* ARPGCreature::GetNearestTarget(UShapeComponent* Collider)
+{
+	AActor* ClosestAttackableActor = nullptr;
+	float MinDistance = FLT_MAX;
+	TSet<AActor*> OverlappingActors = {};
+	Collider->GetOverlappingActors(OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
+		if (Distance < MinDistance)
+		{
+			ClosestAttackableActor = Actor;
+			MinDistance = Distance;
+		}
+	}
+
+	return ClosestAttackableActor;
+}
+
+void ARPGCreature::EnterRecovery(float Duration)
+{
+	InRecovery = true;
+	GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, true);
+}
+
+void ARPGCreature::ExitRecovery()
+{
+	InRecovery = false;
+	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
+	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, false);
+}

@@ -5,6 +5,7 @@
 #include "RPGPlayerUnit.h"
 #include "RPGPlayer.h"
 #include "Components/Image.h"
+#include "Components/ProgressBar.h"
 #include "RPG_EventManager.h"
 
 void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
@@ -12,6 +13,7 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	ReferencedUnit = Unit;
 	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
 	URPG_EventManager::GetInstance()->UnitAttackedEnemy.AddDynamic(this, &URPG_AvatarWidget::OnUnitAttackedEnemy);
+	URPG_EventManager::GetInstance()->EnemyAttackedUnit.AddDynamic(this, &URPG_AvatarWidget::OnEnemyAttackedUnit);
 	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 }
 
@@ -36,7 +38,7 @@ URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer
 	}
 }
 
-void URPG_AvatarWidget::OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State)
+void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 {
 	if (ReferencedUnit.Get() != Unit)
 	{
@@ -72,6 +74,30 @@ void URPG_AvatarWidget::OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResu
 
 	GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
 	GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+}
+
+void URPG_AvatarWidget::OnEnemyAttackedUnit(ARPGPlayerUnit* Unit, FRPGAttackResults Results)
+{
+	if (ReferencedUnit.Get() != Unit)
+	{
+		return;
+	}
+
+	auto percent = HPBar->Percent - Results.DamageDealt / Unit->MaxHP;
+	HPBar->SetPercent(percent);
+
+	GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
+
+	if (percent > 0)
+	{
+		Portrait->SetBrushFromTexture(AvatarMap[PAIN]);
+		GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+	}
+	else
+	{
+		//TODO: Implement OnDie?
+		Portrait->SetBrushFromTexture(AvatarMap[DEAD]);
+	}
 }
 
 void URPG_AvatarWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)

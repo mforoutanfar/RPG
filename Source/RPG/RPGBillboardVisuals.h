@@ -79,5 +79,6 @@ public:
 		FString TexturePrefix = "";
 
 	void OnOwnerAttacked();
+	void OnOwnerAttack();
 	void OnOwnerDied();
 };

@@ -5,27 +5,27 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RPGFunctionLibrary.h"
+#include "RPGAttackable.h"
 
 #include "RPGPlayerUnit.generated.h"
-
-class IRPGAttackable;
 
 /**
  *
 */
 UCLASS()
-class RPG_API ARPGPlayerUnit : public AActor
+class RPG_API ARPGPlayerUnit : public AActor, public IRPGAttackable
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	/**
 	 * Sets default values for this actor's properties
 	*/
 	ARPGPlayerUnit();
 
-	float MeleeDamage = 100.0f;
-	float RangedDamage = 100.0f;
+	virtual void Tick(float DeltaTime) override;
+
+	virtual void BeginPlay() override;
 
 	void AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttackable* NearestRangedTarget);
 
@@ -33,20 +33,29 @@ public:
 
 	int UnitIndex = -1;
 
+	bool IsInRecovery() { return InRecovery; };
+
+	float MaxHP = 300.0f;
+
+	float MaxMana = 300.0f;
+
 protected:
-	/**
-	 * Called when the game starts or when spawned
-	*/
-	virtual void BeginPlay() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-public:	
-	/**
-	 * Called every frame
-	 * @param DeltaTime Game time elapsed during last frame modified by the time dilation 
-	*/
-	virtual void Tick(float DeltaTime) override;
+	float MeleeDamage = 100.0f;
+
+	float RangedDamage = 100.0f;
+
+	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
+
+	float HP = 300.0f;
+
+	float Mana = 300.0f;
+
+	bool Dead = false;
+	bool IsDead() { return Dead; }
+	void Die();
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
@@ -58,13 +67,10 @@ private:
 	bool InRecovery = false;
 	void EnterRecovery(float Duration);
 	void ExitRecovery();
-		
+
 	FTimerHandle RecoveryTimerHandle;
 
 	class URPGRandomAudioComponent* AudioComponent;
 
 	class URPGInventory* Inventory;
-
-public:
-	bool IsInRecovery() { return InRecovery; };
 };

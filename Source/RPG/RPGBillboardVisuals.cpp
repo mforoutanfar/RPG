@@ -222,6 +222,11 @@ void URPGBillboardVisuals::OnOwnerAttacked()
 	SetAnimState(HIT);
 }
 
+void URPGBillboardVisuals::OnOwnerAttack()
+{
+	SetAnimState(ATTACK);
+}
+
 void URPGBillboardVisuals::OnOwnerDied()
 {
 	SetAnimState(DIE);

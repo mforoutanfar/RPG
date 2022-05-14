@@ -18,7 +18,7 @@
 */
 ARPGPlayerUnit::ARPGPlayerUnit()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	HitBox = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBox"));
@@ -31,7 +31,7 @@ ARPGPlayerUnit::ARPGPlayerUnit()
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
 
-	ActionLocation = FVector(0.0f,0.0f,30.0f);
+	ActionLocation = FVector(0.0f, 0.0f, 30.0f);
 }
 
 void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttackable* NearestRangedTarget)
@@ -47,7 +47,7 @@ void ARPGPlayerUnit::AttackTarget(IRPGAttackable* NearestMeleeTarget, IRPGAttack
 		{
 			Results = NearestMeleeTarget->OnAttacked(attackData);
 		}
-		
+
 		EnterRecovery(2.0f);
 	}
 	else if (NearestRangedTarget)
@@ -87,12 +87,43 @@ void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 {
 }
 
+FRPGAttackResults ARPGPlayerUnit::OnAttacked(FRPGAttackData AttackData)
+{
+	FRPGAttackResults Results;
+	Results.Target = this;
+
+	float DamageDealt = 0.0f;
+	DamageDealt += AttackData.PhysicalDamage;
+	HP -= DamageDealt;
+
+	Results.DamageDealt = DamageDealt;
+
+	AudioComponent->PlayRandom("hit");
+
+	if (HP <= 0)
+	{
+		Die();
+		Results.TargetDied = true;
+	}
+	else
+	{
+		EnterRecovery(1.0f);
+	}
+
+	return Results;
+}
+
+void ARPGPlayerUnit::Die()
+{
+	Dead = true;
+}
+
 /**
  * Called when the game starts or when spawned
 */
 void ARPGPlayerUnit::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 }
 
 /**

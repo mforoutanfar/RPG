@@ -19,18 +19,11 @@ public:
 	// Sets default values for this character's properties
 	ARPGPlayer();
 
-protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
-	void AddUnit();
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	const int UnitCapacity = 4;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -48,6 +41,12 @@ public:
 	void OnAttackPressed();
 
 	void OnSwitchUnitPressed();
+
+protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+	void AddUnit();
+
+	const int UnitCapacity = 4;
 
 private:
 
@@ -78,7 +77,7 @@ private:
 	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
 
 	UFUNCTION()
-	void OnUnitRecoveryStateChanged(ARPGPlayerUnit* Unit, bool IsInRecovery);
+	void OnUnitRecoveryStateChanged(AActor* Unit, bool IsInRecovery);
 
 	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
 

@@ -41,11 +41,20 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		class UImage* SelectedIndicator;
 
+	UPROPERTY(meta = (BindWidget))
+		class UProgressBar* HPBar;
+
+	UPROPERTY(meta = (BindWidget))
+		class UProgressBar* ManaBar;
+
 	UFUNCTION()
-	void OnRecoveryStateChanged(ARPGPlayerUnit* Unit, bool State);
+	void OnRecoveryStateChanged(AActor* Unit, bool State);
 	
 	UFUNCTION()
 	void OnUnitAttackedEnemy(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
+
+	UFUNCTION()
+	void OnEnemyAttackedUnit(ARPGPlayerUnit* Unit, FRPGAttackResults Results);
 	
 	UFUNCTION()
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
