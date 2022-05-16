@@ -14,6 +14,8 @@
 #include "RPGInventory.h"
 #include "RPG_Projectile.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 ARPGCreature::ARPGCreature()
 {
@@ -83,7 +85,14 @@ void ARPGCreature::Attack()
 	FRPGAttackResults Results;
 	float RecoveryDuration = 2.0f;
 
-	if (auto NearestMelee = GetNearestAttackTarget(MeleeSphere))
+	bool ShouldBeVisible = true;
+	if (CreatureType == CreatureType::ENEMY)
+	{
+		ShouldBeVisible = false;
+	}
+	bool ExcludeOwnType = true;
+
+	if (auto NearestMelee = GetNearestAttackTarget(MeleeSphere, ExcludeOwnType, ShouldBeVisible))
 	{
 		AudioComponent->PlayRandom("whoosh");
 
@@ -98,7 +107,7 @@ void ARPGCreature::Attack()
 	}
 	else 
 	{
-		if (auto NearestRanged = GetNearestAttackTarget(RangeSphere))
+		if (auto NearestRanged = GetNearestAttackTarget(RangeSphere, ExcludeOwnType, ShouldBeVisible))
 		{
 			AudioComponent->PlayRandom("arrow_shot");
 
@@ -134,7 +143,8 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 	{
 		if (ShouldBeVisible)
 		{
-			if (!Actor->WasRecentlyRendered(KINDA_SMALL_NUMBER))
+			FVector2D pos;
+			if (!UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(this, 0), Actor->GetActorLocation(), pos))
 			{
 				continue;
 			}
