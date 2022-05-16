@@ -19,4 +19,8 @@ class RPG_API ARPG_HUD : public AHUD
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
 		TSubclassOf <class URPG_GameHUD> GameHUDClass;
 
+	class URPG_GameHUD* GameHUD = nullptr;
+
+public:
+	void OnOpenInventoryPressed(bool InventoryOpen);
 };

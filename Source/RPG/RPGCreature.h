@@ -71,7 +71,7 @@ protected:
 	bool IsDead() { return Dead; }
 	virtual void Die();
 
-	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true);
+	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true, bool ShouldBeVisible = true);
 
 	FTimerHandle RecoveryTimerHandle;
 

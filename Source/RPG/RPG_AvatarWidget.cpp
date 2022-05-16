@@ -14,6 +14,7 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
 	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPG_AvatarWidget::OnAttackOccured);
 	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
+	URPG_EventManager::GetInstance()->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
 }
 
 void URPG_AvatarWidget::NativeConstruct()
@@ -55,9 +56,23 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 	}
 }
 
+void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
+{
+	if (auto Unit = Cast<ARPGPlayerUnit>(Creature))
+	{
+		if (Unit == ReferencedUnit.Get())
+		{
+			Portrait->SetBrushFromTexture(AvatarMap[HAPPY]);
+
+			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
+			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+		}
+	}
+}
+
 void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
-	//TODO: Shouldn't Access Unit Directly
+	//TODO: Shouldn't Access Unit Directly?
 	auto Unit = ReferencedUnit.Get();
 
 	if (Unit == Attacker)//Is Attacker

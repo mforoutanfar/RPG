@@ -59,6 +59,7 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 
 void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 }
 
 /**

@@ -35,6 +35,7 @@ void ARPGCaptureManager::BeginPlay()
 
 void ARPGCaptureManager::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 }
 
 /**

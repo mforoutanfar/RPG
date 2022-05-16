@@ -12,11 +12,16 @@ class ARPGPlayer;
 class ARPGCreature;
 class ARPGPlayerUnit;
 class IRPGAttackable;
+class URPGInventoryItem;
+class URPG_ItemWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Unit, bool, State);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, AActor*, Attacker, AActor*, Target, FRPGAttackResults, Results);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetPicked, URPG_ItemWidget*, Item);
+
 
 /**
  * 
@@ -47,4 +52,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FSelectedUnitChanged SelectedUnitChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FInventoryItemAdded InventoryItemAdded;
+
+	UPROPERTY(BlueprintAssignable)
+	FItemWidgetPicked ItemWidgetPicked;
 };

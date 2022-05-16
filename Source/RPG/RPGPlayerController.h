@@ -13,4 +13,28 @@ UCLASS()
 class RPG_API ARPGPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+	virtual void SetupInputComponent() override;
+
+	void OnOpenInventoryPressed();
+
+	void ToggleInventory();
+
+protected:
+	void OnForwardBackwardPressed(float Value);
+	void OnStrafePressed(float Value);
+	void OnLookYaw(float Value);
+	void OnLookPitch(float Value);
+	void OnJumpPressed();
+	void OnJumpReleased();
+	void OnRunPressed();
+	void OnRunReleased();
+	void OnInteractPressed();
+	void OnAttackPressed();
+	void OnSwitchUnitPressed();
+
+	bool InventoryOpen = false;
+
 };
+

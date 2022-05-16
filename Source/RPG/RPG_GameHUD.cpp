@@ -6,6 +6,8 @@
 
 #include "RPGPlayerUnit.h"
 #include "RPGCreature.h"
+#include "RPG_InventoryWidget.h"
+#include "RPG_ItemWidget.h"
 #include "RPG_EventManager.h"
 #include "RPG_AvatarWidget.h"
 #include "RPG_SlashWidget.h"
@@ -13,11 +15,21 @@
 #include "Components/CanvasPanel.h"
 #include "Components/VerticalBoxSlot.h"
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 
 void URPG_GameHUD::NativeConstruct()
 {
+	Super::NativeConstruct();
 	URPG_EventManager::GetInstance()->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
 	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
+	URPG_EventManager::GetInstance()->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);
+}
+
+void URPG_GameHUD::OnItemWidgetPicked(URPG_ItemWidget* ItemWidget)
+{
+	Canvas->AddChildToCanvas(ItemWidget);
+	ItemWidget->UpdateSizeForHUD();	
+	ItemWidget->FollowMouse();//So it won't jump on first frame.
 }
 
 void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
@@ -26,7 +38,6 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 	Avatar->Init(Unit);
 	AvatarsBox->AddChildToVerticalBox(Avatar);
 
-	//Cast<UVerticalBoxSlot>(Avatar->Slot)->SetPadding(FMargin(0.0f, 0.0f, 0.0f, 20.0f));
 	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 }
 
@@ -46,3 +57,20 @@ void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackR
 	}
 }
 
+void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
+{
+	if (InventoryOpen)
+	{
+		Inventory->SetVisibility(ESlateVisibility::Visible);
+		Blur->SetVisibility(ESlateVisibility::Visible);
+
+		//TODO: Hack! Find a better way.
+		Cast<URPG_InventoryWidget>(Inventory)->UpdateInventoryScale();
+		//
+	}
+	else
+	{
+		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+		Blur->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}

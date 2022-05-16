@@ -53,6 +53,7 @@ ARPGPlayer::ARPGPlayer()
 
 void ARPGPlayer::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -100,23 +101,6 @@ void ARPGPlayer::BeginPlay()
 void ARPGPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-void ARPGPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("Move FB", this, &ARPGPlayer::OnForwardBackwardPressed);
-	PlayerInputComponent->BindAxis("Strafe", this, &ARPGPlayer::OnStrafePressed);
-	PlayerInputComponent->BindAxis("Look Pitch", this, &ARPGPlayer::OnLookPitch);
-	PlayerInputComponent->BindAxis("Look Yaw", this, &ARPGPlayer::OnLookYaw);
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed,this, &ARPGPlayer::OnJumpPressed);
-	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, this, &ARPGPlayer::OnJumpReleased);
-	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnRunPressed);
-	PlayerInputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ARPGPlayer::OnRunReleased);
-	PlayerInputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnInteractPressed);
-	PlayerInputComponent->BindAction("Attack", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnAttackPressed);
-	PlayerInputComponent->BindAction("SwitchUnit", EInputEvent::IE_Pressed, this, &ARPGPlayer::OnSwitchUnitPressed);
 }
 
 void ARPGPlayer::OnForwardBackwardPressed(float Value)
@@ -180,33 +164,6 @@ void ARPGPlayer::OnInteractPressed()
 	}	
 }
 
-bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
-{
-	auto Type = Target->GetInteractableType();
-	switch (Type)
-	{
-		case InteractableCategory::MISC:
-		case InteractableCategory::NONE:
-		case InteractableCategory::ITEM:
-		{
-			return false;
-			break;
-		}
-		case InteractableCategory::DOOR:
-		case InteractableCategory::CHEST:
-		case InteractableCategory::CORPSE:
-		{
-			return true;
-			break;
-		}
-		default:
-		{
-			return false;
-			break;
-		}		
-	}
-}
-
 void ARPGPlayer::OnAttackPressed()
 {
 	if (SelectedUnit.IsValid())
@@ -240,6 +197,33 @@ void ARPGPlayer::OnSwitchUnitPressed()
 			NextUnitIndex = 0;
 		}
 		SetSelectedUnit(Units[NextUnitIndex]);
+	}
+}
+
+bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
+{
+	auto Type = Target->GetInteractableType();
+	switch (Type)
+	{
+	case InteractableCategory::MISC:
+	case InteractableCategory::NONE:
+	case InteractableCategory::ITEM:
+	{
+		return false;
+		break;
+	}
+	case InteractableCategory::DOOR:
+	case InteractableCategory::CHEST:
+	case InteractableCategory::CORPSE:
+	{
+		return true;
+		break;
+	}
+	default:
+	{
+		return false;
+		break;
+	}
 	}
 }
 

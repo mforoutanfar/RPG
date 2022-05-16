@@ -25,9 +25,6 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	void OnForwardBackwardPressed(float Value);
 	void OnStrafePressed(float Value);
 	void OnLookYaw(float Value);
@@ -37,10 +34,10 @@ public:
 	void OnRunPressed();
 	void OnRunReleased();
 	void OnInteractPressed();
-	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
 	void OnAttackPressed();
-
 	void OnSwitchUnitPressed();
+
+	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;

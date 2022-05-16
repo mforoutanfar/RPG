@@ -19,16 +19,20 @@ public:
 	// Sets default values for this component's properties
 	URPGInventory();
 
-	bool AddItem(FRPGItemInfo ItemInfo);
+	bool AddItem(FRPGItemInfo &OutItemInfo);
+
+	void RemoveItem(URPGInventoryItem* Item);
 
 	bool DoesItemFit(int width, int height, int row, int col);
+
+	class ARPGCreature* OwnerUnit = nullptr;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	static const int Rows = 20;
-	static const int Cols = 30;
+	static const int Rows = 12;
+	static const int Cols = 12;
 
 	//Top Left is {Row = 0,Col = 0}.
 	bool Occupied[Rows][Cols] = {false};

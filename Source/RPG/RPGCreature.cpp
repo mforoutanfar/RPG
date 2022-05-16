@@ -35,6 +35,7 @@ ARPGCreature::ARPGCreature()
 	AudioComponent->SetupAttachment(RootComponent);
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
+	Inventory->OwnerUnit = this;
 }
 
 // Called when the game starts or when spawned
@@ -122,7 +123,7 @@ void ARPGCreature::Die()
 	AttackableEnabled = false;
 }
 
-AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType)
+AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType, bool ShouldBeVisible)
 {
 	AActor* ClosestAttackableActor = nullptr;
 	float MinDistance = FLT_MAX;
@@ -131,6 +132,14 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 
 	for (AActor* Actor : OverlappingActors)
 	{
+		if (ShouldBeVisible)
+		{
+			if (!Actor->WasRecentlyRendered(KINDA_SMALL_NUMBER))
+			{
+				continue;
+			}
+		}
+
 		if (auto Attackable = Cast<IRPGAttackable>(Actor))
 		{
 			if (!Attackable->AttackableEnabled)

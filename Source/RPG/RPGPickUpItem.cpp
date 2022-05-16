@@ -38,6 +38,7 @@ ARPGPickUpItem::ARPGPickUpItem()
 
 void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
 {
+	Super::OnConstruction(Transform);
 	ItemPicture->SetRelativeLocation(FVector::ZeroVector);
 	ItemPicture->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 	AudioComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);

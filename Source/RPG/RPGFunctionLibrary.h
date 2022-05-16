@@ -76,6 +76,12 @@ struct FRPGItemInfo
 	int Height = 0;
 
 	UPROPERTY()
+	int InventoryX = -1;
+
+	UPROPERTY()
+	int InventoryY = -1;
+
+	UPROPERTY()
 	TEnumAsByte<ItemCategory::ItemCat> ItemCategory = ItemCategory::ItemCat::NONE;
 
 	UPROPERTY()

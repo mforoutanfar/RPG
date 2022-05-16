@@ -9,6 +9,11 @@ void ARPG_HUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto GameHUD = CreateWidget<URPG_GameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), GameHUDClass);
+	GameHUD = CreateWidget<URPG_GameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), GameHUDClass);	
 	GameHUD->AddToViewport();
+}
+
+void ARPG_HUD::OnOpenInventoryPressed(bool InventoryOpen)
+{
+	GameHUD->OnOpenInventoryPressed(InventoryOpen);
 }

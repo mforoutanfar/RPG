@@ -19,6 +19,8 @@ class RPG_API URPGInventoryItem : public UObject
 public:
 	FRPGItemInfo ItemInformation;
 
+	class RPG_InventoryWidget* RefWidget = nullptr;
+
 public:
 	//Location of Top Left square of Item in Inventory
 	//int PosX = 0;

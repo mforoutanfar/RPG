@@ -25,14 +25,27 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class URPG_SlashWidget> DamageWidgetClass;
 
+	void OnOpenInventoryPressed(bool InventoryOpen);
+
+	float InventoryScale = -1.0f;
+
 protected:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnItemWidgetPicked(class URPG_ItemWidget* ItemWidget);
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* Canvas;
 
 	UPROPERTY(meta = (BindWidget))
 	class UVerticalBox* AvatarsBox;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidget* Inventory;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidget* Blur;
 
 	UFUNCTION()
 	void OnUnitAdded(ARPGPlayerUnit* Unit);
