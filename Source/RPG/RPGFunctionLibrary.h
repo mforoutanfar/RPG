@@ -61,6 +61,17 @@ namespace ItemCategory
 	};
 }
 
+UENUM(BlueprintType)
+namespace UnitSafety
+{
+	enum SafetyState
+	{
+		SAFE,
+		WARNING,
+		DANGER
+	};
+}
+
 USTRUCT(BlueprintType)
 struct FRPGItemInfo
 {

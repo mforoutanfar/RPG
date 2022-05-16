@@ -15,6 +15,7 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPG_AvatarWidget::OnAttackOccured);
 	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 	URPG_EventManager::GetInstance()->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
+	URPG_EventManager::GetInstance()->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
 }
 
 void URPG_AvatarWidget::NativeConstruct()
@@ -38,6 +39,37 @@ URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer
 	}
 }
 
+void URPG_AvatarWidget::OnSafetyStateChanged(ARPGPlayerUnit* Unit, TEnumAsByte<UnitSafety::SafetyState> State)
+{
+	if (ReferencedUnit.Get() != Unit)
+	{
+		return;
+	}
+
+	switch (State)
+	{
+	case UnitSafety::SAFE:
+	{
+		DefaultSafetyColor = SafeColor;
+		break;
+	}	
+	case UnitSafety::WARNING:
+	{
+		DefaultSafetyColor = WarningColor;
+		break;
+	}
+	case UnitSafety::DANGER:
+	{
+		DefaultSafetyColor = DangerColor;
+		break;
+	}
+	default:
+		break;
+	}
+
+	ResetToDefaultColor();
+}
+
 void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 {
 	if (ReferencedUnit.Get() != Unit)
@@ -51,9 +83,13 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 	}
 	else
 	{
-		//TODO: Change based on Unit Safety
-		RecoveryIndicator->SetBrushTintColor(SafeColor);
+		ResetToDefaultColor();
 	}
+}
+
+void URPG_AvatarWidget::ResetToDefaultColor()
+{
+	RecoveryIndicator->SetBrushTintColor(DefaultSafetyColor);
 }
 
 void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)

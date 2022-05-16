@@ -50,6 +50,8 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	UFUNCTION()
 	void OnRecoveryStateChanged(AActor* Unit, bool State);
 
+	void ResetToDefaultColor();
+
 	UFUNCTION()
 	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
@@ -58,6 +60,11 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 		
 	UFUNCTION()
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
+
+	UFUNCTION()
+	void OnSafetyStateChanged(ARPGPlayerUnit* Unit, TEnumAsByte<UnitSafety::SafetyState> State);
+
+	UnitSafety::SafetyState DefaultState;
 
 	void ResetAvatar();
 
@@ -85,6 +92,8 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
 		FLinearColor DeselectedColor;
+
+	FLinearColor DefaultSafetyColor;
 
 protected:
 	virtual void NativeConstruct() override;

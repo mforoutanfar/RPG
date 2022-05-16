@@ -36,6 +36,23 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+	UFUNCTION()
+	void OnMeleeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnMeleeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void OnRangeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnRangeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	int EnemiedInMeleeRange = 0;
+	int EnemiedInRangedRange = 0;
+
+	UnitSafety::SafetyState CurrentSafetyState = UnitSafety::SafetyState::SAFE;
+	void UpdateSafetyState();
 private:
 
 };
