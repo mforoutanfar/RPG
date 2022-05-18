@@ -45,9 +45,10 @@ protected:
 
 	const int UnitCapacity = 4;
 
-private:
+	UPROPERTY(EditDefaultsOnly)
+	int StarterUnits = 1;
 
-	TArray<class UChildActorComponent*> UnitPlaceHolders = {};
+private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* PlayerCameraComponent;
@@ -64,6 +65,9 @@ private:
 	class UAIPerceptionStimuliSourceComponent* SightSource;
 
 	TArray<ARPGPlayerUnit*> Units = {};
+
+	UPROPERTY()
+	class ASceneCapture2D* MiniMapCamera = nullptr;
 
 	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
 

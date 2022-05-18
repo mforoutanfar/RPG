@@ -43,10 +43,10 @@ public:
 	virtual void Attack();
 
 	UPROPERTY(EditAnywhere)
-	float MaxHP = 300.0f;
+	float MaxHP = 30000.0f;
 
 	UPROPERTY(EditAnywhere)
-	float HP = 300.0f;
+	float HP = 30000.0f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;

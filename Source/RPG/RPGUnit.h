@@ -6,6 +6,7 @@
 #include "RPGCreature.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "RPGInteractable.h"
+#include "RPG_Minimappable.h"
 
 #include "RPGUnit.generated.h"
 
@@ -13,7 +14,7 @@
  * 
  */
 UCLASS()
-class RPG_API ARPGUnit : public ARPGCreature, public IRPGInteractable
+class RPG_API ARPGUnit : public ARPGCreature, public IRPGInteractable, public IRPG_Minimappable
 {
 	GENERATED_BODY()
 

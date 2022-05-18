@@ -33,6 +33,17 @@ namespace AnimationState
 }
 
 UENUM(BlueprintType)
+namespace MiniMap
+{
+	enum ObjectType
+	{
+		ENEMY,
+		LOOT,
+		NPC
+	};
+}
+
+UENUM(BlueprintType)
 namespace InteractableCategory
 {
 	enum InteractableCat
@@ -105,7 +116,7 @@ struct FRPGAttackData
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-		int PhysicalDamage = 0;
+		int Damage = 0;
 
 	UPROPERTY()
 		AActor* Attacker = nullptr;
@@ -127,4 +138,8 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 		TWeakObjectPtr<AActor> Target = nullptr;
+
+	//TODO: Hack for preventing slash animation showing on ranged attacks.
+	UPROPERTY(BlueprintReadWrite)
+		bool Ranged = false;
 };

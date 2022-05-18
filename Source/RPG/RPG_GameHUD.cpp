@@ -10,7 +10,7 @@
 #include "RPG_ItemWidget.h"
 #include "RPG_EventManager.h"
 #include "RPG_AvatarWidget.h"
-#include "RPG_SlashWidget.h"
+#include "RPG_DamageNumberWidget.h"
 #include "Components/VerticalBox.h"
 #include "Components/CanvasPanel.h"
 #include "Components/VerticalBoxSlot.h"
@@ -43,18 +43,26 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 
 void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
 {
-	if (auto CreatTarget = Cast<ARPGCreature>(Target))
+	if (Attacker)
 	{
-		if (CreatTarget->CreatureType == ARPGCreature::CreatureType::ENEMY)
+		if (Cast<ARPGPlayerUnit>(Attacker) && !Results.Ranged)
 		{
-			if (DamageWidgetClass)
-			{
-				auto Slash = CreateWidget<URPG_SlashWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageWidgetClass);
-				Slash->Init(Attacker, Results.Target.Get(), Results);
-				Canvas->AddChildToCanvas(Slash);
-			}
+			auto Slash = CreateWidget<URPG_FollowerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), SlashWidgetClass);
+			Slash->Target = Target;
+			Canvas->AddChildToCanvas(Slash);
 		}
 	}
+
+	if (Target)
+	{
+		if (!Cast<ARPGPlayerUnit>(Target))
+		{
+			auto DamageNumber = CreateWidget<URPG_DamageNumberWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageNumberWidgetClass);
+			DamageNumber->Init(Target, Results);
+			Canvas->AddChildToCanvas(DamageNumber);
+		}
+	}
+
 }
 
 void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)

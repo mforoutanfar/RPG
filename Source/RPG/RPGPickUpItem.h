@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "RPGFunctionLibrary.h"
 #include  "RPG\RPGInteractable.h"
+#include "RPG_Minimappable.h"
 
 #include "RPGPickUpItem.generated.h"
 
@@ -15,7 +16,7 @@ using namespace ItemCategory;
  *
 */
 UCLASS()
-class RPG_API ARPGPickUpItem : public AActor, public IRPGInteractable
+class RPG_API ARPGPickUpItem : public AActor, public IRPGInteractable, public IRPG_Minimappable
 {
 	GENERATED_BODY()
 	
@@ -34,6 +35,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
 public:	
 	/**

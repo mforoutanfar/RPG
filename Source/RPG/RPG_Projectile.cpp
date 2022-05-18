@@ -32,7 +32,7 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	if (auto Attackable = Cast<IRPGAttackable>(OtherActor))
 	{
 		FRPGAttackData Data;
-		Data.PhysicalDamage = 30.0f;		
+		Data.Damage = 30.0f;		
 		Data.Target = OtherActor;
 		auto Results = Attackable->OnAttacked(Data);
 

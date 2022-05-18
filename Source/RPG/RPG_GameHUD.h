@@ -23,7 +23,10 @@ public:
 	TSubclassOf<class URPG_AvatarWidget> AvatarClass;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class URPG_SlashWidget> DamageWidgetClass;
+	TSubclassOf<class URPG_FollowerWidget> SlashWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class URPG_DamageNumberWidget> DamageNumberWidgetClass;
 
 	void OnOpenInventoryPressed(bool InventoryOpen);
 

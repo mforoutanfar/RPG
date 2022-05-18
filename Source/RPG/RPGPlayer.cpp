@@ -17,6 +17,10 @@
 #include "RPGRandomAudioComponent.h"
 #include "RPG_EventManager.h"
 
+#include "Engine\SceneCapture2D.h"
+#include "Components/SceneCaptureComponent2D.h"
+#include "Engine/TextureRenderTarget2D.h"
+
 // Sets default values
 ARPGPlayer::ARPGPlayer()
 {
@@ -38,17 +42,6 @@ ARPGPlayer::ARPGPlayer()
 
 	SightSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("SightSource"));
 	SightSource->RegisterForSense(UAISense_Sight::StaticClass());
-
-	float UnitOffset = 30.0f;
-
-	for (size_t i = 0; i < UnitCapacity; i++)
-	{
-		auto Name = FString::Printf(TEXT("UnitPlaceHolder%d"), i);
-		auto UnitPlaceHolder = CreateDefaultSubobject<UChildActorComponent>(FName(*Name));		
-		auto posY = -(UnitCapacity - 1) * UnitOffset / 2.0f + i * UnitOffset;
-		UnitPlaceHolder->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
-		UnitPlaceHolders.Add(UnitPlaceHolder);
-	}
 }
 
 void ARPGPlayer::OnConstruction(const FTransform& Transform)
@@ -56,12 +49,6 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
-	for (auto Holder : UnitPlaceHolders)
-	{
-		Holder->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-		Holder->SetChildActorClass(UnitClass);
-	}	
 }
 
 //TODO: Get Unit Info as Input
@@ -73,10 +60,19 @@ void ARPGPlayer::AddUnit()
 		return;
 	}
 
-	auto Holder = UnitPlaceHolders[Units.Num()];
-	Holder->CreateChildActor();
+	float UnitOffset = 30.0f;
 
-	auto Unit = Cast<ARPGPlayerUnit>(Holder->GetChildActor());
+	auto Name = FString::Printf(TEXT("UnitPlaceHolder%d"), Units.Num());
+	auto UnitPlaceHolder = NewObject<UChildActorComponent>(this);	
+	auto posY = -(StarterUnits - 1) * UnitOffset / 2.0f + Units.Num() * UnitOffset;
+	UnitPlaceHolder->SetRelativeLocation(FVector(0.0f, posY, 0.0f));
+	UnitPlaceHolder->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	UnitPlaceHolder->SetChildActorClass(UnitClass);
+	UnitPlaceHolder->CreateChildActor();
+	UnitPlaceHolder->RegisterComponent();
+
+	///////////////////////
+	auto Unit = Cast<ARPGPlayerUnit>(UnitPlaceHolder->GetChildActor());
 	Unit->UnitIndex = Units.Num();
 	Units.Add(Unit);
 
@@ -90,7 +86,24 @@ void ARPGPlayer::BeginPlay()
 
 	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 
-	for (int i = 0; i < UnitCapacity; i++)
+	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
+	MiniMapCamera->SetActorLocation(GetActorLocation() + FVector(0.0f,0.0f,10000.0f));
+	MiniMapCamera->GetCaptureComponent2D()->ProjectionType = ECameraProjectionMode::Orthographic;
+	MiniMapCamera->GetCaptureComponent2D()->OrthoWidth = 10000.f;
+	MiniMapCamera->SetActorRotation((GetActorLocation() - MiniMapCamera->GetActorLocation()).ToOrientationRotator());	
+
+	FString PathToLoad = FString("TextureRenderTarget2D'/Game/HUD/MiniMapTexture.MiniMapTexture'");
+	UTextureRenderTarget2D* tmpTexture = Cast<UTextureRenderTarget2D>(StaticLoadObject(UTextureRenderTarget2D::StaticClass(), NULL, *(PathToLoad)));
+
+	if (tmpTexture)
+	{
+		MiniMapCamera->GetCaptureComponent2D()->TextureTarget = tmpTexture;
+	}
+
+	auto Rules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
+	MiniMapCamera->AttachToActor(this, Rules);
+
+	for (int i = 0; i < StarterUnits; i++)
 	{
 		AddUnit();
 		SetSelectedUnit(FindFirstOutOfRecoveryUnit());
@@ -166,20 +179,29 @@ void ARPGPlayer::OnInteractPressed()
 
 void ARPGPlayer::OnAttackPressed()
 {
+	ARPGPlayerUnit* UnitToAttack = nullptr;
+
 	if (SelectedUnit.IsValid())
 	{
-		auto UnitToAttack = SelectedUnit;
-
-		if (SelectedUnit->IsInRecovery())
+		if (!SelectedUnit->IsInRecovery())
+		{
+			UnitToAttack = SelectedUnit.Get();
+		}
+		else
 		{
 			UnitToAttack = FindFirstOutOfRecoveryUnit();
-			SetSelectedUnit(UnitToAttack.Get());
+			SetSelectedUnit(UnitToAttack);
 		}
+	}
+	else
+	{
+		UnitToAttack = FindFirstOutOfRecoveryUnit();
+		SetSelectedUnit(UnitToAttack);
+	}
 
-		if (UnitToAttack.IsValid())
-		{
-			UnitToAttack->Attack();
-		}
+	if (UnitToAttack)
+	{
+		UnitToAttack->Attack();
 	}
 }
 
@@ -257,6 +279,11 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 
 void ARPGPlayer::OnUnitRecoveryStateChanged(AActor* Unit, bool IsInRecovery)
 {
+	if (!Cast<ARPGPlayerUnit>(Unit))
+	{
+		return;
+	}
+
 	if (IsInRecovery)
 	{
 		//Set next active unit if available

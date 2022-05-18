@@ -16,6 +16,9 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 	URPG_EventManager::GetInstance()->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
 	URPG_EventManager::GetInstance()->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
+
+	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Modify!
+	DefaultSafetyColor = SafeColor;
 }
 
 void URPG_AvatarWidget::NativeConstruct()

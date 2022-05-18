@@ -58,7 +58,7 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	Results.Target = this;
 
 	float DamageDealt = 0.0f;
-	DamageDealt += AttackData.PhysicalDamage;
+	DamageDealt += AttackData.Damage;
 	HP -= DamageDealt;
 
 	Results.DamageDealt = DamageDealt;
@@ -83,7 +83,7 @@ void ARPGCreature::Attack()
 {	
 	FRPGAttackData AttackData;
 	FRPGAttackResults Results;
-	float RecoveryDuration = 2.0f;
+	float RecoveryDuration = 1.0f;
 
 	bool ShouldBeVisible = true;
 	if (CreatureType == CreatureType::ENEMY)
@@ -98,12 +98,10 @@ void ARPGCreature::Attack()
 
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
-		AttackData.PhysicalDamage = MeleeDamage;
+		AttackData.Damage = MeleeDamage;
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
 		Results = Attackable->OnAttacked(AttackData);
-
-		URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 	}
 	else 
 	{
@@ -115,13 +113,15 @@ void ARPGCreature::Attack()
 			auto PointOfAction = GetActorLocation() + ModifActionLocation;
 			auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
 			auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjectileClass, PointOfAction, Direction);
+			Results.Ranged = true;
 		}
 		else
 		{
 			AudioComponent->PlayRandom("whoosh");
-			URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 		}
 	}
+
+	URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
 
 	EnterRecovery(RecoveryDuration);
 }

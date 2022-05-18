@@ -46,6 +46,24 @@ void ARPGUnit::BeginPlay()
 	Super::BeginPlay();
 	Visuals->Init(CreatureName.ToString());
 	SetIsWalking(false);
+
+	switch (CreatureType)
+	{
+	case ARPGCreature::CreatureType::PLAYER:
+		break;
+	case ARPGCreature::CreatureType::ENEMY:
+	{
+		RegisterOnMiniMap(this, MiniMap::ENEMY);
+		break;
+	}
+	case ARPGCreature::CreatureType::NPC:
+	{
+		RegisterOnMiniMap(this, MiniMap::NPC);
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 InteractableCat ARPGUnit::GetInteractableType()
@@ -79,5 +97,8 @@ void ARPGUnit::Die()
 	{
 		Controller->UnPossess();
 	}
+
+	//TODO: Replace Enemy ping with Loot ping.
+	UnregisterFromMiniMap(this);
 }
 

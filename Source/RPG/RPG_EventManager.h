@@ -33,7 +33,7 @@ class RPG_API URPG_EventManager : public UObject
 	GENERATED_BODY()
 
 private:	
-	static TWeakObjectPtr<URPG_EventManager> Instance;
+	static URPG_EventManager* Instance;
 
 protected:
 	virtual void BeginDestroy() override;

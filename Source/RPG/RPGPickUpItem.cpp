@@ -44,6 +44,12 @@ void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
 	AudioComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 }
 
+void ARPGPickUpItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	UnregisterFromMiniMap(this);
+	Super::EndPlay(EndPlayReason);
+}
+
 /**
  * Called when the game starts or when spawned
 */
@@ -51,6 +57,7 @@ void ARPGPickUpItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	RegisterOnMiniMap(this, MiniMap::LOOT);
 }
 
 /**
