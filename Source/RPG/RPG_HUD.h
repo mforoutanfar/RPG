@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RPGFunctionLibrary.h"
 #include "GameFramework/HUD.h"
 #include "RPG_HUD.generated.h"
 
@@ -14,6 +15,9 @@ class RPG_API ARPG_HUD : public AHUD
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
+
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
@@ -23,4 +27,7 @@ class RPG_API ARPG_HUD : public AHUD
 
 public:
 	void OnOpenInventoryPressed(bool InventoryOpen);
+
+	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
+	void UnregisterFromMinimap(AActor* Actor);
 };

@@ -5,15 +5,30 @@
 #include "RPG_GameHUD.h"
 #include "Kismet/GameplayStatics.h"
 
+void ARPG_HUD::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	GameHUD = CreateWidget<URPG_GameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), GameHUDClass);
+	GameHUD->AddToViewport();
+}
+
 void ARPG_HUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GameHUD = CreateWidget<URPG_GameHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), GameHUDClass);	
-	GameHUD->AddToViewport();
 }
 
 void ARPG_HUD::OnOpenInventoryPressed(bool InventoryOpen)
 {
 	GameHUD->OnOpenInventoryPressed(InventoryOpen);
+}
+
+void ARPG_HUD::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
+{
+	GameHUD->RegisterOnMinimap(Actor, Type);
+}
+
+void ARPG_HUD::UnregisterFromMinimap(AActor* Actor)
+{
+	GameHUD->UnregisterFromMinimap(Actor);
 }

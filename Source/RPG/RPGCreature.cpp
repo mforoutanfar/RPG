@@ -116,12 +116,14 @@ void ARPGCreature::Attack()
 			Results.Ranged = true;
 		}
 		else
-		{
+		{			
 			AudioComponent->PlayRandom("whoosh");
 		}
 	}
 
 	RPGEventManager->AttackOccured.Broadcast(this, AttackData.Target, Results);
+
+	
 
 	EnterRecovery(RecoveryDuration);
 }

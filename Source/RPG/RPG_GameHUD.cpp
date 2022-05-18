@@ -12,6 +12,7 @@
 #include "RPG_GameStateBase.h"
 #include "RPG_AvatarWidget.h"
 #include "RPG_DamageNumberWidget.h"
+#include "RPG_MiniMapWidget.h"
 #include "Components/VerticalBox.h"
 #include "Components/CanvasPanel.h"
 #include "Components/VerticalBoxSlot.h"
@@ -82,4 +83,14 @@ void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
 		Inventory->SetVisibility(ESlateVisibility::Collapsed);
 		Blur->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void URPG_GameHUD::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
+{
+	MiniMap->RegisterOnMinimap(Actor, Type);
+}
+
+void URPG_GameHUD::UnregisterFromMinimap(AActor* Actor)
+{
+	MiniMap->UnregisterFromMinimap(Actor);
 }

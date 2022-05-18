@@ -32,6 +32,9 @@ public:
 
 	float InventoryScale = -1.0f;
 
+	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
+	void UnregisterFromMinimap(AActor* Actor);
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -49,6 +52,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* Blur;
+
+	UPROPERTY(meta = (BindWidget))
+	class URPG_MiniMapWidget* MiniMap;
 
 	UFUNCTION()
 	void OnUnitAdded(ARPGPlayerUnit* Unit);

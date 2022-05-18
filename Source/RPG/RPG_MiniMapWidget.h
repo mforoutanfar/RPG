@@ -17,9 +17,6 @@ class RPG_API URPG_MiniMapWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	static void Register(AActor* Actor, MiniMap::ObjectType Type);
-	static void Unregister(AActor* Actor);
-
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class URPGPingWidget> EnemyPingClass;
 
@@ -32,18 +29,14 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UCanvasPanel* PingCanvas;
 
+	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
+	void UnregisterFromMinimap(AActor* Actor);
+
 protected:
-
-	static TMap<AActor*, TEnumAsByte<MiniMap::ObjectType>> RegisterMap;
-	static TMap<AActor*, class URPGPingWidget*> ActorMap;
-
-	virtual void NativeConstruct() override;
-	virtual void NativeDestruct() override;
-
-	static URPG_MiniMapWidget* Instance;
 
 	void AddPing(AActor* Actor, MiniMap::ObjectType Type);
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	TMap<AActor*, class URPGPingWidget*> ActorMap;
 };

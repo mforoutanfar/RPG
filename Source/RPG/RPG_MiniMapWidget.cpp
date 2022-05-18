@@ -9,29 +9,22 @@
 #include "Kismet/GameplayStatics.h"
 #include "RPGPingWidget.h"
 
-URPG_MiniMapWidget* URPG_MiniMapWidget::Instance = nullptr;
-TMap<AActor*, URPGPingWidget*> URPG_MiniMapWidget::ActorMap;
-TMap<AActor*, TEnumAsByte<MiniMap::ObjectType>> URPG_MiniMapWidget::RegisterMap;
-
-void URPG_MiniMapWidget::Register(AActor* Actor, MiniMap::ObjectType Type)
+void URPG_MiniMapWidget::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
 {
-	if (Instance)
+	if (!ActorMap.Find(Actor))
 	{
-		Instance->AddPing(Actor, Type);
+		AddPing(Actor, Type);
 	}
-	else
-	{
-		RegisterMap.Add(Actor, Type);
-	}
+}
+
+void URPG_MiniMapWidget::UnregisterFromMinimap(AActor* Actor)
+{
+	auto Ping = ActorMap.FindAndRemoveChecked(Actor);
+	Ping->RemoveFromParent();
 }
 
 void URPG_MiniMapWidget::AddPing(AActor* Actor, MiniMap::ObjectType Type)
 {
-	if (ActorMap.Find(Actor))
-	{
-		return;
-	}
-
 	TSubclassOf<UUserWidget> PingClass;
 	FLinearColor Color;
 
@@ -56,8 +49,8 @@ void URPG_MiniMapWidget::AddPing(AActor* Actor, MiniMap::ObjectType Type)
 		break;
 	}
 
-	auto Ping = Instance->WidgetTree->ConstructWidget<URPGPingWidget>(PingClass, FName(FString::Printf(TEXT("Ping%d"), ActorMap.Num())));
-	Instance->PingCanvas->AddChildToCanvas(Ping);
+	auto Ping = WidgetTree->ConstructWidget<URPGPingWidget>(PingClass, FName(FString::Printf(TEXT("Ping%d"), ActorMap.Num())));
+	PingCanvas->AddChildToCanvas(Ping);
 	auto CanvasSlot = Cast<UCanvasPanelSlot>(Ping->Slot);
 	auto Anchors = FAnchors();
 	Anchors.Minimum = FVector2D(0.5f, 0.5f);
@@ -69,41 +62,6 @@ void URPG_MiniMapWidget::AddPing(AActor* Actor, MiniMap::ObjectType Type)
 	ActorMap.Add(Actor,Ping);
 }
 
-void URPG_MiniMapWidget::Unregister(AActor* Actor)
-{
-	if (!Instance)
-	{
-		return;
-	}	
-	ActorMap[Actor]->RemoveFromParent();
-	ActorMap.FindAndRemoveChecked(Actor);
-}
-
-void URPG_MiniMapWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-	if (!Instance)
-	{
-		Instance = this;
-		ActorMap.Empty();
-	}
-
-	//Make Pings for actors that registered before Instance was created.
-	for (auto i : RegisterMap)
-	{
-		AddPing(i.Key, i.Value);
-	}
-
-	RegisterMap.Empty();
-}
-
-void URPG_MiniMapWidget::NativeDestruct()
-{
-	Super::NativeDestruct();
-	Instance = nullptr;
-	ActorMap.Empty();
-	RegisterMap.Empty();
-}
 
 //TODO: Move to URPGPingWidget?
 void URPG_MiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -138,7 +96,6 @@ void URPG_MiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 			}
 			
 			Cast<UCanvasPanelSlot>(i.Value->Slot)->SetPosition(Position);
-
 		}
 	}
 }
