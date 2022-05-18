@@ -51,7 +51,7 @@ protected:
 	class UWidget* Inventory;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* Blur;
+	class UWidget* Background;
 
 	UPROPERTY(meta = (BindWidget))
 	class URPG_MiniMapWidget* MiniMap;
