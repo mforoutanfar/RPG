@@ -14,6 +14,7 @@
 #include "RPGRandomAudioComponent.h"
 #include "RPGPickupItem.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "RPGInventory.h"
 
 
@@ -99,7 +100,7 @@ void ARPGPlayerUnit::UpdateSafetyState()
 		CurrentSafetyState = UnitSafety::SafetyState::SAFE;
 	}
 
-	URPG_EventManager::GetInstance()->SafetyStateChanged.Broadcast(this, CurrentSafetyState);
+	RPGEventManager->SafetyStateChanged.Broadcast(this, CurrentSafetyState);
 }
 
 void ARPGPlayerUnit::InteractWithTarget(AActor* Target)

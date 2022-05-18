@@ -21,6 +21,8 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 
+#include "RPG_GameStateBase.h"
+
 // Sets default values
 ARPGPlayer::ARPGPlayer()
 {
@@ -76,7 +78,7 @@ void ARPGPlayer::AddUnit()
 	Unit->UnitIndex = Units.Num();
 	Units.Add(Unit);
 
-	URPG_EventManager::GetInstance()->UnitAdded.Broadcast(Unit);
+	RPGEventManager->UnitAdded.Broadcast(Unit);
 }
 
 // Called when the game starts or when spawned
@@ -84,7 +86,7 @@ void ARPGPlayer::BeginPlay()
 {
 	Super::BeginPlay();	
 
-	URPG_EventManager::GetInstance()->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
 	MiniMapCamera->SetActorLocation(GetActorLocation() + FVector(0.0f,0.0f,10000.0f));
@@ -334,5 +336,5 @@ ARPGPlayerUnit* ARPGPlayer::FindFirstOutOfRecoveryUnit()
 void ARPGPlayer::SetSelectedUnit(ARPGPlayerUnit* Unit)
 {
 	SelectedUnit = Unit;
-	URPG_EventManager::GetInstance()->SelectedUnitChanged.Broadcast(Unit);
+	RPGEventManager->SelectedUnitChanged.Broadcast(Unit);
 }

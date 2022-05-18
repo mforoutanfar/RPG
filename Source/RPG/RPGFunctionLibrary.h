@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 #include "RPGFunctionLibrary.generated.h"
 
-class ARPGCreature;
+#define RPGEventManager Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())->EventManager
 
 /**
  * 

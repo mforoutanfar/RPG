@@ -4,6 +4,7 @@
 #include "RPGInventory.h"
 #include "RPGInventoryItem.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "Components/ScaleBox.h"
 
 // Sets default values for this component's properties
@@ -59,7 +60,7 @@ bool URPGInventory::AddItem(FRPGItemInfo &OutItemInfo)
 					}
 				}
 
-				URPG_EventManager::GetInstance()->InventoryItemAdded.Broadcast(Item, OwnerUnit);
+				RPGEventManager->InventoryItemAdded.Broadcast(Item, OwnerUnit);
 
 				return true;
 			}

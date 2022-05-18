@@ -32,16 +32,7 @@ class RPG_API URPG_EventManager : public UObject
 {
 	GENERATED_BODY()
 
-private:	
-	static URPG_EventManager* Instance;
-
-protected:
-	virtual void BeginDestroy() override;
-
 public:
-	UFUNCTION(BlueprintCallable)
-	static URPG_EventManager* GetInstance();
-
 	UPROPERTY(BlueprintAssignable)
 	FUnitAdded UnitAdded;
 

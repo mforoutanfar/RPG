@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "RPG_EventManager.h"
 #include "RPGCreature.h"
+#include "RPG_GameStateBase.h"
 
 URPGBillboardVisuals::URPGBillboardVisuals()
 {
@@ -39,7 +40,7 @@ void URPGBillboardVisuals::Init(FString texturePrefix)//Called by Owner
 {
 	TexturePrefix = texturePrefix;
 	PopulateSprites();	
-	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPGBillboardVisuals::OnAttackOccured);
+	RPGEventManager->AttackOccured.AddDynamic(this, &URPGBillboardVisuals::OnAttackOccured);
 }
 
 

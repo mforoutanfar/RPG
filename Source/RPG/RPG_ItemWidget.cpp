@@ -8,6 +8,7 @@
 #include "RPGInventoryItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 
 float URPG_ItemWidget::InventoryScale = -1.0f;
 
@@ -47,7 +48,7 @@ FReply URPG_ItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, con
 				
 		bIsSelected = true;
 
-		URPG_EventManager::GetInstance()->ItemWidgetPicked.Broadcast(this);
+		RPGEventManager->ItemWidgetPicked.Broadcast(this);
 	}
 	else
 	{

@@ -9,12 +9,12 @@
 #include "RPGFunctionLibrary.h"
 #include "RPGRandomAudioComponent.h"
 
-#include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "RPGPlayerUnit.h"
 #include "RPGInventory.h"
 #include "RPG_Projectile.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "RPG_EventManager.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -37,7 +37,7 @@ ARPGCreature::ARPGCreature()
 	AudioComponent->SetupAttachment(RootComponent);
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
-	Inventory->OwnerUnit = this;
+	Inventory->OwnerUnit = this;	
 }
 
 // Called when the game starts or when spawned
@@ -121,7 +121,7 @@ void ARPGCreature::Attack()
 		}
 	}
 
-	URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, AttackData.Target, Results);
+	RPGEventManager->AttackOccured.Broadcast(this, AttackData.Target, Results);
 
 	EnterRecovery(RecoveryDuration);
 }
@@ -188,11 +188,11 @@ void ARPGCreature::EnterRecovery(float Duration)
 		GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
 	}
 
-	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, true);
+	RPGEventManager->RecoveryStateChanged.Broadcast(this, true);
 }
 
 void ARPGCreature::ExitRecovery()
 {
 	InRecovery = false;
-	URPG_EventManager::GetInstance()->RecoveryStateChanged.Broadcast(this, false);
+	RPGEventManager->RecoveryStateChanged.Broadcast(this, false);
 }

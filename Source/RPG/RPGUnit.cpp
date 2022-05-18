@@ -5,6 +5,7 @@
 
 #include "RPGBillboardVisuals.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
 

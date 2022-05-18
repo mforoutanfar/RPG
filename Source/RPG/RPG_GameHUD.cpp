@@ -9,6 +9,7 @@
 #include "RPG_InventoryWidget.h"
 #include "RPG_ItemWidget.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "RPG_AvatarWidget.h"
 #include "RPG_DamageNumberWidget.h"
 #include "Components/VerticalBox.h"
@@ -20,9 +21,9 @@
 void URPG_GameHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
-	URPG_EventManager::GetInstance()->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
-	URPG_EventManager::GetInstance()->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
-	URPG_EventManager::GetInstance()->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);
+	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
+	RPGEventManager->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
+	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);
 }
 
 void URPG_GameHUD::OnItemWidgetPicked(URPG_ItemWidget* ItemWidget)

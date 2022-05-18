@@ -5,6 +5,7 @@
 #include "RPGPlayerUnit.h"
 #include "RPG_ItemWidget.h"
 #include "RPG_EventManager.h"
+#include "RPG_GameStateBase.h"
 #include "RPGInventoryItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CanvasPanel.h"
@@ -18,9 +19,9 @@ void URPG_InventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	URPG_EventManager::GetInstance()->InventoryItemAdded.AddDynamic(this, &URPG_InventoryWidget::OnInventoryItemAdded);
-	URPG_EventManager::GetInstance()->UnitAdded.AddDynamic(this, &URPG_InventoryWidget::OnUnitAdded);
-	URPG_EventManager::GetInstance()->SelectedUnitChanged.AddDynamic(this, &URPG_InventoryWidget::OnSelectedUnitChanged);
+	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_InventoryWidget::OnInventoryItemAdded);
+	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_InventoryWidget::OnUnitAdded);
+	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_InventoryWidget::OnSelectedUnitChanged);
 }
 
 void URPG_InventoryWidget::OnUnitAdded(ARPGPlayerUnit* Unit)

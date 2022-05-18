@@ -6,6 +6,7 @@
 #include "RPG_EventManager.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "RPG_GameStateBase.h"
 
 /**
  * Sets default values
@@ -36,7 +37,7 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		Data.Target = OtherActor;
 		auto Results = Attackable->OnAttacked(Data);
 
-		URPG_EventManager::GetInstance()->AttackOccured.Broadcast(this, Data.Target, Results);
+		RPGEventManager->AttackOccured.Broadcast(this, Data.Target, Results);
 	}
 	Destroy();
 }
