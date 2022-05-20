@@ -48,6 +48,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int StarterUnits = 1;
 
+	UFUNCTION()
+		void OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit);
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))

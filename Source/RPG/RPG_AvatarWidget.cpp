@@ -8,6 +8,7 @@
 #include "Components/ProgressBar.h"
 #include "RPG_EventManager.h"
 #include "RPG_GameStateBase.h"
+#include "RPGPlayer.h"
 
 void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 {
@@ -164,4 +165,25 @@ void URPG_AvatarWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 void URPG_AvatarWidget::ResetAvatar()
 {
 	Portrait->SetBrushFromTexture(AvatarMap[NORMAL]);
+}
+
+FReply URPG_AvatarWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	auto Button = InMouseEvent.GetEffectingButton();
+	
+	if (Button.GetFName() == "LeftMouseButton")
+	{
+		RPGEventManager->AvatarLeftClicked.Broadcast(ReferencedUnit.Get());
+	}
+	else if (Button.GetFName() == "RightMouseButton")
+	{
+		RPGEventManager->AvatarRightClicked.Broadcast(ReferencedUnit.Get());
+	}
+
+	return FReply::Handled();
+}
+
+FReply URPG_AvatarWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
 }

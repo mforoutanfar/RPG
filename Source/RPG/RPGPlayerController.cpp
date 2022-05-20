@@ -32,7 +32,7 @@ void ARPGPlayerController::OnOpenInventoryPressed()
 {
 	ToggleInventory();
 
-	Cast<ARPG_HUD>(GetHUD())->OnOpenInventoryPressed(InventoryOpen);
+	Cast<ARPG_HUD>(GetHUD())->OnOpenInventoryPressed(InventoryOpen);	
 }
 
 void ARPGPlayerController::ToggleInventory()

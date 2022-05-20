@@ -9,6 +9,8 @@
 #include "RPGFunctionLibrary.generated.h"
 
 #define RPGEventManager Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())->EventManager
+#define RPGPlayerController Cast<ARPGPlayerController>(GetWorld()->GetFirstPlayerController())
+#define RPGPlayer Cast<ARPGPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn())
 
 /**
  * 

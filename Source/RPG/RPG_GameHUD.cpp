@@ -73,10 +73,6 @@ void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
 	{
 		Inventory->SetVisibility(ESlateVisibility::Visible);
 		Background->SetVisibility(ESlateVisibility::Visible);
-
-		//TODO: Hack! Find a better way.
-		Cast<URPG_InventoryWidget>(Inventory)->UpdateInventoryScale();
-		//
 	}
 	else
 	{

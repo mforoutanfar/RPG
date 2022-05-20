@@ -51,6 +51,9 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
+	RPGEventManager->AvatarLeftClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarLeftClicked);
 }
 
 //TODO: Get Unit Info as Input
@@ -85,8 +88,6 @@ void ARPGPlayer::AddUnit()
 void ARPGPlayer::BeginPlay()
 {
 	Super::BeginPlay();	
-
-	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
 	MiniMapCamera->SetActorLocation(GetActorLocation() + FVector(0.0f,0.0f,10000.0f));
@@ -222,6 +223,11 @@ void ARPGPlayer::OnSwitchUnitPressed()
 		}
 		SetSelectedUnit(Units[NextUnitIndex]);
 	}
+}
+
+void ARPGPlayer::OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit)
+{
+	SetSelectedUnit(Unit);
 }
 
 bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)

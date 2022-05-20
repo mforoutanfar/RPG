@@ -23,14 +23,17 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* InventorySwitcher;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UImage* Background;
 
-	void UpdateInventoryScale();
+	//void UpdateInventoryScale();
 
-	void DoUpdateInventoryScale();
+	//void DoUpdateInventoryScale();
 
 protected:
+
+	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const;
+
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
@@ -43,4 +46,10 @@ protected:
 	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
 	TMap <TWeakObjectPtr<class ARPGPlayerUnit>, class UCanvasPanel* > CanvasMap;
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	//TODO: Link to RPGInventory class
+	const int Rows = 12;
+	const int Cols = 12;
 };

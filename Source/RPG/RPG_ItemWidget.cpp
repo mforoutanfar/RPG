@@ -79,6 +79,6 @@ void URPG_ItemWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void URPG_ItemWidget::FollowMouse()
 {
 	auto MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
-	Cast<UCanvasPanelSlot>(Slot)->SetPosition(MousePos/* * UWidgetLayoutLibrary::GetViewportScale(this)*/);
+	Cast<UCanvasPanelSlot>(Slot)->SetPosition(MousePos + FVector2D(30.0f, 30.0f)/* * UWidgetLayoutLibrary::GetViewportScale(this)*/);
 }
 

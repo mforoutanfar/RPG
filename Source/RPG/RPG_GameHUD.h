@@ -30,8 +30,6 @@ public:
 
 	void OnOpenInventoryPressed(bool InventoryOpen);
 
-	float InventoryScale = -1.0f;
-
 	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
 	void UnregisterFromMinimap(AActor* Actor);
 

@@ -14,6 +14,18 @@
 #include "Components/WidgetSwitcher.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
+
+int32 URPG_InventoryWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
+{
+	int32 ret = Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+
+	auto a = Background->GetCachedGeometry().GetAbsoluteSize().Y / UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+	auto b = Background->GetCachedGeometry().GetLocalSize().Y;
+	URPG_ItemWidget::InventoryScale = a / b;
+
+	return ret;
+}
 
 void URPG_InventoryWidget::NativeConstruct()
 {
@@ -55,18 +67,35 @@ void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCre
 	}
 }
 
-//TODO: Hack! Find a better way.
-void URPG_InventoryWidget::UpdateInventoryScale()
+FReply URPG_InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (URPG_ItemWidget::InventoryScale < 0)
-	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPG_InventoryWidget::DoUpdateInventoryScale, 0.1f, false);
-	}
+	auto MousePos = InMouseEvent.GetScreenSpacePosition();
+
+	auto BackgroundGeom = Background->GetCachedGeometry();
+	auto BGParGeom = Background->GetParent()->GetCachedGeometry();
+	auto BgPos = BGParGeom.LocalToAbsolute(BackgroundGeom.GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)));
+
+	FVector2D RelPos = MousePos - BgPos;
+
+	auto Size = BackgroundGeom.GetAbsoluteSize();
+	auto RowHeight = Size.Y / Rows;
+	auto ColWidth = Size.X / Cols;
+
+	int X = RelPos.X / ColWidth;
+	int Y = RelPos.Y / RowHeight;
+
+	return FReply::Handled();
 }
-void URPG_InventoryWidget::DoUpdateInventoryScale()
-{
-	auto a = Background->GetCachedGeometry().GetAbsoluteSize().Y / UWidgetLayoutLibrary::GetViewportScale(this);
-	auto b = Background->GetCachedGeometry().GetLocalSize().Y;
-	URPG_ItemWidget::InventoryScale = a / b;
-}
+
+//void URPG_InventoryWidget::UpdateInventoryScale()
+//{
+//	//TODO: Hack! Find a better way.
+//	FTimerHandle TimerHandle;
+//	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &URPG_InventoryWidget::DoUpdateInventoryScale, 0.1f, false);
+//}
+//void URPG_InventoryWidget::DoUpdateInventoryScale()
+//{
+//	auto a = Background->GetCachedGeometry().GetAbsoluteSize().Y / UWidgetLayoutLibrary::GetViewportScale(this);
+//	auto b = Background->GetCachedGeometry().GetLocalSize().Y;
+//	URPG_ItemWidget::InventoryScale = a / b;
+//}
