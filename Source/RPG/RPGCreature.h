@@ -34,6 +34,8 @@ public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnItemWidgetPicked(class URPG_ItemWidget* Item);
 
 	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
 

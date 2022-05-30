@@ -4,6 +4,7 @@
 #include "RPGInventory.h"
 #include "RPGInventoryItem.h"
 #include "RPG_EventManager.h"
+#include "RPGCreature.h"
 #include "RPG_GameStateBase.h"
 #include "Components/ScaleBox.h"
 
@@ -35,39 +36,58 @@ void URPGInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
-bool URPGInventory::AddItem(FRPGItemInfo &OutItemInfo)
+bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int ProposedCol)
 {
 	int Width = OutItemInfo.Width;
 	int Height = OutItemInfo.Height;
-
-	for (size_t i = 0; i < Cols - Width + 1; i++)//col
+	int DestRow = ProposedRow;
+	int DestCol = ProposedCol;
+		
+	if (!DoesItemFit(Width, Height, DestRow, DestCol))
 	{
-		for (size_t j = 0; j < Rows - Height + 1; j++)//row
+		bool Found = false;
+		for (size_t i = 0; i < Cols - Width + 1; i++)//col
 		{
-			if (DoesItemFit(Width, Height, j, i))
+			for (size_t j = 0; j < Rows - Height + 1; j++)//row
 			{
-				OutItemInfo.InventoryX = i;
-				OutItemInfo.InventoryY = j;
-				URPGInventoryItem* Item = NewObject<URPGInventoryItem>(this, "Item");
-				Item->ItemInformation = OutItemInfo;
-				Items.Add(Item);
-
-				for (size_t m = 0; m < Width; m++)//col
+				if (DoesItemFit(Width, Height, j, i))
 				{
-					for (size_t n = 0; n < Height; n++)//row
-					{
-						Occupied[j + n][i + m] = true;
-					}
+					DestRow = j;
+					DestCol = i;
+					Found = true;
+					break;
 				}
-
-				RPGEventManager->InventoryItemAdded.Broadcast(Item, OwnerUnit);
-
-				return true;
 			}
+
+			if (Found)
+			{
+				break;
+			}
+		}
+
+		if (!Found)
+		{
+			return false;
+		}		
+	}
+
+	OutItemInfo.InventoryX = DestCol;
+	OutItemInfo.InventoryY = DestRow;
+	OutItemInfo.Owner = Cast<AActor>(OwnerUnit);
+	URPGInventoryItem* Item = NewObject<URPGInventoryItem>(this);
+	Item->ItemInformation = OutItemInfo;
+	Items.Add(Item);
+
+	for (size_t m = 0; m < Width; m++)//col
+	{
+		for (size_t n = 0; n < Height; n++)//row
+		{
+			Occupied[DestRow + n][DestCol + m] = true;
 		}
 	}
 
-	return false;
+	RPGEventManager->InventoryItemAdded.Broadcast(Item, OwnerUnit);
+	return true;
 }
 
 void URPGInventory::RemoveItem(URPGInventoryItem* Item)
@@ -87,6 +107,8 @@ void URPGInventory::RemoveItem(URPGInventoryItem* Item)
 
 	Item->ItemInformation.InventoryX = -1;
 	Item->ItemInformation.InventoryY = -1;
+
+	RPGEventManager->InventoryItemRemoved.Broadcast(Item, OwnerUnit);
 
 	Items.Remove(Item);
 }

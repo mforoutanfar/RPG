@@ -8,6 +8,7 @@
 #include "RPGCreature.h"
 #include "RPG_InventoryWidget.h"
 #include "RPG_ItemWidget.h"
+#include "RPGInventoryItem.h"
 #include "RPG_EventManager.h"
 #include "RPG_GameStateBase.h"
 #include "RPG_AvatarWidget.h"
@@ -18,20 +19,37 @@
 #include "Components/VerticalBoxSlot.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "Blueprint/WidgetTree.h"
 
 void URPG_GameHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
 	RPGEventManager->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
-	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);
+	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);	
+	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_GameHUD::OnInventoryItemAdded);
 }
 
 void URPG_GameHUD::OnItemWidgetPicked(URPG_ItemWidget* ItemWidget)
 {
-	Canvas->AddChildToCanvas(ItemWidget);
-	ItemWidget->UpdateSizeForHUD();	
-	ItemWidget->FollowMouse();//So it won't jump on first frame.
+	PickedItem = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
+	PickedItem->Init(nullptr, ItemWidget->ItemRef->ItemInformation);
+
+	Canvas->AddChildToCanvas(PickedItem);
+	PickedItem->UpdateSizeForHUD();
+	PickedItem->bShouldFollowMouse = true;
+	PickedItem->FollowMouse(false);//So it won't jump on first frame.
+
+}
+
+void URPG_GameHUD::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
+{
+	//Assuming the item was added via picked item in inventory. TODO: Better solution?
+	if (PickedItem)
+	{
+		PickedItem->RemoveFromParent();
+		PickedItem = nullptr;
+	}
 }
 
 void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)

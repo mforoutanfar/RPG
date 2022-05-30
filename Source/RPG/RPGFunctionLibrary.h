@@ -11,6 +11,7 @@
 #define RPGEventManager Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())->EventManager
 #define RPGPlayerController Cast<ARPGPlayerController>(GetWorld()->GetFirstPlayerController())
 #define RPGPlayer Cast<ARPGPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn())
+#define RPGGameHUD Cast<ARPG_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->GameHUD
 
 /**
  * 
@@ -112,6 +113,9 @@ struct FRPGItemInfo
 
 	UPROPERTY()
 	int Price = 0;
+
+	UPROPERTY()
+	AActor* Owner = nullptr;
 };
 
 USTRUCT()

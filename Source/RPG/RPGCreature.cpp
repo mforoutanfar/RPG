@@ -15,6 +15,8 @@
 #include "RPG_Projectile.h"
 
 #include "RPG_EventManager.h"
+#include "RPG_ItemWidget.h"
+#include "RPGInventoryItem.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -44,6 +46,19 @@ ARPGCreature::ARPGCreature()
 void ARPGCreature::BeginPlay()
 {
 	Super::BeginPlay();	
+
+	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &ARPGCreature::OnItemWidgetPicked);
+}
+
+void ARPGCreature::OnItemWidgetPicked(URPG_ItemWidget* Item)
+{	
+	if (auto ref = Item->ItemRef)
+	{
+		if (ref->ItemInformation.Owner == this)
+		{
+			Inventory->RemoveItem(Item->ItemRef);
+		}
+	}
 }
 
 // Called every frame

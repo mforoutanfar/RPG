@@ -48,6 +48,9 @@ protected:
 	UFUNCTION()
 		void OnRangeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UFUNCTION()
+	void OnAddItemToInventoryProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol);
+
 	int EnemiedInMeleeRange = 0;
 	int EnemiedInRangedRange = 0;
 

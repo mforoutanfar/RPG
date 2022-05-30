@@ -23,11 +23,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
 		TSubclassOf <class URPG_GameHUD> GameHUDClass;
 
-	class URPG_GameHUD* GameHUD = nullptr;
-
 public:
 	void OnOpenInventoryPressed(bool InventoryOpen);
 
 	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
 	void UnregisterFromMinimap(AActor* Actor);
+
+	class URPG_GameHUD* GameHUD = nullptr;
 };

@@ -9,6 +9,7 @@
 #include "RPG_GameHUD.generated.h"
 
 class ARPGPlayerUnit;
+class URPG_ItemWidget;
 
 /**
  * 
@@ -33,11 +34,19 @@ public:
 	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
 	void UnregisterFromMinimap(AActor* Actor);
 
+	URPG_ItemWidget* PickedItem = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class URPG_ItemWidget> ItemClass;
+
 protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnItemWidgetPicked(class URPG_ItemWidget* ItemWidget);
+	void OnItemWidgetPicked(URPG_ItemWidget* ItemWidget);
+
+	UFUNCTION()
+	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* Canvas;

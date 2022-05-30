@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "RPGFunctionLibrary.h"
 #include "RPG_ItemWidget.generated.h"
 
 class URPGInventoryItem;
@@ -22,9 +23,9 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	void FollowMouse();
+	void FollowMouse(bool HasLag);
 
-	void Init(URPGInventoryItem* ItemRef);
+	void Init(URPGInventoryItem* ItemRef, FRPGItemInfo InItemInfo);
 
 	void UpdateSizeForInventory();
 
@@ -34,13 +35,15 @@ public:
 
 	static float InventoryScale;
 
+	URPGInventoryItem* ItemRef = nullptr;
+
+	FRPGItemInfo ItemInfo;
+
+	bool bShouldFollowMouse = false;
+
 protected:
 	virtual void NativeConstruct() override;
 
-	URPGInventoryItem* ItemRef = nullptr;	
-
-	bool bIsSelected = false;
-
-	FVector2D InitOffset;
-	
+	UFUNCTION()
+	void OnItemRemoved(URPGInventoryItem* Item, class ARPGCreature* Creature);
 };

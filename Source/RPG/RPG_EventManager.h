@@ -20,10 +20,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Uni
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, AActor*, Attacker, AActor*, Target, FRPGAttackResults, Results);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetClicked, URPG_ItemWidget*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetPicked, URPG_ItemWidget*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSafetyStateChanged, ARPGPlayerUnit*, Unit, TEnumAsByte<UnitSafety::SafetyState>, State);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarLeftClicked, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarRightClicked, ARPGPlayerUnit*, Unit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAddItemToInventoryProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo, int, ProposedRow, int, ProposedCol);
 
 /**
  * 
@@ -50,6 +53,12 @@ public:
 	FInventoryItemAdded InventoryItemAdded;
 
 	UPROPERTY(BlueprintAssignable)
+	FInventoryItemRemoved InventoryItemRemoved;
+
+	UPROPERTY(BlueprintAssignable)
+	FItemWidgetClicked ItemWidgetClicked;
+
+	UPROPERTY(BlueprintAssignable)
 	FItemWidgetPicked ItemWidgetPicked;
 
 	UPROPERTY(BlueprintAssignable)
@@ -60,4 +69,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FAvatarRightClicked AvatarRightClicked;
+
+	UPROPERTY(BlueprintAssignable)
+	FAddItemToInventoryProposed AddItemToInventoryProposed;
 };

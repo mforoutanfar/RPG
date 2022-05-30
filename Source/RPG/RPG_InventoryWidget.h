@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "RPG_InventoryWidget.generated.h"
 
+class URPG_ItemWidget;
+
 /**
  * 
  */
@@ -15,10 +17,8 @@ class RPG_API URPG_InventoryWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	class RPGInventoryItem* RefItem = nullptr;
-
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class URPG_ItemWidget> ItemClass;
+	TSubclassOf<URPG_ItemWidget> ItemClass;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* InventorySwitcher;
@@ -37,6 +37,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+	void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget);
+
+	UFUNCTION()
 	void OnUnitAdded(class ARPGPlayerUnit* Unit);
 
 	UFUNCTION()
@@ -52,4 +55,6 @@ protected:
 	//TODO: Link to RPGInventory class
 	const int Rows = 12;
 	const int Cols = 12;
+
+	URPG_ItemWidget* ClickedItemWidget = nullptr;
 };

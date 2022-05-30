@@ -15,6 +15,9 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
+#include "RPG_HUD.h"
+#include "RPG_GameHUD.h"
+
 
 int32 URPG_InventoryWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
@@ -34,6 +37,12 @@ void URPG_InventoryWidget::NativeConstruct()
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_InventoryWidget::OnInventoryItemAdded);
 	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_InventoryWidget::OnUnitAdded);
 	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_InventoryWidget::OnSelectedUnitChanged);
+	RPGEventManager->ItemWidgetClicked.AddDynamic(this, &URPG_InventoryWidget::OnItemWidgetClicked);
+}
+
+void URPG_InventoryWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget)
+{
+	ClickedItemWidget = ItemWidget;
 }
 
 void URPG_InventoryWidget::OnUnitAdded(ARPGPlayerUnit* Unit)
@@ -49,7 +58,7 @@ void URPG_InventoryWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 {
 	if (Unit)
 	{
-		InventorySwitcher->SetActiveWidget(CanvasMap[Unit]);
+		InventorySwitcher->SetActiveWidget(CanvasMap[Unit]);		
 	}
 }
 
@@ -62,27 +71,42 @@ void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCre
 			auto ItemWidget = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
 			Canvas->AddChildToCanvas(ItemWidget);
 
-			ItemWidget->Init(Item);
+			ItemWidget->Init(Item, Item->ItemInformation);
+			ItemWidget->UpdateSizeForInventory();
 		}
 	}
 }
 
 FReply URPG_InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	auto MousePos = InMouseEvent.GetScreenSpacePosition();
+	if (RPGGameHUD->PickedItem)
+	{
+		auto MousePos = InMouseEvent.GetScreenSpacePosition();
 
-	auto BackgroundGeom = Background->GetCachedGeometry();
-	auto BGParGeom = Background->GetParent()->GetCachedGeometry();
-	auto BgPos = BGParGeom.LocalToAbsolute(BackgroundGeom.GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)));
+		auto BackgroundGeom = Background->GetCachedGeometry();
+		auto BGParGeom = Background->GetParent()->GetCachedGeometry();
+		auto BgPos = BGParGeom.LocalToAbsolute(BackgroundGeom.GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)));
 
-	FVector2D RelPos = MousePos - BgPos;
+		FVector2D RelPos = MousePos - BgPos;
 
-	auto Size = BackgroundGeom.GetAbsoluteSize();
-	auto RowHeight = Size.Y / Rows;
-	auto ColWidth = Size.X / Cols;
+		auto Size = BackgroundGeom.GetAbsoluteSize();
+		auto RowHeight = Size.Y / Rows;
+		auto ColWidth = Size.X / Cols;
 
-	int X = RelPos.X / ColWidth;
-	int Y = RelPos.Y / RowHeight;
+		int Col = RelPos.X / ColWidth;
+		int Row = RelPos.Y / RowHeight;
+
+		auto CurrentCanvas = InventorySwitcher->GetActiveWidget();
+		auto RefUnit = Cast<ARPGCreature>(CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get());
+
+		RPGEventManager->AddItemToInventoryProposed.Broadcast(RefUnit, RPGGameHUD->PickedItem->ItemInfo, Row , Col);
+	}
+	else if (ClickedItemWidget)
+	{
+		RPGEventManager->ItemWidgetPicked.Broadcast(ClickedItemWidget);
+	}
+
+	ClickedItemWidget = nullptr;
 
 	return FReply::Handled();
 }

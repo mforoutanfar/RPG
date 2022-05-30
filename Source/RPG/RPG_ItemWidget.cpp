@@ -12,73 +12,72 @@
 
 float URPG_ItemWidget::InventoryScale = -1.0f;
 
-void URPG_ItemWidget::Init(URPGInventoryItem* InItemRef)
+void URPG_ItemWidget::Init(URPGInventoryItem* InItemRef, FRPGItemInfo InItemInfo)
 {
 	ItemRef = InItemRef;
+	ItemInfo = InItemInfo;
 
-	FString AssetName = "Item_" + InItemRef->ItemInformation.ItemName.ToString();
+	FString AssetName = "Item_" + ItemInfo.ItemName.ToString();
 	FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
 	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
 	ItemImage->SetBrushFromTexture(tmpTexture);
-
-	//TODO: Find a more elegant sizing way!
-	UpdateSizeForInventory();
 }
 
+//TODO: Find a more elegant sizing way!
 void URPG_ItemWidget::UpdateSizeForInventory()
 {
-	auto Data = ItemRef->ItemInformation;
-	Cast<UCanvasPanelSlot>(Slot)->SetSize(FVector2D(100.0f * Data.Width, 100.0f * Data.Height));
-	Cast<UCanvasPanelSlot>(Slot)->SetPosition(FVector2D(100.f * (Data.InventoryX), 100.f * (Data.InventoryY)));
+	Cast<UCanvasPanelSlot>(Slot)->SetSize(FVector2D(100.0f * ItemInfo.Width, 100.0f * ItemInfo.Height));
+	Cast<UCanvasPanelSlot>(Slot)->SetPosition(FVector2D(100.f * (ItemInfo.InventoryX), 100.f * (ItemInfo.InventoryY)));
 }
 
 void URPG_ItemWidget::UpdateSizeForHUD()
 {
-	auto Data = ItemRef->ItemInformation;
-	Cast<UCanvasPanelSlot>(Slot)->SetSize(FVector2D(100.0f * Data.Width* InventoryScale, 100.0f * Data.Height* InventoryScale));
-	Cast<UCanvasPanelSlot>(Slot)->SetPosition(FVector2D(100.f * (Data.InventoryX), 100.f * (Data.InventoryY)));
+	Cast<UCanvasPanelSlot>(Slot)->SetSize(FVector2D(100.0f * ItemInfo.Width* InventoryScale, 100.0f * ItemInfo.Height* InventoryScale));
+	Cast<UCanvasPanelSlot>(Slot)->SetPosition(FVector2D(100.f * (ItemInfo.InventoryX), 100.f * (ItemInfo.InventoryY)));
 }
 
 FReply URPG_ItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (!bIsSelected)
-	{
-		auto MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
-		InitOffset = Cast<UCanvasPanelSlot>(Slot)->GetPosition() - MousePos;
-				
-		bIsSelected = true;
+	RPGEventManager->ItemWidgetClicked.Broadcast(this);
 
-		RPGEventManager->ItemWidgetPicked.Broadcast(this);
-	}
-	else
-	{
-		bIsSelected = false;
-	}
-
-	//Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-	return FReply::Handled();
+	//Unhandled So that Inventorywidget can handle it.
+	return FReply::Unhandled();
 }
 
 void URPG_ItemWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	bIsFocusable = false;
+
+	RPGEventManager->InventoryItemRemoved.AddDynamic(this, &URPG_ItemWidget::OnItemRemoved);
 }
 
+void URPG_ItemWidget::OnItemRemoved(URPGInventoryItem* Item, ARPGCreature* Creature)
+{
+	if (Item == ItemRef)
+	{
+		RemoveFromParent();
+	}
+}
 
 void URPG_ItemWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-	
-	if (bIsSelected)
+	if (bShouldFollowMouse)
 	{
-		FollowMouse();
+		FollowMouse(true);
 	}
 }
 
-void URPG_ItemWidget::FollowMouse()
+void URPG_ItemWidget::FollowMouse(bool HasLag)
 {
 	auto MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetOwningPlayer());
-	Cast<UCanvasPanelSlot>(Slot)->SetPosition(MousePos + FVector2D(30.0f, 30.0f)/* * UWidgetLayoutLibrary::GetViewportScale(this)*/);
+	auto Dest = MousePos + FVector2D(30.0f, 30.0f);
+	float Alpha = 0.3f;
+	if (!HasLag)
+	{
+		Alpha = 1.0f;
+	}
+	Cast<UCanvasPanelSlot>(Slot)->SetPosition(FMath::Lerp(Cast<UCanvasPanelSlot>(Slot)->GetPosition(), Dest, Alpha));
 }
 

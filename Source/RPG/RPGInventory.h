@@ -19,7 +19,7 @@ public:
 	// Sets default values for this component's properties
 	URPGInventory();
 
-	bool AddItem(FRPGItemInfo &OutItemInfo);
+	bool AddItem(FRPGItemInfo &OutItemInfo, int ProposedRow = 0, int ProposedCol = 0);
 
 	void RemoveItem(URPGInventoryItem* Item);
 
