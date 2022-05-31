@@ -89,7 +89,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		float Resolution = 200.0f;
 
-	AnimStates CurrentAnimState = NONE;	 
+	AnimStates CurrentAnimState = AnimStates::ATTACK;
 
 	int BetweenAnglesCounter = 10;
 };
