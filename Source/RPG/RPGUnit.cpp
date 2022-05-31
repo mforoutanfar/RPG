@@ -21,6 +21,7 @@ ARPGUnit::ARPGUnit()
 	CreatureType = CreatureType::ENEMY;
 
 	Visuals = CreateDefaultSubobject<URPGBillboardVisuals>(FName("Visuals"));
+	Visuals->AttackCallback.BindUObject(this, &ARPGUnit::Attack);
 	Visuals->SetupAttachment(RootComponent);
 
 	MeleeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
@@ -37,7 +38,7 @@ ARPGUnit::ARPGUnit()
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	SightConfig->SetMaxAge(45.0f);
+	SightConfig->SetMaxAge(10.0f);
 
 	PerceptionComponent->ConfigureSense(*SightConfig);
 }
@@ -103,3 +104,10 @@ void ARPGUnit::Die()
 	UnregisterFromMiniMap(this);
 }
 
+void ARPGUnit::BeginAttack()
+{
+	Visuals->BeginAttack();
+
+	//TODO: Hack! Entering recovery before actually attacking because otherwise behavior tree will misbehave.
+	EnterRecovery(1.25f);
+}

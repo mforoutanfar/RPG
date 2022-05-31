@@ -41,6 +41,8 @@ public:
 
 	virtual void Die() override;
 
+	virtual void BeginAttack() override;
+
 protected:
 
 };

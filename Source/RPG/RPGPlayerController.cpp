@@ -52,7 +52,7 @@ void ARPGPlayerController::ToggleInventory()
 		SetInputMode(FInputModeGameOnly());
 	}
 
-	UGameplayStatics::SetGamePaused(this, InventoryOpen);
+	SetPause(InventoryOpen);
 }
 
 void ARPGPlayerController::OnForwardBackwardPressed(float Value)

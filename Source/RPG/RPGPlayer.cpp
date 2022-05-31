@@ -204,7 +204,7 @@ void ARPGPlayer::OnAttackPressed()
 
 	if (UnitToAttack)
 	{
-		UnitToAttack->Attack();
+		UnitToAttack->BeginAttack();
 	}
 }
 

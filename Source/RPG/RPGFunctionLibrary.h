@@ -145,6 +145,9 @@ public:
 		float DamageDealt = 0.0f;
 
 	UPROPERTY(BlueprintReadWrite)
+		float RecoveryDuration = 0.0f;
+
+	UPROPERTY(BlueprintReadWrite)
 		TWeakObjectPtr<AActor> Target = nullptr;
 
 	//TODO: Hack for preventing slash animation showing on ranged attacks.

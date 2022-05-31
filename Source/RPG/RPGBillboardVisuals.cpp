@@ -225,6 +225,12 @@ void URPGBillboardVisuals::AdvanceFrame()
 		}		
 	}
 	UpdateSprite();
+
+	//TODO: Cleaner system for animation callbacks?
+	if (CurrentAnimState == ATTACK && CurrentFrame == AttackCallbackFrame)
+	{
+		AttackCallback.Execute();
+	}
 }
 
 void URPGBillboardVisuals::UpdateOrientation()
@@ -265,14 +271,14 @@ void URPGBillboardVisuals::OnOwnerDied()
 	SetAnimState(DIE);
 }
 
+void URPGBillboardVisuals::BeginAttack()
+{
+	SetAnimState(ATTACK);
+}
 
 void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
-{
-	if (Attacker == GetOwner())
-	{
-		SetAnimState(ATTACK);
-	}
-	else if (Target == GetOwner())
+{	
+	if (Target == GetOwner())
 	{
 		if (Results.TargetDied)
 		{

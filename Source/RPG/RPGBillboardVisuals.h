@@ -10,6 +10,8 @@
 
 using namespace AnimationState;
 
+DECLARE_DELEGATE_RetVal(FRPGAttackResults, FAnimCallback);
+
 enum Orientation
 {
 	BACK,
@@ -66,6 +68,8 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 	void AdvanceFrame();
 	void UpdateSprite();
 
+	int AttackCallbackFrame = 5;
+
 public:
 
 	UFUNCTION()
@@ -82,4 +86,8 @@ public:
 
 	UFUNCTION()
 	void OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results);
+
+	void BeginAttack();
+	
+	FAnimCallback AttackCallback;
 };

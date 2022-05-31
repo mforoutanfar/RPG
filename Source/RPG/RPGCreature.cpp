@@ -94,7 +94,14 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	return Results;
 }
 
-void ARPGCreature::Attack()
+
+void ARPGCreature::BeginAttack()
+{
+	auto Results = Attack();
+	EnterRecovery(Results.RecoveryDuration);
+}
+
+FRPGAttackResults ARPGCreature::Attack()
 {	
 	FRPGAttackData AttackData;
 	FRPGAttackResults Results;
@@ -136,11 +143,11 @@ void ARPGCreature::Attack()
 		}
 	}
 
+	Results.RecoveryDuration = RecoveryDuration;
+
 	RPGEventManager->AttackOccured.Broadcast(this, AttackData.Target, Results);
 
-	
-
-	EnterRecovery(RecoveryDuration);
+	return Results;
 }
 
 void ARPGCreature::Die()

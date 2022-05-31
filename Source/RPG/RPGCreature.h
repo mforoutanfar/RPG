@@ -42,7 +42,7 @@ public:
 	bool IsInRecovery() { return InRecovery; };
 
 	UFUNCTION(BlueprintCallable)
-	virtual void Attack();
+	virtual void BeginAttack();
 
 	UPROPERTY(EditAnywhere)
 	float MaxHP = 30000.0f;
@@ -91,4 +91,5 @@ protected:
 
 	class URPGInventory* Inventory;
 
+	FRPGAttackResults Attack();
 };

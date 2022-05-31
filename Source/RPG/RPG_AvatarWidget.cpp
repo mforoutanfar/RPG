@@ -27,7 +27,7 @@ void URPG_AvatarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	RecoveryIndicator->SetBrushTintColor(SafeColor);
-	SelectedIndicator->SetBrushTintColor(DeselectedColor);
+	SelectedIndicator->SetBrushTintColor(DeselectedColor);	
 }
 
 URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -97,6 +97,7 @@ void URPG_AvatarWidget::ResetToDefaultColor()
 	RecoveryIndicator->SetBrushTintColor(DefaultSafetyColor);
 }
 
+//TODO: All avatar changes can be made using UMG animations in editor. This way they won't pause when the game is paused.
 void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
 {
 	if (auto Unit = Cast<ARPGPlayerUnit>(Creature))
@@ -106,7 +107,7 @@ void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreatu
 			Portrait->SetBrushFromTexture(AvatarMap[COCKY]);
 
 			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
-			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);			
 		}
 	}
 }
