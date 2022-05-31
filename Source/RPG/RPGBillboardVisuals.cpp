@@ -59,13 +59,20 @@ void URPGBillboardVisuals::OnOwnerWalkingStateChanged(ARPGCreature* Creature, bo
 		if (DefaultAnimState != WALK)
 		{
 			SetDefaultAnimState(WALK);
-			SetAnimState(WALK);
+
+			if (CurrentAnimState == IDLE || CurrentAnimState == NONE)//TODO: Any other case?
+			{
+				SetAnimState(WALK);
+			}			
 		}
 	}
 	else
 	{
 		SetDefaultAnimState(IDLE);
-		SetAnimState(IDLE);
+		if (CurrentAnimState == WALK || CurrentAnimState == NONE)//TODO: Any other case?
+		{
+			SetAnimState(IDLE);
+		}		
 	}
 }
 

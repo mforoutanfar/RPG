@@ -47,8 +47,6 @@ void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 	MeleeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnMeleeSphereEndOverlap);
 	RangeSphere->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereBeginOverlap);
 	RangeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereEndOverlap);
-
-	RPGEventManager->AddItemToInventoryProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToInventoryProposed);
 }
 
 void ARPGPlayerUnit::OnMeleeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -139,6 +137,7 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 void ARPGPlayerUnit::BeginPlay()
 {
 	Super::BeginPlay();
+	RPGEventManager->AddItemToInventoryProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToInventoryProposed);
 	UpdateSafetyState();
 }
 

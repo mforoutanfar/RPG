@@ -32,9 +32,9 @@ void URPG_AvatarWidget::NativeConstruct()
 
 URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	FString Codes[7] = {"normal", "angry", "sad", "dead", "disappointed", "happy", "pain"};
+	FString Codes[8] = {"normal", "angry", "sad", "dead", "disappointed", "happy", "pain", "cocky"};
 		
-	for (size_t i = 0; i < 7; i++)
+	for (size_t i = 0; i < 8; i++)
 	{
 		FString AssetName = "avatar_dummy_" + Codes[i];
 		FString PathToLoad = FString("/Game/Assets/Avatars/") + AssetName + FString(".") + AssetName;
@@ -103,7 +103,7 @@ void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreatu
 	{
 		if (Unit == ReferencedUnit.Get())
 		{
-			Portrait->SetBrushFromTexture(AvatarMap[HAPPY]);
+			Portrait->SetBrushFromTexture(AvatarMap[COCKY]);
 
 			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
 			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
@@ -120,7 +120,7 @@ void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAt
 	{
 		if (Results.TargetDied)
 		{
-			Portrait->SetBrushFromTexture(AvatarMap[HAPPY]);
+			Portrait->SetBrushFromTexture(AvatarMap[COCKY]);
 		}
 		else
 		{

@@ -19,7 +19,8 @@ enum AvatarState
 	DEAD,
 	DISAPPOINTED,
 	HAPPY,
-	PAIN
+	PAIN,
+	COCKY
 };
 
 /**
