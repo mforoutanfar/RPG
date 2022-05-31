@@ -104,7 +104,7 @@ void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreatu
 	{
 		if (Unit == ReferencedUnit.Get())
 		{
-			Portrait->SetBrushFromTexture(AvatarMap[COCKY]);
+			Portrait->SetBrushFromTexture(AvatarMap[HAPPY]);
 
 			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
 			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);			
