@@ -20,6 +20,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
+#include "Components/CanvasPanelSlot.h"
 
 void URPG_GameHUD::NativeConstruct()
 {
@@ -69,7 +70,9 @@ void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackR
 		{
 			auto Slash = CreateWidget<URPG_FollowerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), SlashWidgetClass);
 			Slash->Target = Target;
-			Canvas->AddChildToCanvas(Slash);
+			Slash->CanvasSlot = Canvas->AddChildToCanvas(Slash);			 
+			Slash->CanvasSlot->SetAutoSize(true);
+			Slash->CanvasSlot->SetAlignment(FVector2D(0.5f,0.5f));
 		}
 	}
 
@@ -79,7 +82,9 @@ void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackR
 		{
 			auto DamageNumber = CreateWidget<URPG_DamageNumberWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageNumberWidgetClass);
 			DamageNumber->Init(Target, Results);
-			Canvas->AddChildToCanvas(DamageNumber);
+			DamageNumber->CanvasSlot = Canvas->AddChildToCanvas(DamageNumber);
+			DamageNumber->CanvasSlot->SetAutoSize(true);
+			DamageNumber->CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 		}
 	}
 
@@ -91,11 +96,15 @@ void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
 	{
 		Inventory->SetVisibility(ESlateVisibility::Visible);
 		Background->SetVisibility(ESlateVisibility::Visible);
+		Equipment->SetVisibility(ESlateVisibility::Visible);
+		MiniMap->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	else
 	{
 		Inventory->SetVisibility(ESlateVisibility::Collapsed);
 		Background->SetVisibility(ESlateVisibility::Collapsed);
+		Equipment->SetVisibility(ESlateVisibility::Collapsed);
+		MiniMap->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 

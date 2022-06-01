@@ -58,6 +58,9 @@ protected:
 	class UWidget* Inventory;
 
 	UPROPERTY(meta = (BindWidget))
+	class UWidget* Equipment;
+
+	UPROPERTY(meta = (BindWidget))
 	class UWidget* Background;
 
 	UPROPERTY(meta = (BindWidget))

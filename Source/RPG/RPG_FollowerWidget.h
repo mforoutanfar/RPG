@@ -22,18 +22,20 @@ protected:
 
 	FVector2D PosOnScreen;
 
-	UPROPERTY()
-	class UCanvasPanelSlot* CanvasSlot = nullptr;
-
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* Canvas = nullptr;
+	//UPROPERTY(meta = (BindWidget))
+	//class UCanvasPanel* Canvas = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UWidget* FollowerVisuals;
 
+	bool PlacedInPosition = false;
+
 public:
+
+	UPROPERTY()
+		class UCanvasPanelSlot* CanvasSlot = nullptr;
 
 	TWeakObjectPtr<AActor> Target = nullptr;
 
