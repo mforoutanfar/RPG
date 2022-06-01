@@ -12,7 +12,6 @@
 #include "RPG_GameStateBase.h"
 #include "RPGPlayerUnit.h"
 #include "RPGInventory.h"
-#include "RPG_Equipment.h"
 #include "RPG_Projectile.h"
 
 #include "RPG_EventManager.h"
@@ -40,10 +39,7 @@ ARPGCreature::ARPGCreature()
 	AudioComponent->SetupAttachment(RootComponent);
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
-	Inventory->OwnerUnit = this;
-
-	Equipment = CreateDefaultSubobject<URPG_Equipment>(FName("Equipment"));
-	Equipment->OwnerUnit = this;
+	Inventory->OwnerUnit = this;	
 }
 
 // Called when the game starts or when spawned
@@ -58,13 +54,9 @@ void ARPGCreature::OnItemWidgetPicked(URPG_ItemWidget* Item)
 {	
 	if (auto ref = Item->ItemRef)
 	{
-		if (Inventory->Contains(ref))
+		if (ref->ItemInformation.Owner == this)
 		{
 			Inventory->RemoveItem(Item->ItemRef);
-		}
-		else if (Equipment->Contains(ref))
-		{
-
 		}
 	}
 }

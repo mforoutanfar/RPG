@@ -51,9 +51,6 @@ protected:
 	UFUNCTION()
 	void OnAddItemToInventoryProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol);
 
-	UFUNCTION()
-	void OnAddItemToEquipmentProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol);
-
 	int EnemiedInMeleeRange = 0;
 	int EnemiedInRangedRange = 0;
 

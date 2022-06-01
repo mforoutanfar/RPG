@@ -90,7 +90,6 @@ protected:
 		FVector ActionLocation;
 
 	class URPGInventory* Inventory;
-	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();
 };

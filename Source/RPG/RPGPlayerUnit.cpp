@@ -16,7 +16,6 @@
 #include "RPG_EventManager.h"
 #include "RPG_GameStateBase.h"
 #include "RPGInventory.h"
-#include "RPG_Equipment.h"
 
 
 /**
@@ -48,26 +47,6 @@ void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 	MeleeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnMeleeSphereEndOverlap);
 	RangeSphere->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereBeginOverlap);
 	RangeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereEndOverlap);
-}
-
-/**
- * Called when the game starts or when spawned
-*/
-void ARPGPlayerUnit::BeginPlay()
-{
-	Super::BeginPlay();
-	RPGEventManager->AddItemToInventoryProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToInventoryProposed);
-	RPGEventManager->AddItemToEquipmentProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToEquipmentProposed);
-	UpdateSafetyState();
-}
-
-/**
- * Called every frame
- * @param DeltaTime Game time elapsed during last frame modified by the time dilation
-*/
-void ARPGPlayerUnit::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void ARPGPlayerUnit::OnMeleeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -114,14 +93,6 @@ void ARPGPlayerUnit::OnAddItemToInventoryProposed(ARPGCreature* Creature, FRPGIt
 	}
 }
 
-void ARPGPlayerUnit::OnAddItemToEquipmentProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol)
-{
-	if (Creature == this)
-	{
-		Equipment->AddItem(ItemInfo);
-	}
-}
-
 void ARPGPlayerUnit::UpdateSafetyState()
 {
 	if (EnemiedInMeleeRange > 0)
@@ -160,3 +131,21 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 	}
 }
 
+/**
+ * Called when the game starts or when spawned
+*/
+void ARPGPlayerUnit::BeginPlay()
+{
+	Super::BeginPlay();
+	RPGEventManager->AddItemToInventoryProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToInventoryProposed);
+	UpdateSafetyState();
+}
+
+/**
+ * Called every frame
+ * @param DeltaTime Game time elapsed during last frame modified by the time dilation
+*/
+void ARPGPlayerUnit::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}

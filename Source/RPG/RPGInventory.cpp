@@ -36,11 +36,6 @@ void URPGInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
-bool URPGInventory::Contains(URPGInventoryItem* Item)
-{
-	return Items.Contains(Item);
-}
-
 bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int ProposedCol)
 {
 	int Width = OutItemInfo.Width;
@@ -114,8 +109,6 @@ void URPGInventory::RemoveItem(URPGInventoryItem* Item)
 	Item->ItemInformation.InventoryY = -1;
 
 	RPGEventManager->InventoryItemRemoved.Broadcast(Item, OwnerUnit);
-
-	Item->ItemInformation.Owner = nullptr;
 
 	Items.Remove(Item);
 }
