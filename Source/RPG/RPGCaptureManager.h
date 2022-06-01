@@ -11,12 +11,12 @@ class UAnimationAsset;
 UENUM()
 enum AnimStates
 {
-	NONE,
-	IDLE,
-	WALK,
-	ATTACK,
-	HIT,
-	DIE
+	AS_NONE,
+	AS_IDLE,
+	AS_WALK,
+	AS_ATTACK,
+	AS_HIT,
+	AS_DIE
 };
 
 /**
@@ -89,7 +89,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		float Resolution = 200.0f;
 
-	AnimStates CurrentAnimState = AnimStates::ATTACK;
+	AnimStates CurrentAnimState = AnimStates::AS_ATTACK;
 
 	int BetweenAnglesCounter = 10;
 };

@@ -80,7 +80,7 @@ void ARPGCaptureManager::Tick(float DeltaTime)
 			else
 			{
 				ChangeAngle(0);
-				if (CurrentAnimState == DIE)
+				if (CurrentAnimState == AS_DIE)
 				{
 					TakingShots = false;
 				}
@@ -95,12 +95,12 @@ void ARPGCaptureManager::Tick(float DeltaTime)
 
 void ARPGCaptureManager::Init()
 {
-	AnimStateSuffix.Add(NONE, "ERROR");
-	AnimStateSuffix.Add(IDLE, "Idle");
-	AnimStateSuffix.Add(WALK, "Walk");
-	AnimStateSuffix.Add(ATTACK, "Attack");
-	AnimStateSuffix.Add(HIT, "Hit");
-	AnimStateSuffix.Add(DIE, "Die");
+	AnimStateSuffix.Add(AS_NONE, "ERROR");
+	AnimStateSuffix.Add(AS_IDLE, "Idle");
+	AnimStateSuffix.Add(AS_WALK, "Walk");
+	AnimStateSuffix.Add(AS_ATTACK, "Attack");
+	AnimStateSuffix.Add(AS_HIT, "Hit");
+	AnimStateSuffix.Add(AS_DIE, "Die");
 
 	checkf(GetWorld(), TEXT("No World!"));
 
@@ -142,7 +142,7 @@ void ARPGCaptureManager::TakeShot()
 {	
 	int FrameNumber = CurrentFrame - 1;
 
-	if (CurrentAnimState == DIE)//for DIE only for some reason!
+	if (CurrentAnimState == AS_DIE)//for DIE only for some reason!
 	{
 		FrameNumber = CurrentFrame - 2;
 		if (FrameNumber < 0)
