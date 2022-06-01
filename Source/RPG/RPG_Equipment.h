@@ -5,44 +5,39 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "RPGFunctionLibrary.h"
-
-#include "RPGInventory.generated.h"
+#include "RPG_Equipment.generated.h"
 
 class URPGInventoryItem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class RPG_API URPGInventory : public UActorComponent
+class RPG_API URPG_Equipment : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	URPGInventory();
+	URPG_Equipment();
 
-	bool AddItem(FRPGItemInfo &OutItemInfo, int ProposedRow = 0, int ProposedCol = 0);
-
-	void RemoveItem(URPGInventoryItem* Item);
-
-	bool DoesItemFit(int width, int height, int row, int col);
+	bool AddItem(FRPGItemInfo& OutItemInfo);
 
 	class ARPGCreature* OwnerUnit = nullptr;
+
+	URPGInventoryItem* GetItem(TEnumAsByte<ItemCategory::ItemCat> Category);
+
+	void SetItem(TEnumAsByte<ItemCategory::ItemCat> Category, URPGInventoryItem* Item);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	static const int Rows = 12;
-	static const int Cols = 12;
-
-	//Top Left is {Row = 0,Col = 0}.
-	bool Occupied[Rows][Cols] = {false};
-
-	UPROPERTY()
-	TArray<URPGInventoryItem*> Items = {};
+	TMap<TEnumAsByte<ItemCategory::ItemCat>, URPGInventoryItem*> EquipmentMap;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool Contains(URPGInventoryItem* Item);
+
+	void RemoveItem(URPGInventoryItem* Item);
+
 };

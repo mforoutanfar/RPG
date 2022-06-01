@@ -68,7 +68,8 @@ namespace ItemCategory
 	enum ItemCat
 	{
 		NONE,
-		WEAPON,
+		MELEE_WEAPON,
+		RANGED_WEAPON,
 		ARMOR,
 		CONSUMABLE,
 		INGREDIENTS,
