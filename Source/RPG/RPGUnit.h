@@ -22,7 +22,7 @@ public:
 	ARPGUnit();
 
 	virtual void BeginPlay() override;
-	
+
 	virtual InteractableCat GetInteractableType() override;
 	virtual void OnInteracted(bool Successful) override;
 

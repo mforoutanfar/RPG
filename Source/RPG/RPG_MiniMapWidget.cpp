@@ -11,7 +11,7 @@
 
 void URPG_MiniMapWidget::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
 {
-	if (!ActorMap.Find(Actor))
+	if (!ActorMap.Contains(Actor))
 	{
 		AddPing(Actor, Type);
 	}
@@ -19,8 +19,14 @@ void URPG_MiniMapWidget::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::O
 
 void URPG_MiniMapWidget::UnregisterFromMinimap(AActor* Actor)
 {
-	auto Ping = ActorMap.FindAndRemoveChecked(Actor);
-	Ping->RemoveFromParent();
+	if (ActorMap.Contains(Actor))
+	{
+		if (auto Ping = ActorMap[Actor])
+		{
+			Ping->RemoveFromParent();
+			ActorMap.Remove(Actor);
+		}
+	}
 }
 
 void URPG_MiniMapWidget::AddPing(AActor* Actor, MiniMap::ObjectType Type)

@@ -44,10 +44,8 @@ void ARPGPlayerUnit::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	MeleeSphere->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayerUnit::OnMeleeSphereBeginOverlap);
-	MeleeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnMeleeSphereEndOverlap);
-	RangeSphere->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereBeginOverlap);
-	RangeSphere->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnRangeSphereEndOverlap);
+	HitBox->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayerUnit::OnHitboxBeginOverlap);
+	HitBox->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayerUnit::OnHitboxEndOverlap);
 }
 
 /**
@@ -70,36 +68,28 @@ void ARPGPlayerUnit::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ARPGPlayerUnit::OnMeleeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ARPGPlayerUnit::OnHitboxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherComp->GetCollisionProfileName() == FName("EnemyHitBox"))
+	if (OtherComp->ComponentHasTag(FName("MeleeSphere")))
 	{
 		EnemiedInMeleeRange++;
 		UpdateSafetyState();
 	}
-}
-
-void ARPGPlayerUnit::OnMeleeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherComp->GetCollisionProfileName() == FName("EnemyHitBox"))
-	{
-		EnemiedInMeleeRange--;
-		UpdateSafetyState();
-	}
-}
-
-void ARPGPlayerUnit::OnRangeSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherComp->GetCollisionProfileName() == FName("EnemyHitBox"))
+	else if (OtherComp->ComponentHasTag(FName("RangeSphere")))
 	{
 		EnemiedInRangedRange++;
 		UpdateSafetyState();
 	}
 }
 
-void ARPGPlayerUnit::OnRangeSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ARPGPlayerUnit::OnHitboxEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (OtherComp->GetCollisionProfileName() == FName("EnemyHitBox"))
+	if (OtherComp->ComponentHasTag(FName("MeleeSphere")))
+	{
+		EnemiedInMeleeRange--;
+		UpdateSafetyState();
+	}
+	else if (OtherComp->ComponentHasTag(FName("RangeSphere")))
 	{
 		EnemiedInRangedRange--;
 		UpdateSafetyState();

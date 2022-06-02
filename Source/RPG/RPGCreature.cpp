@@ -29,9 +29,11 @@ ARPGCreature::ARPGCreature()
 	GetMesh()->SetActive(false);
 
 	MeleeSphere = CreateDefaultSubobject<USphereComponent>(TEXT("MeleeSphere"));
+	MeleeSphere->ComponentTags.Add(FName("MeleeSphere"));
 	MeleeSphere->SetupAttachment(RootComponent);
 
 	RangeSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RangeSphere"));
+	RangeSphere->ComponentTags.Add(FName("RangeSphere"));
 	RangeSphere->SetupAttachment(RootComponent);
 
 	HitBox = GetCapsuleComponent();
@@ -128,7 +130,7 @@ FRPGAttackResults ARPGCreature::Attack()
 
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
-		AttackData.Damage = MeleeDamage;
+		AttackData.Damage = CalculateMeleeDamage();
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
 		Results = Attackable->OnAttacked(AttackData);
@@ -158,10 +160,20 @@ FRPGAttackResults ARPGCreature::Attack()
 	return Results;
 }
 
+int ARPGCreature::CalculateMeleeDamage()
+{
+	if (auto Weapon = Equipment->GetItem(ItemCategory::ItemCat::MELEE_WEAPON))
+	{
+		return Weapon->ItemInformation.MeleeDamage.GetResult();
+	}
+
+	return BaseMeleeDamage.GetResult();
+}
+
 void ARPGCreature::Die()
 {
 	Dead = true;
-	AttackableEnabled = false;
+	AttackableEnabled = false;	
 }
 
 AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType, bool ShouldBeVisible)

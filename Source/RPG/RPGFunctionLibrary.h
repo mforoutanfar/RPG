@@ -89,6 +89,27 @@ namespace UnitSafety
 	};
 }
 
+//k1*Rand(0,Dn) + k1
+USTRUCT(BlueprintType)
+struct FRPGDice
+{
+	GENERATED_BODY()
+
+		UPROPERTY(EditAnywhere)
+		int k1;
+
+	UPROPERTY(EditAnywhere)
+		int Dn;
+
+	UPROPERTY(EditAnywhere)
+		int k2;
+
+	int GetResult()
+	{
+		return k1 * FMath::RandRange(0, Dn) + k2;
+	};
+};
+
 USTRUCT(BlueprintType)
 struct FRPGItemInfo
 {
@@ -102,6 +123,9 @@ struct FRPGItemInfo
 
 	UPROPERTY(EditAnywhere)
 	int Height = 0;
+
+	UPROPERTY(EditAnywhere)
+	FRPGDice MeleeDamage;
 
 	UPROPERTY()
 	int InventoryX = -1;

@@ -28,7 +28,7 @@ ARPGUnit::ARPGUnit()
 	RangeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 	HitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 
-	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));	
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(FName("PerceptionComponent"));
 
 	auto SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(FName("SightConfig"));
 
@@ -99,6 +99,10 @@ void ARPGUnit::Die()
 	{
 		Controller->UnPossess();
 	}
+
+	//Removes threat to PlayerUnits (Affects safety)
+	MeleeSphere->DestroyComponent();
+	RangeSphere->DestroyComponent();
 
 	//TODO: Replace Enemy ping with Loot ping.
 	UnregisterFromMiniMap(this);

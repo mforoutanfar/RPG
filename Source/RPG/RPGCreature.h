@@ -50,8 +50,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	float HP = 30000.0f;
 
+	float MaxMana = 300.0f;
+	float Mana = 300.0f;
+
+	UPROPERTY(EditAnywhere)
+	FRPGDice BaseMeleeDamage;	
+
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
+		TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
+
+	bool IsDead() { return Dead; }
 
 protected:
 	bool InRecovery = false;
@@ -60,25 +68,17 @@ protected:
 
 	FName CreatureName = "Corpse";
 
-	float MaxMana = 300.0f;
-	float Mana = 300.0f;
-
-	float MeleeDamage = 100.0f;
-
-	float RangedDamage = 100.0f;
 
 	class URPGRandomAudioComponent* AudioComponent;
 
 	bool Dead = false;
-	bool IsDead() { return Dead; }
 	virtual void Die();
 
 	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true, bool ShouldBeVisible = true);
 
 	FTimerHandle RecoveryTimerHandle;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* HitBox;
+	TWeakObjectPtr<UCapsuleComponent> HitBox;
 
 	UPROPERTY(EditDefaultsOnly)
 		class USphereComponent* MeleeSphere = nullptr;
@@ -93,4 +93,5 @@ protected:
 	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();
+	int CalculateMeleeDamage();
 };
