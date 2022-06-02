@@ -42,7 +42,25 @@ void URPG_InventoryWidget::NativeConstruct()
 
 void URPG_InventoryWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget)
 {
-	ClickedItemWidget = ItemWidget;
+	if (IsItemWidgetInInventoryWidget(ItemWidget))//Make sure it's not in equipment widget. TODO: Looks too complicated. Solution?
+	{
+		ClickedItemWidget = ItemWidget;
+	}
+}
+
+bool URPG_InventoryWidget::IsItemWidgetInInventoryWidget(URPG_ItemWidget* ItemWidget)
+{
+	auto Par = ItemWidget->GetParent();
+
+	for (auto i : CanvasMap)
+	{
+		if (i.Value == Par)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void URPG_InventoryWidget::OnUnitAdded(ARPGPlayerUnit* Unit)
@@ -73,6 +91,8 @@ void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCre
 
 			ItemWidget->Init(Item, Item->ItemInformation);
 			ItemWidget->UpdateSizeForInventory();
+
+			Item->RefWidget = ItemWidget;
 		}
 	}
 }

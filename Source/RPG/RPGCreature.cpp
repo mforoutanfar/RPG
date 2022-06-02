@@ -12,6 +12,7 @@
 #include "RPG_GameStateBase.h"
 #include "RPGPlayerUnit.h"
 #include "RPGInventory.h"
+#include "RPG_Equipment.h"
 #include "RPG_Projectile.h"
 
 #include "RPG_EventManager.h"
@@ -21,7 +22,7 @@
 // Sets default values
 ARPGCreature::ARPGCreature()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetMesh()->DestroyComponent();
@@ -39,24 +40,31 @@ ARPGCreature::ARPGCreature()
 	AudioComponent->SetupAttachment(RootComponent);
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
-	Inventory->OwnerUnit = this;	
+	Inventory->OwnerUnit = this;
+
+	Equipment = CreateDefaultSubobject<URPG_Equipment>(FName("Equipment"));
+	Equipment->OwnerUnit = this;
 }
 
 // Called when the game starts or when spawned
 void ARPGCreature::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 
 	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &ARPGCreature::OnItemWidgetPicked);
 }
 
 void ARPGCreature::OnItemWidgetPicked(URPG_ItemWidget* Item)
-{	
+{
 	if (auto ref = Item->ItemRef)
 	{
-		if (ref->ItemInformation.Owner == this)
+		if (Inventory->Contains(ref))
 		{
-			Inventory->RemoveItem(Item->ItemRef);
+			Inventory->RemoveItem(ref);
+		}
+		else if (Equipment->Contains(ref))
+		{
+			Equipment->RemoveItem(ref);
 		}
 	}
 }
@@ -77,7 +85,7 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	HP -= DamageDealt;
 
 	Results.DamageDealt = DamageDealt;
-	
+
 	AudioComponent->PlayRandom("hit");
 
 	float RecoveryDuration = 1.0f;
@@ -102,7 +110,7 @@ void ARPGCreature::BeginAttack()
 }
 
 FRPGAttackResults ARPGCreature::Attack()
-{	
+{
 	FRPGAttackData AttackData;
 	FRPGAttackResults Results;
 	float RecoveryDuration = 1.0f;
@@ -125,7 +133,7 @@ FRPGAttackResults ARPGCreature::Attack()
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
 		Results = Attackable->OnAttacked(AttackData);
 	}
-	else 
+	else
 	{
 		if (auto NearestRanged = GetNearestAttackTarget(RangeSphere, ExcludeOwnType, ShouldBeVisible))
 		{
@@ -138,7 +146,7 @@ FRPGAttackResults ARPGCreature::Attack()
 			Results.Ranged = true;
 		}
 		else
-		{			
+		{
 			AudioComponent->PlayRandom("whoosh");
 		}
 	}

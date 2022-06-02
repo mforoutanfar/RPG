@@ -36,13 +36,18 @@ void URPGInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
+bool URPGInventory::Contains(URPGInventoryItem* Item)
+{
+	return Items.Contains(Item);
+}
+
 bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int ProposedCol)
 {
 	int Width = OutItemInfo.Width;
 	int Height = OutItemInfo.Height;
 	int DestRow = ProposedRow;
 	int DestCol = ProposedCol;
-		
+
 	if (!DoesItemFit(Width, Height, DestRow, DestCol))
 	{
 		bool Found = false;
@@ -68,7 +73,7 @@ bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int Prop
 		if (!Found)
 		{
 			return false;
-		}		
+		}
 	}
 
 	OutItemInfo.InventoryX = DestCol;
@@ -109,6 +114,8 @@ void URPGInventory::RemoveItem(URPGInventoryItem* Item)
 	Item->ItemInformation.InventoryY = -1;
 
 	RPGEventManager->InventoryItemRemoved.Broadcast(Item, OwnerUnit);
+
+	Item->ItemInformation.Owner = nullptr;
 
 	Items.Remove(Item);
 }

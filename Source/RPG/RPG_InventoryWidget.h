@@ -39,6 +39,8 @@ protected:
 	UFUNCTION()
 	void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget);
 
+	bool IsItemWidgetInInventoryWidget(URPG_ItemWidget* ItemWidget);
+
 	UFUNCTION()
 	void OnUnitAdded(class ARPGPlayerUnit* Unit);
 

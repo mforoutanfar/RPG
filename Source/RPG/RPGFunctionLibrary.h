@@ -68,7 +68,8 @@ namespace ItemCategory
 	enum ItemCat
 	{
 		NONE,
-		WEAPON,
+		MELEE_WEAPON,
+		RANGED_WEAPON,
 		ARMOR,
 		CONSUMABLE,
 		INGREDIENTS,
@@ -93,13 +94,13 @@ struct FRPGItemInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	FName ItemName = "";
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int Width = 0;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int Height = 0;
 
 	UPROPERTY()
@@ -108,10 +109,10 @@ struct FRPGItemInfo
 	UPROPERTY()
 	int InventoryY = -1;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TEnumAsByte<ItemCategory::ItemCat> ItemCategory = ItemCategory::ItemCat::NONE;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int Price = 0;
 
 	UPROPERTY()

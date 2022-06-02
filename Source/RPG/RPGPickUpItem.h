@@ -26,6 +26,7 @@ public:
 	*/
 	ARPGPickUpItem();
 
+	UPROPERTY(EditDefaultsOnly)
 	FRPGItemInfo ItemInformation;
 
 protected:
@@ -54,7 +55,7 @@ private:
 	class UBillboardComponent* ItemPicture;
 
 	UPROPERTY(EditDefaultsOnly)
-		class USphereComponent* HitBox;
+	class USphereComponent* HitBox;
 
 	class URPGRandomAudioComponent* AudioComponent;
 };

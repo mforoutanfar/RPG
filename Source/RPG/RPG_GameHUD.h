@@ -48,6 +48,12 @@ protected:
 	UFUNCTION()
 	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
+	UFUNCTION()
+	void OnEquipmentItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
+
+	UFUNCTION()
+	void OnEquipmentItemReplaced(FRPGItemInfo PreviousItemInfo);
+
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* Canvas;
 

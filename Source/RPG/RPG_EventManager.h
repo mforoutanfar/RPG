@@ -27,6 +27,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSafetyStateChanged, ARPGPlayerUnit
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarLeftClicked, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarRightClicked, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAddItemToInventoryProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo, int, ProposedRow, int, ProposedCol);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAddItemToEquipmentProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipmentItemReplaced, FRPGItemInfo, PreviousItemInfo);
+
 
 /**
  * 
@@ -72,4 +77,16 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FAddItemToInventoryProposed AddItemToInventoryProposed;
+
+	UPROPERTY(BlueprintAssignable)
+		FAddItemToEquipmentProposed AddItemToEquipmentProposed;
+
+	UPROPERTY(BlueprintAssignable)
+		FEquipmentItemAdded EquipmentItemAdded;
+
+	UPROPERTY(BlueprintAssignable)
+		FEquipmentItemRemoved EquipmentItemRemoved;
+
+	UPROPERTY(BlueprintAssignable)
+		FEquipmentItemReplaced EquipmentItemReplaced;
 };
