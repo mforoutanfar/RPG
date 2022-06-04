@@ -7,7 +7,7 @@
 #include "RPGFunctionLibrary.h"
 #include "RPG_Equipment.generated.h"
 
-class URPGInventoryItem;
+class URPGInventoryItem; 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class RPG_API URPG_Equipment : public UActorComponent
@@ -30,6 +30,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
 	TMap<TEnumAsByte<ItemCategory::ItemCat>, URPGInventoryItem*> EquipmentMap;
 
 public:

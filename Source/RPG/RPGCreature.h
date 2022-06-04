@@ -37,7 +37,7 @@ public:
 	UFUNCTION()
 	void OnItemWidgetPicked(class URPG_ItemWidget* Item);
 
-	virtual FRPGAttackResults OnAttacked(FRPGAttackData AttackData) override;
+	virtual void OnAttacked(FRPGAttackData AttackData, FRPGAttackResults& Results) override;
 
 	bool IsInRecovery() { return InRecovery; };
 
@@ -52,6 +52,15 @@ public:
 
 	float MaxMana = 300.0f;
 	float Mana = 300.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Accuracy = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+	float BaseCriticalChance = 0.01f;
+
+	UPROPERTY(EditAnywhere)
+	float BaseCriticalMultiplier = 2.0f;
 
 	UPROPERTY(EditAnywhere)
 	FRPGDice BaseMeleeDamage;	
@@ -93,5 +102,5 @@ protected:
 	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();
-	int CalculateMeleeDamage();
+	void CalculateMeleeDamage(FRPGAttackData &OutData, FRPGAttackResults &Results);
 };

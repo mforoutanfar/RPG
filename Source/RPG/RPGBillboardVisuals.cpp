@@ -284,7 +284,7 @@ void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, AActor* Target, FRP
 		{
 			SetAnimState(DIE);
 		}
-		else
+		else if (!Results.Missed)
 		{
 			SetAnimState(HIT);
 		}		

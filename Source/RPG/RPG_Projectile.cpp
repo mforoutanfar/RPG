@@ -35,7 +35,8 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		FRPGAttackData Data;
 		Data.Damage = 30.0f;		
 		Data.Target = OtherActor;
-		auto Results = Attackable->OnAttacked(Data);
+		FRPGAttackResults Results;
+		Attackable->OnAttacked(Data, Results);
 
 		RPGEventManager->AttackOccured.Broadcast(this, Data.Target, Results);
 	}

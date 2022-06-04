@@ -127,6 +127,12 @@ struct FRPGItemInfo
 	UPROPERTY(EditAnywhere)
 	FRPGDice MeleeDamage;
 
+	UPROPERTY(EditAnywhere)
+	float CriticalChance;
+
+	UPROPERTY(EditAnywhere)
+	float CriticalMultiplier;
+
 	UPROPERTY()
 	int InventoryX = -1;
 
@@ -150,6 +156,9 @@ struct FRPGAttackData
 public:
 	UPROPERTY()
 		int Damage = 0;
+	
+	UPROPERTY()
+		float Accuracy = 0;
 
 	UPROPERTY()
 		AActor* Attacker = nullptr;
@@ -178,4 +187,10 @@ public:
 	//TODO: Hack for preventing slash animation showing on ranged attacks.
 	UPROPERTY(BlueprintReadWrite)
 		bool Ranged = false;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool Missed = false;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool Crit = false;
 };

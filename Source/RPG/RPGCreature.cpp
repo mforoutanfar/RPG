@@ -77,20 +77,34 @@ void ARPGCreature::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
+void ARPGCreature::OnAttacked(FRPGAttackData AttackData, FRPGAttackResults& Results)
 {
-	FRPGAttackResults Results;
 	Results.Target = this;
 
 	float DamageDealt = 0.0f;
 	DamageDealt += AttackData.Damage;
+
+	auto rand = FMath::RandRange(0.0f,1.0f);
+
+	float RecoveryDuration = 1.0f;
+
+	if (rand > AttackData.Accuracy)//miss
+	{
+		RecoveryDuration = 0.0f;
+		Results.Missed = true;
+	}
+	else if (Results.Crit)
+	{
+		AudioComponent->PlayRandom("crit");
+	}
+	else
+	{
+		AudioComponent->PlayRandom("hit");
+	}
+
 	HP -= DamageDealt;
 
 	Results.DamageDealt = DamageDealt;
-
-	AudioComponent->PlayRandom("hit");
-
-	float RecoveryDuration = 1.0f;
 
 	if (HP <= 0)
 	{
@@ -100,8 +114,6 @@ FRPGAttackResults ARPGCreature::OnAttacked(FRPGAttackData AttackData)
 	}
 
 	EnterRecovery(RecoveryDuration);
-
-	return Results;
 }
 
 
@@ -130,10 +142,11 @@ FRPGAttackResults ARPGCreature::Attack()
 
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
-		AttackData.Damage = CalculateMeleeDamage();
+		AttackData.Accuracy = Accuracy;
+		CalculateMeleeDamage(AttackData, Results);
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
-		Results = Attackable->OnAttacked(AttackData);
+		Attackable->OnAttacked(AttackData, Results);
 	}
 	else
 	{
@@ -160,14 +173,36 @@ FRPGAttackResults ARPGCreature::Attack()
 	return Results;
 }
 
-int ARPGCreature::CalculateMeleeDamage()
+void ARPGCreature::CalculateMeleeDamage(FRPGAttackData& OutData, FRPGAttackResults& Results)
 {
 	if (auto Weapon = Equipment->GetItem(ItemCategory::ItemCat::MELEE_WEAPON))
 	{
-		return Weapon->ItemInformation.MeleeDamage.GetResult();
-	}
+		auto Damage = Weapon->ItemInformation.MeleeDamage.GetResult();
+		float rand = FMath::RandRange(0.0f, 1.0f);
+		bool IsCrit = rand < Weapon->ItemInformation.CriticalChance;
+		if (IsCrit)
+		{
+			Damage *= Weapon->ItemInformation.CriticalMultiplier;
+		}
 
-	return BaseMeleeDamage.GetResult();
+		Results.Crit = IsCrit;
+
+		OutData.Damage = Damage;
+	}
+	else
+	{
+		auto Damage = BaseMeleeDamage.GetResult();
+		float rand = FMath::RandRange(0.0f, 1.0f);
+		bool IsCrit = rand < BaseCriticalChance;
+		if (IsCrit)
+		{
+			Damage *= BaseCriticalMultiplier;
+		}
+
+		Results.Crit = IsCrit;
+
+		OutData.Damage = Damage;
+	}
 }
 
 void ARPGCreature::Die()
@@ -223,16 +258,15 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 
 void ARPGCreature::EnterRecovery(float Duration)
 {
-	GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
-
-	InRecovery = true;
-
-	if (Duration >= 0)
+	if (Duration > 0)
 	{
-		GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
-	}
+		GetWorldTimerManager().ClearTimer(RecoveryTimerHandle);
 
-	RPGEventManager->RecoveryStateChanged.Broadcast(this, true);
+		InRecovery = true;
+
+		GetWorldTimerManager().SetTimer(RecoveryTimerHandle, this, &ARPGCreature::ExitRecovery, Duration, false);
+		RPGEventManager->RecoveryStateChanged.Broadcast(this, true);
+	}
 }
 
 void ARPGCreature::ExitRecovery()
