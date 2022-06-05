@@ -51,6 +51,16 @@ protected:
 	UFUNCTION()
 		void OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit);
 
+	int InteractablesInRange = 0;
+
+	UFUNCTION()
+		void OnInteractionColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	AActor* NearestInteractable = nullptr;
+
 private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
@@ -72,7 +82,7 @@ private:
 	UPROPERTY()
 	class ASceneCapture2D* MiniMapCamera = nullptr;
 
-	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true);
+	AActor* GetNearestTarget(class UShapeComponent* Collider, bool ShouldBeVisible = true, bool ShouldBeInteractable = false);
 
 	UFUNCTION()
 	void OnUnitRecoveryStateChanged(AActor* Unit, bool IsInRecovery);

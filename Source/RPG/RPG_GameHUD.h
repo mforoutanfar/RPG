@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class URPG_ItemWidget> ItemClass;
 
+	UPROPERTY(meta = (BindWidget))
+	class URPG_InteractablePing* InteractionPing = nullptr;
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -54,6 +57,9 @@ protected:
 	UFUNCTION()
 	void OnEquipmentItemReplaced(FRPGItemInfo PreviousItemInfo);
 
+	UFUNCTION()
+	void OnNearestInteractableChanged(AActor* NearestInteractable);
+	
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* Canvas;
 

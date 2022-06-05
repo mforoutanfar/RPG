@@ -86,6 +86,11 @@ void ARPGUnit::OnInteracted(bool Successful)
 	}
 }
 
+bool ARPGUnit::IsInteractable()
+{
+	return Dead;
+}
+
 void ARPGUnit::SetIsWalking(bool IsWalking)
 {
 	Walking = IsWalking;

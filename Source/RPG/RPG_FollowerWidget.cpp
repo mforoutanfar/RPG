@@ -16,15 +16,32 @@ void URPG_FollowerWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	//To prevent jump on first frame.
+	if (ShouldBecomeVisibleNextTick)
+	{
+		FollowerVisuals->SetVisibility(ESlateVisibility::Visible);
+		ShouldBecomeVisibleNextTick = false;
+	}
+
 	if (!CanvasSlot)
 	{
+		if (Slot)
+		{
+			if (auto CS = Cast<UCanvasPanelSlot>(Slot))
+			{
+				CanvasSlot = CS;
+			}
+		}
 		return;
 	}
 
 	if (!PlacedInPosition)
 	{
 		FollowTarget();
-		FollowerVisuals->SetVisibility(ESlateVisibility::Visible);
+		if (Target || !InvisibleWhenNoTarget)
+		{
+			ShouldBecomeVisibleNextTick = true;
+		}		
 		PlacedInPosition = true;
 	}
 	else if (KeepFollowing)
@@ -37,10 +54,10 @@ void URPG_FollowerWidget::FollowTarget()
 {
 	float VPScale = UWidgetLayoutLibrary::GetViewportScale(this);
 
-	if (Target.IsValid())
+	if (Target)
 	{
-		auto TargetPos = Target.Get()->GetActorLocation() + DesignOffset;
-		UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(Target.Get(), 0), TargetPos, PosOnScreen);
+		auto TargetPos = Target->GetActorLocation() + DesignOffset;
+		UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(Target, 0), TargetPos, PosOnScreen);
 		CanvasSlot->SetPosition((PosOnScreen)/ VPScale);
 	}	
 	else if (RemoveOnTargetInvalidated)
@@ -57,5 +74,15 @@ void URPG_FollowerWidget::FollowTarget()
 		}
 
 		CanvasSlot->SetPosition((Result / VPScale)/ 2.0f);
+	}
+}
+
+void URPG_FollowerWidget::SetTarget(AActor* InTarget)
+{
+	if (Target != InTarget)
+	{
+		Target = InTarget;
+		FollowerVisuals->SetVisibility(ESlateVisibility::Collapsed);
+		PlacedInPosition = false;
 	}
 }

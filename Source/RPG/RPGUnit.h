@@ -26,6 +26,8 @@ public:
 	virtual InteractableCat GetInteractableType() override;
 	virtual void OnInteracted(bool Successful) override;
 
+	virtual bool IsInteractable() override;
+
 	UFUNCTION(BlueprintCallable)
 		void SetIsWalking(bool IsWalking);
 

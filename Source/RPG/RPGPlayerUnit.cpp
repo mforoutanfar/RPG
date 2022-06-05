@@ -56,6 +56,23 @@ void ARPGPlayerUnit::BeginPlay()
 	Super::BeginPlay();
 	RPGEventManager->AddItemToInventoryProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToInventoryProposed);
 	RPGEventManager->AddItemToEquipmentProposed.AddDynamic(this, &ARPGPlayerUnit::OnAddItemToEquipmentProposed);
+		
+	TSet<UPrimitiveComponent*> OverlappingComponents;
+	HitBox->GetOverlappingComponents(OverlappingComponents);
+
+	//TODO: OverlappingComponents is empty on BeginPlay for some reason.
+	for (auto Comp : OverlappingComponents)
+	{
+		if (Comp->ComponentHasTag(FName("MeleeSphere")))
+		{
+			EnemiedInMeleeRange++;
+		}
+		else if (Comp->ComponentHasTag(FName("RangeSphere")))
+		{
+			EnemiedInRangedRange++;
+		}
+	}
+
 	UpdateSafetyState();
 }
 

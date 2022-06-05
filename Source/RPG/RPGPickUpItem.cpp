@@ -83,6 +83,11 @@ void ARPGPickUpItem::OnInteracted(bool Successful)
 	}
 }
 
+bool ARPGPickUpItem::IsInteractable()
+{
+	return true;
+}
+
 InteractableCat ARPGPickUpItem::GetInteractableType()
 {
 	return ITEM;

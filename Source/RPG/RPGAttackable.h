@@ -26,5 +26,5 @@ class RPG_API IRPGAttackable
 public:
 	virtual void OnAttacked(FRPGAttackData AttackData, FRPGAttackResults& Results) = 0;
 
-	bool AttackableEnabled = true;
+	virtual bool IsAttackable() = 0;
 };

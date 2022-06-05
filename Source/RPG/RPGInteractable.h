@@ -29,4 +29,6 @@ public:
 	virtual void OnInteracted(bool Successful) = 0;
 
 	virtual InteractableCat GetInteractableType() = 0;
+
+	virtual bool IsInteractable() = 0;
 };

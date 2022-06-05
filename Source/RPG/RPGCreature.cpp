@@ -208,8 +208,13 @@ void ARPGCreature::CalculateMeleeDamage(FRPGAttackData& OutData, FRPGAttackResul
 void ARPGCreature::Die()
 {
 	Dead = true;
-	AttackableEnabled = false;	
 }
+
+bool ARPGCreature::IsAttackable()
+{
+	return !Dead;
+}
+
 
 AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType, bool ShouldBeVisible)
 {
@@ -231,7 +236,7 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 
 		if (auto Attackable = Cast<IRPGAttackable>(Actor))
 		{
-			if (!Attackable->AttackableEnabled)
+			if (!Attackable->IsAttackable())
 			{
 				continue;
 			}

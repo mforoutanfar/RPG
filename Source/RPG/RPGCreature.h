@@ -70,6 +70,8 @@ public:
 
 	bool IsDead() { return Dead; }
 
+	virtual bool IsAttackable() override;
+
 protected:
 	bool InRecovery = false;
 	void EnterRecovery(float Duration);

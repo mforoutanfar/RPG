@@ -21,6 +21,8 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/CanvasPanelSlot.h"
+#include "RPG_InteractablePing.h"
+#include "RPGInteractable.h"
 
 void URPG_GameHUD::NativeConstruct()
 {
@@ -31,6 +33,7 @@ void URPG_GameHUD::NativeConstruct()
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_GameHUD::OnInventoryItemAdded);
 	RPGEventManager->EquipmentItemAdded.AddDynamic(this, &URPG_GameHUD::OnEquipmentItemAdded);
 	RPGEventManager->EquipmentItemReplaced.AddDynamic(this, &URPG_GameHUD::OnEquipmentItemReplaced);
+	RPGEventManager->NearestInteractableChanged.AddDynamic(this, &URPG_GameHUD::OnNearestInteractableChanged);
 }
 
 void URPG_GameHUD::OnItemWidgetPicked(URPG_ItemWidget* ItemWidget)
@@ -53,6 +56,17 @@ void URPG_GameHUD::OnEquipmentItemReplaced(FRPGItemInfo PreviousItemInfo)
 	PickedItem->UpdateSizeForHUD();
 	PickedItem->bShouldFollowMouse = true;
 	PickedItem->FollowMouse(false);//So it won't jump on first frame.
+}
+
+void URPG_GameHUD::OnNearestInteractableChanged(AActor* NearestInteractable)
+{
+	InteractionPing->SetTarget(NearestInteractable);
+
+	if (NearestInteractable)
+	{
+		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
+		InteractionPing->SetPingString(Interactable->GetInteractableType());
+	}
 }
 
 void URPG_GameHUD::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)

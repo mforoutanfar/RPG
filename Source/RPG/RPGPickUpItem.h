@@ -48,6 +48,8 @@ public:
 
 	virtual void OnInteracted(bool Successful) override;
 
+	virtual bool IsInteractable() override;
+
 	virtual InteractableCat GetInteractableType() override;
 
 private:

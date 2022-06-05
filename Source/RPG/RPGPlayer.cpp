@@ -51,6 +51,9 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	PlayerCameraComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	InteractionCollider->AttachToComponent(PlayerCameraComponent, FAttachmentTransformRules::KeepRelativeTransform);	
+
+	InteractionCollider->OnComponentBeginOverlap.AddDynamic(this, &ARPGPlayer::OnInteractionColliderBeginOverlap);
+	InteractionCollider->OnComponentEndOverlap.AddDynamic(this, &ARPGPlayer::OnInteractionColliderEndOverlap);
 }
 
 //TODO: Get Unit Info as Input
@@ -111,12 +114,41 @@ void ARPGPlayer::BeginPlay()
 		AddUnit();
 		SetSelectedUnit(FindFirstOutOfRecoveryUnit());
 	}
+
+	TSet<AActor*> OverlappingActors;
+	InteractionCollider->GetOverlappingActors(OverlappingActors);
+	int NumOfInteractables = 0;
+	for (auto i : OverlappingActors)
+	{
+		if (auto Interactable = Cast<IRPGInteractable>(i))
+		{
+			NumOfInteractables++;
+		}
+	}
+	InteractablesInRange = NumOfInteractables;
 }
 
 // Called every frame
 void ARPGPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (InteractablesInRange > 0)
+	{
+		auto Nearest = GetNearestTarget(InteractionCollider, true, true);
+
+		if (Nearest != NearestInteractable)
+		{
+			NearestInteractable = Nearest;
+
+			RPGEventManager->NearestInteractableChanged.Broadcast(NearestInteractable);
+		}
+	}
+	else if (NearestInteractable)
+	{
+		NearestInteractable = nullptr;
+		RPGEventManager->NearestInteractableChanged.Broadcast(NearestInteractable);
+	}
 }
 
 void ARPGPlayer::OnForwardBackwardPressed(float Value)
@@ -161,20 +193,20 @@ void ARPGPlayer::OnRunReleased()
 
 void ARPGPlayer::OnInteractPressed()
 {
-	if (auto InteractTarget = GetNearestTarget(InteractionCollider))
+	if (NearestInteractable)
 	{
 		if (SelectedUnit.IsValid())
 		{
-			SelectedUnit->InteractWithTarget(InteractTarget);
+			SelectedUnit->InteractWithTarget(NearestInteractable);
 		}
 		else
 		{
-			auto Interactable = Cast<IRPGInteractable>(InteractTarget);
+			auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
 			auto Type = Interactable->GetInteractableType();
 
 			if (Type == ITEM)
 			{
-				Units[0]->InteractWithTarget(InteractTarget);
+				Units[0]->InteractWithTarget(NearestInteractable);
 			}
 		}
 	}	
@@ -230,6 +262,22 @@ void ARPGPlayer::OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit)
 	SetSelectedUnit(Unit);
 }
 
+void ARPGPlayer::OnInteractionColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (auto Interactable = Cast<IRPGInteractable>(OtherActor))
+	{
+		InteractablesInRange++;
+	}
+}
+
+void ARPGPlayer::OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (auto Interactable = Cast<IRPGInteractable>(OtherActor))
+	{
+		InteractablesInRange--;
+	}
+}
+
 bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
 {
 	auto Type = Target->GetInteractableType();
@@ -257,9 +305,9 @@ bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
 	}
 }
 
-AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVisible)
+AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVisible, bool ShouldBeInteractable)
 {
-	AActor* ClosestAttackableActor = nullptr;
+	AActor* NearestTarget = nullptr;
 	float MinDistance = FLT_MAX;
 	TSet<AActor*> OverlappingActors = {};
 	Collider->GetOverlappingActors(OverlappingActors);
@@ -268,7 +316,21 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 	{
 		if (ShouldBeVisible)
 		{
-			if (!Actor->WasRecentlyRendered(KINDA_SMALL_NUMBER))
+			FVector2D pos;
+			if (!UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(this, 0), Actor->GetActorLocation(), pos))
+			{
+				continue;
+			}
+		}
+
+		if (ShouldBeInteractable)
+		{
+			auto Interactable = Cast<IRPGInteractable>(Actor);
+			if (!Interactable)
+			{
+				continue;
+			}
+			else if (!Interactable->IsInteractable())
 			{
 				continue;
 			}
@@ -277,12 +339,12 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 		auto Distance = (Actor->GetActorLocation() - GetActorLocation()).SizeSquared();
 		if (Distance < MinDistance)
 		{
-			ClosestAttackableActor = Actor;
+			NearestTarget = Actor;
 			MinDistance = Distance;
 		}
 	}
 
-	return ClosestAttackableActor;
+	return NearestTarget;
 }
 
 void ARPGPlayer::OnUnitRecoveryStateChanged(AActor* Unit, bool IsInRecovery)
