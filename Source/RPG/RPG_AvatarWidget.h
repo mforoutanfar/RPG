@@ -57,7 +57,7 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
 	UFUNCTION()
-	void OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results);
+	void OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results);
 		
 	UFUNCTION()
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);

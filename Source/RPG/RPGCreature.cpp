@@ -77,9 +77,9 @@ void ARPGCreature::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ARPGCreature::OnAttacked(FRPGAttackData AttackData, FRPGAttackResults& Results)
+void ARPGCreature::OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results)
 {
-	Results.Target = this;
+	AttackData.Target = this;
 
 	float DamageDealt = 0.0f;
 	DamageDealt += AttackData.Damage;
@@ -138,8 +138,6 @@ FRPGAttackResults ARPGCreature::Attack()
 
 	if (auto NearestMelee = GetNearestAttackTarget(MeleeSphere, ExcludeOwnType, ShouldBeVisible))
 	{
-		AudioComponent->PlayRandom("whoosh");
-
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
 		AttackData.Accuracy = Accuracy;
@@ -152,26 +150,48 @@ FRPGAttackResults ARPGCreature::Attack()
 	{
 		if (auto NearestRanged = GetNearestAttackTarget(RangeSphere, ExcludeOwnType, ShouldBeVisible))
 		{
-			AudioComponent->PlayRandom("arrow_shot");
+			TSubclassOf<ARPG_Projectile> ProjClass = nullptr;
 
-			auto ModifActionLocation = GetActorRotation().RotateVector(ActionLocation);
-			auto PointOfAction = GetActorLocation() + ModifActionLocation;
-			auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
-			auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjectileClass, PointOfAction, Direction);
-			Results.Ranged = true;
+			if (auto RangedEq = Equipment->GetItem(ItemCategory::ItemCat::RANGED_WEAPON))
+			{
+				ProjClass = RangedEq->ItemInformation.ProjectileClass;
+			}
+			else if (ProjectileClass)
+			{
+				ProjClass = ProjectileClass;
+			}
+
+			if (ProjClass)
+			{
+				auto ModifActionLocation = GetActorRotation().RotateVector(ActionLocation);
+				auto PointOfAction = GetActorLocation() + ModifActionLocation;
+				auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
+				auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjClass, PointOfAction, Direction);
+				AttackData.Ranged = true;
+			}
 		}
-		else
-		{
-			AudioComponent->PlayRandom("whoosh");
-		}
+	}
+
+	if (AttackData.Ranged)
+	{
+		AudioComponent->PlayRandom("arrow_shot");
+	}
+	else
+	{
+		AudioComponent->PlayRandom("whoosh");
 	}
 
 	Results.RecoveryDuration = RecoveryDuration;
 
-	RPGEventManager->AttackOccured.Broadcast(this, AttackData.Target, Results);
+	RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 
 	return Results;
 }
+
+//void ARPGCreature::ShootProjectile(TSubclassOf<ARPG_Projectile> ProjectileClass, )
+//{
+//
+//}
 
 void ARPGCreature::CalculateMeleeDamage(FRPGAttackData& OutData, FRPGAttackResults& Results)
 {

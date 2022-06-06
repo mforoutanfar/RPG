@@ -32,15 +32,34 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	if (auto Attackable = Cast<IRPGAttackable>(OtherActor))
 	{
-		FRPGAttackData Data;
-		Data.Damage = 30.0f;		
-		Data.Target = OtherActor;
+		FRPGAttackData AttackData;
 		FRPGAttackResults Results;
-		Attackable->OnAttacked(Data, Results);
 
-		RPGEventManager->AttackOccured.Broadcast(this, Data.Target, Results);
+		AttackData.Attacker = this;
+		AttackData.Target = OtherActor;
+		AttackData.Accuracy = Accuracy;
+		CalculateDamage(AttackData, Results);
+
+		Attackable->OnAttacked(AttackData, Results);
+			
+		RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 	}
 	Destroy();
+}
+
+void ARPG_Projectile::CalculateDamage(FRPGAttackData& OutData, FRPGAttackResults& Results)
+{
+	auto Damage = BaseMeleeDamage.GetResult();
+	float rand = FMath::RandRange(0.0f, 1.0f);
+	bool IsCrit = rand < BaseCriticalChance;
+	if (IsCrit)
+	{
+		Damage *= BaseCriticalMultiplier;
+	}
+
+	Results.Crit = IsCrit;
+
+	OutData.Damage = Damage;
 }
 
 

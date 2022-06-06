@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RPGFunctionLibrary.h"
+
 #include "RPG_Projectile.generated.h"
 
 /**
@@ -22,6 +24,18 @@ public:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UPROPERTY(EditDefaultsOnly)
+	float Accuracy = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BaseCriticalChance = 0.01f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BaseCriticalMultiplier = 2.0f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FRPGDice BaseMeleeDamage;
 
 protected:
 	/**
@@ -34,6 +48,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* SphereComponent = nullptr;
+
+	void CalculateDamage(FRPGAttackData& OutData, FRPGAttackResults& Results);
 
 public:	
 	/**

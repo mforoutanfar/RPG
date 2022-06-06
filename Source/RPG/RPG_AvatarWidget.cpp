@@ -112,7 +112,7 @@ void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreatu
 	}
 }
 
-void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results)
 {
 	//TODO: Shouldn't Access Unit Directly?
 	auto Unit = ReferencedUnit.Get();
@@ -131,7 +131,7 @@ void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAt
 		GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
 		GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
 	}
-	else if (ReferencedUnit.Get() == Target)//Is Attacked
+	else if (ReferencedUnit.Get() == Data.Target)//Is Attacked
 	{
 		auto percent = HPBar->Percent - Results.DamageDealt / Unit->MaxHP;
 		HPBar->SetPercent(percent);

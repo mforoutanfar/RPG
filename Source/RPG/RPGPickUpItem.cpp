@@ -14,24 +14,11 @@ ARPGPickUpItem::ARPGPickUpItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ItemInformation.ItemName = "Sword";
-	ItemInformation.Width = 1;
-	ItemInformation.Height = 3;
-
 	HitBox = CreateDefaultSubobject<USphereComponent>(TEXT("HitBox"));
 	HitBox->SetCollisionProfileName(FName("Interactable"));
 
 	ItemPicture = CreateDefaultSubobject<UBillboardComponent>(FName("ItemPicture"));
 	ItemPicture->SetHiddenInGame(false);
-
-	FString AssetName = "Item_" + ItemInformation.ItemName.ToString();
-	FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
-
-	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
-	if (tmpTexture)
-	{
-		ItemPicture->SetSprite(tmpTexture);
-	}
 
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 }
@@ -58,6 +45,16 @@ void ARPGPickUpItem::BeginPlay()
 	Super::BeginPlay();
 	
 	RegisterOnMiniMap(this, MiniMap::LOOT);
+
+	FString AssetName = "Item_" + ItemInformation.ItemName.ToString();
+	FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
+
+	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
+	if (tmpTexture)
+	{
+		ItemPicture->SetSprite(tmpTexture);
+	}
+
 }
 
 /**

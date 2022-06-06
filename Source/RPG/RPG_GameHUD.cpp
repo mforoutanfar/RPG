@@ -98,26 +98,26 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 }
 
-void URPG_GameHUD::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPG_GameHUD::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results)
 {
 	if (Attacker)
 	{
-		if (Cast<ARPGPlayerUnit>(Attacker) && !Results.Ranged)
+		if (Cast<ARPGPlayerUnit>(Attacker) && !Data.Ranged)
 		{
 			auto Slash = CreateWidget<URPG_FollowerWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), SlashWidgetClass);
-			Slash->Target = Target;
+			Slash->Target = Data.Target;
 			Slash->CanvasSlot = Canvas->AddChildToCanvas(Slash);			 
 			Slash->CanvasSlot->SetAutoSize(true);
 			Slash->CanvasSlot->SetAlignment(FVector2D(0.5f,0.5f));
 		}
 	}
 
-	if (Target)
+	if (Data.Target)
 	{
-		if (!Cast<ARPGPlayerUnit>(Target))
+		if (!Cast<ARPGPlayerUnit>(Data.Target))
 		{
 			auto DamageNumber = CreateWidget<URPG_DamageNumberWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), DamageNumberWidgetClass);
-			DamageNumber->Init(Target, Results);
+			DamageNumber->Init(Data.Target, Results);
 			DamageNumber->CanvasSlot = Canvas->AddChildToCanvas(DamageNumber);
 			DamageNumber->CanvasSlot->SetAutoSize(true);
 			DamageNumber->CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));

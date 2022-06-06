@@ -276,9 +276,9 @@ void URPGBillboardVisuals::BeginAttack()
 	SetAnimState(ATTACK);
 }
 
-void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results)
+void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results)
 {	
-	if (Target == GetOwner())
+	if (Data.Target == GetOwner())
 	{
 		if (Results.TargetDied)
 		{

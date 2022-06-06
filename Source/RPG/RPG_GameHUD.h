@@ -82,5 +82,5 @@ protected:
 	void OnUnitAdded(ARPGPlayerUnit* Unit);
 
 	UFUNCTION()
-	void OnAttackOccured(AActor* Attacker, AActor* Target, FRPGAttackResults Results);
+	void OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results);
 };

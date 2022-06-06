@@ -147,24 +147,30 @@ struct FRPGItemInfo
 
 	UPROPERTY()
 	AActor* Owner = nullptr;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
 };
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FRPGAttackData
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		int Damage = 0;
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		float Accuracy = 0;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AActor* Attacker = nullptr;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 		AActor* Target = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+		bool Ranged = false;
 };
 
 USTRUCT(BlueprintType)
@@ -180,13 +186,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 		float RecoveryDuration = 0.0f;
-
-	UPROPERTY(BlueprintReadWrite)
-		TWeakObjectPtr<AActor> Target = nullptr;
-
-	//TODO: Hack for preventing slash animation showing on ranged attacks.
-	UPROPERTY(BlueprintReadWrite)
-		bool Ranged = false;
 
 	UPROPERTY(BlueprintReadWrite)
 		bool Missed = false;

@@ -37,7 +37,7 @@ public:
 	UFUNCTION()
 	void OnItemWidgetPicked(class URPG_ItemWidget* Item);
 
-	virtual void OnAttacked(FRPGAttackData AttackData, FRPGAttackResults& Results) override;
+	virtual void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
 
 	bool IsInRecovery() { return InRecovery; };
 
