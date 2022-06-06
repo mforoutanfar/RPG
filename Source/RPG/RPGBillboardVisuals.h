@@ -14,14 +14,14 @@ DECLARE_DELEGATE_RetVal(FRPGAttackResults, FAnimCallback);
 
 enum Orientation
 {
-	BACK,
-	BACK_RIGHT,
-	RIGHT,
-	FRONT_RIGHT,
-	FRONT,
-	FRONT_LEFT,
-	LEFT,
-	BACK_LEFT
+	OR_BACK,
+	OR_BACK_RIGHT,
+	OR_RIGHT,
+	OR_FRONT_RIGHT,
+	OR_FRONT,
+	OR_FRONT_LEFT,
+	OR_LEFT,
+	OR_BACK_LEFT
 };
 
 //enum AnimState
@@ -58,9 +58,9 @@ class RPG_API URPGBillboardVisuals : public UBillboardComponent
 
 	APlayerCameraManager* Camera;
 
-	Orientation CurrentOrientation = BACK;
-	AnimState CurrentAnimState = AnimState::NONE;
-	AnimState DefaultAnimState = AnimState::IDLE;
+	Orientation CurrentOrientation = OR_BACK;
+	AnimState CurrentAnimState = AnimState::AST_NONE;
+	AnimState DefaultAnimState = AnimState::AST_IDLE;
 	void SetDefaultAnimState(AnimState state);
 
 	int CurrentFrame = 0;

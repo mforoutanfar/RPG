@@ -28,12 +28,12 @@ namespace AnimationState
 {
 	enum AnimState
 	{
-		NONE,
-		IDLE,
-		WALK,
-		ATTACK,
-		HIT,
-		DIE
+		AST_NONE,
+		AST_IDLE,
+		AST_WALK,
+		AST_ATTACK,
+		AST_HIT,
+		AST_DIE
 	};
 }
 

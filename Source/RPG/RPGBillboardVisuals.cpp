@@ -12,27 +12,27 @@ URPGBillboardVisuals::URPGBillboardVisuals()
 	PrimaryComponentTick.bCanEverTick = true;
 	SetHiddenInGame(false);
 
-	ShouldLoopByDefault.Add(AnimState::NONE, false);
-	ShouldLoopByDefault.Add(IDLE, true);
-	ShouldLoopByDefault.Add(WALK, true);
-	ShouldLoopByDefault.Add(ATTACK, false);
-	ShouldLoopByDefault.Add(HIT, false);
-	ShouldLoopByDefault.Add(DIE, false);
+	ShouldLoopByDefault.Add(AnimState::AST_NONE, false);
+	ShouldLoopByDefault.Add(AnimState::AST_IDLE, true);
+	ShouldLoopByDefault.Add(AnimState::AST_WALK, true);
+	ShouldLoopByDefault.Add(AnimState::AST_ATTACK, false);
+	ShouldLoopByDefault.Add(AnimState::AST_HIT, false);
+	ShouldLoopByDefault.Add(AnimState::AST_DIE, false);
 
-	ShouldReturnToDefault.Add(AnimState::NONE, true);
-	ShouldReturnToDefault.Add(IDLE, false);
-	ShouldReturnToDefault.Add(WALK, false);
-	ShouldReturnToDefault.Add(ATTACK, true);
-	ShouldReturnToDefault.Add(HIT, true);
-	ShouldReturnToDefault.Add(DIE, false);
+	ShouldReturnToDefault.Add(AnimState::AST_NONE, true);
+	ShouldReturnToDefault.Add(AnimState::AST_IDLE, false);
+	ShouldReturnToDefault.Add(AnimState::AST_WALK, false);
+	ShouldReturnToDefault.Add(AnimState::AST_ATTACK, true);
+	ShouldReturnToDefault.Add(AnimState::AST_HIT, true);
+	ShouldReturnToDefault.Add(AnimState::AST_DIE, false);
 
 	float DefaultSPF = 0.12f;
-	AnimSPF.Add(AnimState::NONE, DefaultSPF);
-	AnimSPF.Add(IDLE, DefaultSPF);
-	AnimSPF.Add(WALK, DefaultSPF);
-	AnimSPF.Add(ATTACK, DefaultSPF);
-	AnimSPF.Add(HIT, DefaultSPF);
-	AnimSPF.Add(DIE, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_NONE, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_IDLE, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_WALK, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_ATTACK, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_HIT, DefaultSPF);
+	AnimSPF.Add(AnimState::AST_DIE, DefaultSPF);
 }
 
 
@@ -56,22 +56,22 @@ void URPGBillboardVisuals::OnOwnerWalkingStateChanged(ARPGCreature* Creature, bo
 {
 	if (State)
 	{
-		if (DefaultAnimState != WALK)
+		if (DefaultAnimState != AnimState::AST_WALK)
 		{
-			SetDefaultAnimState(WALK);
+			SetDefaultAnimState(AnimState::AST_WALK);
 
-			if (CurrentAnimState == IDLE || CurrentAnimState == NONE)//TODO: Any other case?
+			if (CurrentAnimState == AnimState::AST_IDLE || CurrentAnimState == AnimState::AST_NONE)//TODO: Any other case?
 			{
-				SetAnimState(WALK);
+				SetAnimState(AnimState::AST_WALK);
 			}			
 		}
 	}
 	else
 	{
-		SetDefaultAnimState(IDLE);
-		if (CurrentAnimState == WALK || CurrentAnimState == NONE)//TODO: Any other case?
+		SetDefaultAnimState(AnimState::AST_IDLE);
+		if (CurrentAnimState == AnimState::AST_WALK || CurrentAnimState == AnimState::AST_NONE)//TODO: Any other case?
 		{
-			SetAnimState(IDLE);
+			SetAnimState(AnimState::AST_IDLE);
 		}		
 	}
 }
@@ -80,7 +80,7 @@ void URPGBillboardVisuals::TickComponent(float DeltaTime, enum ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	
-	if (!CurrentAnimState == AnimState::NONE)
+	if (!CurrentAnimState == AnimState::AST_NONE)
 	{
 		UpdateOrientation();
 	}
@@ -151,32 +151,32 @@ void URPGBillboardVisuals::SetAnimState(AnimState state)
 	FString string;
 	switch (state)
 	{
-	case AnimationState::NONE:
+	case AnimationState::AnimState::AST_NONE:
 	{
 		string = "NONE";
 		break;
 	}	
-	case AnimationState::IDLE:
+	case AnimationState::AnimState::AST_IDLE:
 	{
 		string = "IDLE";
 		break;
 	}
-	case AnimationState::WALK:
+	case AnimationState::AnimState::AST_WALK:
 	{
 		string = "WALK";
 		break;
 	}
-	case AnimationState::ATTACK:
+	case AnimationState::AnimState::AST_ATTACK:
 	{
 		string = "ATTACK";
 		break;
 	}
-	case AnimationState::HIT:
+	case AnimationState::AnimState::AST_HIT:
 	{
 		string = "HIT";
 		break;
 	}
-	case AnimationState::DIE:
+	case AnimationState::AnimState::AST_DIE:
 	{
 		string = "DIE";
 		break;
@@ -227,7 +227,7 @@ void URPGBillboardVisuals::AdvanceFrame()
 	UpdateSprite();
 
 	//TODO: Cleaner system for animation callbacks?
-	if (CurrentAnimState == ATTACK && CurrentFrame == AttackCallbackFrame)
+	if (CurrentAnimState == AnimState::AST_ATTACK && CurrentFrame == AttackCallbackFrame)
 	{
 		AttackCallback.Execute();
 	}
@@ -268,12 +268,12 @@ void URPGBillboardVisuals::UpdateSprite()
 
 void URPGBillboardVisuals::OnOwnerDied()
 {
-	SetAnimState(DIE);
+	SetAnimState(AnimState::AST_DIE);
 }
 
 void URPGBillboardVisuals::BeginAttack()
 {
-	SetAnimState(ATTACK);
+	SetAnimState(AnimState::AST_ATTACK);
 }
 
 void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results)
@@ -282,11 +282,11 @@ void URPGBillboardVisuals::OnAttackOccured(AActor* Attacker, FRPGAttackData Data
 	{
 		if (Results.TargetDied)
 		{
-			SetAnimState(DIE);
+			SetAnimState(AnimState::AST_DIE);
 		}
 		else if (!Results.Missed)
 		{
-			SetAnimState(HIT);
+			SetAnimState(AnimState::AST_HIT);
 		}		
 	}
 }
