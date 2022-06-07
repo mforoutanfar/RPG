@@ -37,6 +37,6 @@ protected:
 		FRPGAttackResults AttackResults;
 
 public:
-	void Init(AActor* InTarget, FRPGAttackResults InAttackResults);
+	void Init(UObject* InTarget, FRPGAttackResults InAttackResults);
 
 };

@@ -10,6 +10,7 @@
 
 class ARPGPlayerUnit;
 class URPG_ItemWidget;
+class URPG_AvatarWidget;
 
 /**
  * 
@@ -21,7 +22,7 @@ class RPG_API URPG_GameHUD : public UUserWidget
 	
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<class URPG_AvatarWidget> AvatarClass;
+	TSubclassOf<URPG_AvatarWidget> AvatarClass;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class URPG_FollowerWidget> SlashWidgetClass;
@@ -83,4 +84,6 @@ protected:
 
 	UFUNCTION()
 	void OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results);
+
+	TMap<ARPGPlayerUnit*, URPG_AvatarWidget*> AvatarMap;
 };

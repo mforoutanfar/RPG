@@ -42,8 +42,8 @@ void URPG_DamageNumberWidget::MakeProjectileAnimation(UWidget* InWidget, float I
 	ProjectileAnimationRunning = true;
 }
 
-void URPG_DamageNumberWidget::Init(AActor* InTarget, FRPGAttackResults InAttackResults)
+void URPG_DamageNumberWidget::Init(UObject* InTarget, FRPGAttackResults InAttackResults)
 {
-	Target = InTarget;
+	SetTarget(InTarget);
 	AttackResults = InAttackResults;
 }

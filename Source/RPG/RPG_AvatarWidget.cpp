@@ -9,6 +9,7 @@
 #include "RPG_EventManager.h"
 #include "RPG_GameStateBase.h"
 #include "RPGPlayer.h"
+#include "RPG_DamageNumberWidget.h"
 
 void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 {

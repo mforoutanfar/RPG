@@ -20,7 +20,6 @@ protected:
 
 	void FollowTarget();
 
-
 	FVector2D PosOnScreen;
 
 	virtual void NativeConstruct() override;
@@ -38,14 +37,14 @@ protected:
 
 	bool ShouldBecomeVisibleNextTick = false;
 
+	TWeakObjectPtr<AActor> ActorTarget = nullptr;
+	TWeakObjectPtr<UWidget> WidgetTarget = nullptr;
 public:
 
 	UPROPERTY()
 		class UCanvasPanelSlot* CanvasSlot = nullptr;
 
-	void SetTarget(AActor* InTarget);
-
-	AActor* Target = nullptr;
+	void SetTarget(UObject* InTarget);	
 
 	UPROPERTY(EditDefaultsOnly)
 	bool KeepFollowing = false;

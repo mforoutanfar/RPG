@@ -38,7 +38,7 @@ void URPG_FollowerWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	if (!PlacedInPosition)
 	{
 		FollowTarget();
-		if (Target || !InvisibleWhenNoTarget)
+		if (ActorTarget.IsValid() || WidgetTarget.IsValid() || !InvisibleWhenNoTarget)
 		{
 			ShouldBecomeVisibleNextTick = true;
 		}		
@@ -54,12 +54,17 @@ void URPG_FollowerWidget::FollowTarget()
 {
 	float VPScale = UWidgetLayoutLibrary::GetViewportScale(this);
 
-	if (Target)
+	if (ActorTarget.IsValid())
 	{
-		auto TargetPos = Target->GetActorLocation() + DesignOffset;
-		UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(Target, 0), TargetPos, PosOnScreen);
+		auto TargetPos = ActorTarget.Get()->GetActorLocation() + DesignOffset;
+		UGameplayStatics::ProjectWorldToScreen(UGameplayStatics::GetPlayerController(this, 0), TargetPos, PosOnScreen);
 		CanvasSlot->SetPosition((PosOnScreen)/ VPScale);
 	}	
+	else if (WidgetTarget.IsValid())
+	{
+		auto TargetPos = WidgetTarget.Get()->GetCachedGeometry().GetLocalPositionAtCoordinates(FVector2D(0.5f,0.5f));		
+		CanvasSlot->SetPosition(TargetPos);
+	}
 	else if (RemoveOnTargetInvalidated)
 	{
 		RemoveFromParent();
@@ -77,12 +82,21 @@ void URPG_FollowerWidget::FollowTarget()
 	}
 }
 
-void URPG_FollowerWidget::SetTarget(AActor* InTarget)
+void URPG_FollowerWidget::SetTarget(UObject* InTarget)
 {
-	if (Target != InTarget)
+	auto NewActorTarget = Cast<AActor>(InTarget);
+	auto NewWidgetTarget = Cast<UWidget>(InTarget);
+
+	if (ActorTarget != NewActorTarget)
 	{
-		Target = InTarget;
-		FollowerVisuals->SetVisibility(ESlateVisibility::Collapsed);
-		PlacedInPosition = false;
+		ActorTarget = NewActorTarget;
 	}
+
+	if (WidgetTarget != NewWidgetTarget)
+	{
+		WidgetTarget = NewWidgetTarget;
+	}
+
+	FollowerVisuals->SetVisibility(ESlateVisibility::Collapsed);
+	PlacedInPosition = false;
 }
