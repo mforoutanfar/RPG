@@ -18,8 +18,4 @@ class RPG_API URPGRandomAudioComponent : public UAudioComponent
 
 public:
 	void PlayRandom(FString BaseFileName);
-
-private:
-	static TMap<FString, TArray<USoundBase*>> SoundMap;
-    static void PopulateSoundsForKey(FString Key);
 };

@@ -20,6 +20,9 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		class URPG_EventManager* EventManager = nullptr;
 
+	TMap<FString, TArray<USoundBase*>> SoundMap;
+	void PopulateSoundsForKey(FString Key);
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform);
 

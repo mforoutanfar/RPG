@@ -2,47 +2,24 @@
 
 
 #include "RPGRandomAudioComponent.h"
+#include "RPG_GameStateBase.h"
 
 void URPGRandomAudioComponent::PlayRandom(FString BaseFileName)
 {
-	PopulateSoundsForKey(BaseFileName);
+	//TODO: In DebugGame, GetWorld returns null sometimes.
+	auto a = GetWorld();
+	auto b = a->GetGameState();	
+	auto GS = Cast<ARPG_GameStateBase>(b);
 
-	int Range = SoundMap[BaseFileName].Num();
+	GS->PopulateSoundsForKey(BaseFileName);
+
+	int Range = GS->SoundMap[BaseFileName].Num();
 
 	if (Range != 0)
 	{
 		int rand = FMath::RandRange(0, Range-1);
 
-		SetSound(SoundMap[BaseFileName][rand]);
+		SetSound(GS->SoundMap[BaseFileName][rand]);
 		Play();
-	}
-}
-
-TMap<FString, TArray<USoundBase*>> URPGRandomAudioComponent::SoundMap;
-
-void URPGRandomAudioComponent::PopulateSoundsForKey(FString Key)
-{
-	if (!SoundMap.Contains(Key))
-	{		
-		FString BasePathToLoad = FString("/Game/Assets/Sounds/");
-
-		SoundMap.Add(Key, TArray<USoundBase*>());
-
-		int c = 0;
-		while (true)
-		{
-			FString Number = FString::Printf(TEXT("%d"), c);
-			FString FullPath = BasePathToLoad + Key + Number + "." + Key + Number;
-			USoundBase* RSound = Cast<USoundBase>(StaticLoadObject(USoundBase::StaticClass(), NULL, *(FullPath)));
-			if (RSound)
-			{
-				SoundMap[Key].Add(RSound);
-				c++;
-			}
-			else
-			{
-				break;
-			}
-		}
 	}
 }
