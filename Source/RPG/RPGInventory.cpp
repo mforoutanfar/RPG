@@ -92,6 +92,9 @@ bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int Prop
 	}
 
 	RPGEventManager->InventoryItemAdded.Broadcast(Item, OwnerUnit);
+
+	RPGEventManager->RemovePickedItemProposed.Broadcast();
+
 	return true;
 }
 

@@ -139,6 +139,9 @@ void URPG_EquipmentWidget::OnEquipmentItemRemoved(URPGInventoryItem* Item, ARPGC
 
 	EquipmentMap[Cat][Player]->RemoveFromParent();
 	EquipmentMap[Cat][Player] = nullptr;
+
+	//Because switcher will switch to next available item.
+	SwitcherMap[Cat]->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void URPG_EquipmentWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName)

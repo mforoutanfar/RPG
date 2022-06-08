@@ -32,6 +32,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemAdded, URPGInventoryI
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipmentItemReplaced, FRPGItemInfo, PreviousItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNearestInteractableChanged, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConsumeItemProposed, FRPGItemInfo, ItemInfo, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemovePickedItemProposed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureStateChanged, ARPGCreature*, Creature);
 
 
 /**
@@ -93,4 +96,13 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FRemoveItemProposed RemoveItemProposed;
+
+	UPROPERTY(BlueprintAssignable)
+		FConsumeItemProposed ConsumeItemProposed;
+	
+	UPROPERTY(BlueprintAssignable)
+		FRemovePickedItemProposed RemovePickedItemProposed;
+
+	UPROPERTY(BlueprintAssignable)
+		FCreatureStateChanged CreatureStateChanged;
 };

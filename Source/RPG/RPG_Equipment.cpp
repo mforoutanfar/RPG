@@ -45,6 +45,8 @@ bool URPG_Equipment::AddItem(FRPGItemInfo OutItemInfo)
 
 		RPGEventManager->EquipmentItemAdded.Broadcast(Item, OwnerUnit);
 
+		RPGEventManager->RemovePickedItemProposed.Broadcast();
+
 		//Add previous item as picked item.
 		if (PreviousItemExists)
 		{

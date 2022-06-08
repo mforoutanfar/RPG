@@ -40,6 +40,10 @@ ARPGCreature::ARPGCreature()
 
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);
+	//So that it will play when paused
+	AudioComponent->SetTickableWhenPaused(true);
+	AudioComponent->bIsUISound = true;
+	//
 
 	Inventory = CreateDefaultSubobject<URPGInventory>(FName("Inventory"));
 	Inventory->OwnerUnit = this;
@@ -55,6 +59,31 @@ void ARPGCreature::BeginPlay()
 
 	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &ARPGCreature::OnItemWidgetPicked);
 	RPGEventManager->RemoveItemProposed.AddDynamic(this, &ARPGCreature::OnRemoveItemProposed);
+	RPGEventManager->ConsumeItemProposed.AddDynamic(this, &ARPGCreature::OnConsumeItemProposed);
+}
+
+void ARPGCreature::OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Creature)
+{
+	if (Creature == this)
+	{
+		HP += ItemInfo.HP;
+		if (HP > MaxHP)
+		{
+			HP = MaxHP;
+		}
+
+		Mana += ItemInfo.Mana;
+		if (Mana > MaxMana)
+		{
+			Mana = MaxMana;
+		}
+
+		RPGEventManager->CreatureStateChanged.Broadcast(this);
+
+		RPGEventManager->RemovePickedItemProposed.Broadcast();
+
+		AudioComponent->PlayRandom("gulp");
+	}
 }
 
 void ARPGCreature::OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item)

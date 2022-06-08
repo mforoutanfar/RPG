@@ -30,10 +30,18 @@ void URPG_GameHUD::NativeConstruct()
 	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_GameHUD::OnUnitAdded);
 	RPGEventManager->AttackOccured.AddDynamic(this, &URPG_GameHUD::OnAttackOccured);
 	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &URPG_GameHUD::OnItemWidgetPicked);	
-	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_GameHUD::OnInventoryItemAdded);
-	RPGEventManager->EquipmentItemAdded.AddDynamic(this, &URPG_GameHUD::OnEquipmentItemAdded);
 	RPGEventManager->EquipmentItemReplaced.AddDynamic(this, &URPG_GameHUD::OnEquipmentItemReplaced);
 	RPGEventManager->NearestInteractableChanged.AddDynamic(this, &URPG_GameHUD::OnNearestInteractableChanged);
+	RPGEventManager->RemovePickedItemProposed.AddDynamic(this, &URPG_GameHUD::OnRemovePickedItemProposed);
+}
+
+void URPG_GameHUD::OnRemovePickedItemProposed()
+{
+	if (PickedItem)
+	{
+		PickedItem->RemoveFromParent();
+		PickedItem = nullptr;
+	}
 }
 
 void URPG_GameHUD::OnItemWidgetPicked(URPG_ItemWidget* ItemWidget)
@@ -66,26 +74,6 @@ void URPG_GameHUD::OnNearestInteractableChanged(AActor* NearestInteractable)
 	{
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
 		InteractionPing->SetPingString(Interactable->GetInteractableType());
-	}
-}
-
-void URPG_GameHUD::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
-{
-	//Assuming the item was added via picked item in inventory. TODO: Better solution?
-	if (PickedItem)
-	{
-		PickedItem->RemoveFromParent();
-		PickedItem = nullptr;
-	}
-}
-
-void URPG_GameHUD::OnEquipmentItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
-{
-	//Assuming the item was added via picked item in inventory. TODO: Better solution?
-	if (PickedItem)
-	{
-		PickedItem->RemoveFromParent();
-		PickedItem = nullptr;
 	}
 }
 

@@ -63,6 +63,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
 
 	UFUNCTION()
+		void OnCreatureStateChanged(ARPGCreature* Creature);
+
+	UFUNCTION()
 	void OnSafetyStateChanged(ARPGPlayerUnit* Unit, TEnumAsByte<UnitSafety::SafetyState> State);
 
 	UnitSafety::SafetyState DefaultState;
@@ -93,7 +96,7 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess))
 		FLinearColor DeselectedColor;
-
+	
 	FLinearColor DefaultSafetyColor;
 
 protected:

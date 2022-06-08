@@ -10,6 +10,9 @@
 #include "RPG_GameStateBase.h"
 #include "RPGPlayer.h"
 #include "RPG_DamageNumberWidget.h"
+#include "RPG_HUD.h"
+#include "RPG_GameHUD.h"
+#include "RPG_ItemWidget.h"
 
 void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 {
@@ -19,9 +22,22 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
 	RPGEventManager->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
-
+	RPGEventManager->CreatureStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnCreatureStateChanged);
+	
 	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Modify!
 	DefaultSafetyColor = SafeColor;
+}
+
+void URPG_AvatarWidget::OnCreatureStateChanged(ARPGCreature* Creature)
+{	 
+	if (Creature == ReferencedUnit.Get())
+	{
+		auto HPPercent = Creature->HP / Creature->MaxHP;
+		HPBar->SetPercent(HPPercent);
+
+		auto ManaPercent = Creature->Mana / Creature->MaxMana;
+		ManaBar->SetPercent(ManaPercent);
+	}
 }
 
 void URPG_AvatarWidget::NativeConstruct()
@@ -134,6 +150,7 @@ void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, F
 	}
 	else if (ReferencedUnit.Get() == Data.Target)//Is Attacked
 	{
+		//TODO: Unify with OnCreatureStateChanged?
 		auto percent = HPBar->Percent - Results.DamageDealt / Unit->MaxHP;
 		HPBar->SetPercent(percent);
 
@@ -172,8 +189,21 @@ void URPG_AvatarWidget::ResetAvatar()
 FReply URPG_AvatarWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	auto Button = InMouseEvent.GetEffectingButton();
-	
-	RPGEventManager->AvatarClicked.Broadcast(ReferencedUnit.Get(), Button.GetFName());
+
+	if (Button.GetFName() == "LeftMouseButton")
+	{
+		RPGEventManager->AvatarClicked.Broadcast(ReferencedUnit.Get(), Button.GetFName());
+	}
+	else if (Button.GetFName() == "RightMouseButton")
+	{
+		if (RPGGameHUD->PickedItem)
+		{
+			if (RPGGameHUD->PickedItem->ItemInfo.ItemCategory == ItemCategory::ItemCat::CONSUMABLE)
+			{
+				RPGEventManager->ConsumeItemProposed.Broadcast(RPGGameHUD->PickedItem->ItemInfo, ReferencedUnit.Get());
+			}
+		}
+	}	
 
 	return FReply::Handled();
 }

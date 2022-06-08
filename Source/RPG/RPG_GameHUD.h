@@ -47,13 +47,10 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+	void OnRemovePickedItemProposed();
+
+	UFUNCTION()
 	void OnItemWidgetPicked(URPG_ItemWidget* ItemWidget);
-
-	UFUNCTION()
-	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
-
-	UFUNCTION()
-	void OnEquipmentItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
 
 	UFUNCTION()
 	void OnEquipmentItemReplaced(FRPGItemInfo PreviousItemInfo);

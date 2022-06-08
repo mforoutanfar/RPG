@@ -42,6 +42,9 @@ public:
 
 	virtual void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
 
+	UFUNCTION()
+	void OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Creature);
+
 	bool IsInRecovery() { return InRecovery; };
 
 	UFUNCTION(BlueprintCallable)
