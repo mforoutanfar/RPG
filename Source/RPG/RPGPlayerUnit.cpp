@@ -37,6 +37,9 @@ ARPGPlayerUnit::ARPGPlayerUnit()
 	MeleeSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
 	RangeSphere->SetCollisionProfileName(FName("PlayerDamageSource"));
 	HitBox->SetCollisionProfileName(FName("PlayerHitBox"));
+
+	//For AI Sight Detection. TODO: Better alternative?
+	Tags.Add(FName("Player"));
 }
 
 

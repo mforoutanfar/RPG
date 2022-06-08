@@ -42,8 +42,11 @@ ARPGPlayer::ARPGPlayer()
 	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 	AudioComponent->SetupAttachment(RootComponent);
 
-	SightSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("SightSource"));
-	SightSource->RegisterForSense(UAISense_Sight::StaticClass());
+	//For AI Sight Detection. TODO: Better alternative?
+	Tags.Add(FName("Player"));
+
+	//SightSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("SightSource"));
+	//SightSource->RegisterForSense(UAISense_Sight::StaticClass());	
 }
 
 void ARPGPlayer::OnConstruction(const FTransform& Transform)

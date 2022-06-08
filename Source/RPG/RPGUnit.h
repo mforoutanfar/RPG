@@ -34,9 +34,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 		class URPGBillboardVisuals* Visuals = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-		class UAIPerceptionComponent* PerceptionComponent = nullptr;
-
 	int SpeedZeroCounter = 0;
 
 	bool Walking = false;
