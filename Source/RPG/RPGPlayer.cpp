@@ -126,6 +126,8 @@ void ARPGPlayer::BeginPlay()
 		}
 	}
 	InteractablesInRange = NumOfInteractables;
+
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 // Called every frame
@@ -149,6 +151,54 @@ void ARPGPlayer::Tick(float DeltaTime)
 		NearestInteractable = nullptr;
 		RPGEventManager->NearestInteractableChanged.Broadcast(NearestInteractable);
 	}
+
+	UpdateWalkingSoundState();
+}
+
+//TODO: Implement State Machine?
+void ARPGPlayer::UpdateWalkingSoundState()
+{
+	auto mc = GetCharacterMovement();
+
+	bool IsOnGround = !mc->IsFalling();
+
+	float Velocity = mc->Velocity.SizeSquared();
+
+	bool IsWalking = !FMath::IsNearlyZero(Velocity);
+
+	bool IsRunning = FMath::IsNearlyEqual(Velocity, (RunCoeff * WalkSpeed)* (RunCoeff * WalkSpeed), WalkSpeed* WalkSpeed);
+
+	if (OnGround != IsOnGround || Walking != IsWalking || Running != IsRunning)
+	{
+		if (IsOnGround)
+		{
+			if (IsWalking)
+			{
+				if (!IsRunning)
+				{
+					AudioComponent->SetWalkingSoundPlaying(true, 0.9f);
+				}
+				else
+				{
+					AudioComponent->SetWalkingSoundPlaying(true, 0.3f);
+				}
+			}
+			else
+			{
+				AudioComponent->SetWalkingSoundPlaying(false, 1.0f);
+			}
+		}
+		else
+		{
+			AudioComponent->SetWalkingSoundPlaying(false, 1.0f);
+		}
+	}
+
+	OnGround = IsOnGround;
+	Walking = IsWalking;
+	Running = IsRunning;
+
+	FString st = "";
 }
 
 void ARPGPlayer::OnForwardBackwardPressed(float Value)
@@ -183,12 +233,12 @@ void ARPGPlayer::OnJumpReleased()
 
 void ARPGPlayer::OnRunPressed()
 {
-	GetCharacterMovement()->MaxWalkSpeed *= 3.0f;
+	GetCharacterMovement()->MaxWalkSpeed *= RunCoeff;
 }
 
 void ARPGPlayer::OnRunReleased()
 {
-	GetCharacterMovement()->MaxWalkSpeed /= 3.0f;
+	GetCharacterMovement()->MaxWalkSpeed /= RunCoeff;
 }
 
 void ARPGPlayer::OnInteractPressed()

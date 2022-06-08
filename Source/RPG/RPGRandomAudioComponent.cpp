@@ -23,3 +23,19 @@ void URPGRandomAudioComponent::PlayRandom(FString BaseFileName)
 		Play();
 	}
 }
+
+void URPGRandomAudioComponent::SetWalkingSoundPlaying(bool Playing, float Interval)
+{
+	GetWorld()->GetTimerManager().ClearTimer(WalkingHandle);
+
+	if (Playing)
+	{
+		PlayWalkSound();
+		GetWorld()->GetTimerManager().SetTimer(WalkingHandle, this, &URPGRandomAudioComponent::PlayWalkSound, Interval, true);
+	}
+}
+
+void URPGRandomAudioComponent::PlayWalkSound()
+{
+	PlayRandom("walk");
+}

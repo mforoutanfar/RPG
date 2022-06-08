@@ -18,4 +18,11 @@ class RPG_API URPGRandomAudioComponent : public UAudioComponent
 
 public:
 	void PlayRandom(FString BaseFileName);
+
+	FTimerHandle WalkingHandle;
+
+	void SetWalkingSoundPlaying(bool Playing, float Interval);
+
+protected:
+	void PlayWalkSound();
 };

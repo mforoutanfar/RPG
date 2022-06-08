@@ -22,6 +22,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void UpdateWalkingSoundState();
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -38,6 +40,12 @@ public:
 	void OnSwitchUnitPressed();
 
 	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
+
+	UPROPERTY(EditDefaultsOnly)
+		float WalkSpeed = 600.f;
+
+	UPROPERTY(EditDefaultsOnly)
+		float RunCoeff = 3.0f;
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -60,6 +68,10 @@ protected:
 		void OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	AActor* NearestInteractable = nullptr;
+
+	bool Walking = false;
+	bool Running = false;
+	bool OnGround = false;
 
 private:
 
