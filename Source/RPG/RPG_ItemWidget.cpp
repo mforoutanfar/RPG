@@ -17,9 +17,7 @@ void URPG_ItemWidget::Init(URPGInventoryItem* InItemRef, FRPGItemInfo InItemInfo
 	ItemRef = InItemRef;
 	ItemInfo = InItemInfo;
 
-	FString AssetName = "Item_" + ItemInfo.ItemName.ToString();
-	FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
-	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
+	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *ItemInfo.GetSpritePath()));
 	ItemImage->SetBrushFromTexture(tmpTexture);
 }
 
@@ -38,7 +36,8 @@ void URPG_ItemWidget::UpdateSizeForHUD()
 
 FReply URPG_ItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	RPGEventManager->ItemWidgetClicked.Broadcast(this);
+	auto Button = InMouseEvent.GetEffectingButton();
+	RPGEventManager->ItemWidgetClicked.Broadcast(this, Button.GetFName());
 
 	//Unhandled So that Inventorywidget can handle it.
 	return FReply::Unhandled();

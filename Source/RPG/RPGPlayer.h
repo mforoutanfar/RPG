@@ -49,7 +49,7 @@ protected:
 	int StarterUnits = 1;
 
 	UFUNCTION()
-		void OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit);
+		void OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName);
 
 	int InteractablesInRange = 0;
 

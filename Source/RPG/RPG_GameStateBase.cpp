@@ -7,11 +7,27 @@
 ARPG_GameStateBase::ARPG_GameStateBase()
 {
 	EventManager = CreateDefaultSubobject<URPG_EventManager>(FName("EventManager"));
+
+	Recepies.Add("Health Potion", TArray<FName>({ "Bottle", "Berries" }));
+	Recepies.Add("Mana Potion", TArray<FName>({ "Bottle", "Blueberries" }));
 }
 
 void ARPG_GameStateBase::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+}
+
+FName ARPG_GameStateBase::GetResultingItem(FName Ingredient1, FName Ingredient2)
+{
+	for (auto i: Recepies)
+	{
+		if (i.Value.Contains(Ingredient1) && i.Value.Contains(Ingredient2))
+		{
+			return i.Key;
+		}
+	}
+
+	return "";
 }
 
 void ARPG_GameStateBase::PopulateSoundsForKey(FString Key)

@@ -173,14 +173,7 @@ FReply URPG_AvatarWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, con
 {
 	auto Button = InMouseEvent.GetEffectingButton();
 	
-	if (Button.GetFName() == "LeftMouseButton")
-	{
-		RPGEventManager->AvatarLeftClicked.Broadcast(ReferencedUnit.Get());
-	}
-	else if (Button.GetFName() == "RightMouseButton")
-	{
-		RPGEventManager->AvatarRightClicked.Broadcast(ReferencedUnit.Get());
-	}
+	RPGEventManager->AvatarClicked.Broadcast(ReferencedUnit.Get(), Button.GetFName());
 
 	return FReply::Handled();
 }

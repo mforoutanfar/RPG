@@ -101,7 +101,12 @@ void URPG_Equipment::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 bool URPG_Equipment::Contains(URPGInventoryItem* Item)
 {
 	//TODO: Might have multiple equipment of same category in the future.
-	return (EquipmentMap[Item->ItemInformation.ItemCategory] == Item);
+	if (EquipmentMap.Contains(Item->ItemInformation.ItemCategory))
+	{
+		return (EquipmentMap[Item->ItemInformation.ItemCategory] == Item);
+	}
+
+	return false;
 }
 
 void URPG_Equipment::RemoveItem(URPGInventoryItem* Item)

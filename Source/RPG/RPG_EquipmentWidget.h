@@ -72,7 +72,7 @@ protected:
 		void OnEquipmentItemRemoved(URPGInventoryItem* Item, ARPGCreature* Creature);
 
 	UFUNCTION()
-		void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget);
+		void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName);
 
 	bool IsItemWidgetInEquipmentWidget(URPG_ItemWidget* ItemWidget);
 

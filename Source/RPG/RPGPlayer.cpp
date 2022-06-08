@@ -90,7 +90,7 @@ void ARPGPlayer::BeginPlay()
 	Super::BeginPlay();	
 
 	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
-	RPGEventManager->AvatarLeftClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarLeftClicked);
+	RPGEventManager->AvatarClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarClicked);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
 	MiniMapCamera->SetActorLocation(GetActorLocation() + FVector(0.0f,0.0f,10000.0f));
@@ -257,9 +257,16 @@ void ARPGPlayer::OnSwitchUnitPressed()
 	}
 }
 
-void ARPGPlayer::OnUnitAvatarLeftClicked(ARPGPlayerUnit* Unit)
+void ARPGPlayer::OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName)
 {
-	SetSelectedUnit(Unit);
+	if (ButtonName == "LeftMouseButton")
+	{
+		SetSelectedUnit(Unit);
+	}
+	else if (ButtonName == "RightMouseButton")
+	{
+
+	}
 }
 
 void ARPGPlayer::OnInteractionColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

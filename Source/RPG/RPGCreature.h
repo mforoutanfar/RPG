@@ -37,6 +37,9 @@ public:
 	UFUNCTION()
 	void OnItemWidgetPicked(class URPG_ItemWidget* Item);
 
+	UFUNCTION()
+	void OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item);
+
 	virtual void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
 
 	bool IsInRecovery() { return InRecovery; };

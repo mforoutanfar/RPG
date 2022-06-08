@@ -141,11 +141,18 @@ void URPG_EquipmentWidget::OnEquipmentItemRemoved(URPGInventoryItem* Item, ARPGC
 	EquipmentMap[Cat][Player] = nullptr;
 }
 
-void URPG_EquipmentWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget)
+void URPG_EquipmentWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName)
 {
-	if (IsItemWidgetInEquipmentWidget(ItemWidget))//Make sure it's not in inventory widget. TODO: Looks too complicated. Solution?
+	if (ButtonName == "LeftMouseButton")
 	{
-		ClickedItemWidget = ItemWidget;
+		if (IsItemWidgetInEquipmentWidget(ItemWidget))//Make sure it's not in inventory widget. TODO: Looks too complicated. Solution?
+		{
+			ClickedItemWidget = ItemWidget;
+		}
+	}
+	else if (ButtonName == "RightMouseButton")
+	{
+
 	}
 }
 
@@ -153,11 +160,14 @@ bool URPG_EquipmentWidget::IsItemWidgetInEquipmentWidget(URPG_ItemWidget* ItemWi
 {	
 	auto Cat = ItemWidget->ItemInfo.ItemCategory;
 
-	for (auto i : EquipmentMap[Cat])
+	if (EquipmentMap.Contains(Cat))
 	{
-		if (i.Value == ItemWidget)
+		for (auto i : EquipmentMap[Cat])
 		{
-			return true;
+			if (i.Value == ItemWidget)
+			{
+				return true;
+			}
 		}
 	}
 

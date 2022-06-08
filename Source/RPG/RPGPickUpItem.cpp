@@ -46,10 +46,7 @@ void ARPGPickUpItem::BeginPlay()
 	
 	RegisterOnMiniMap(this, MiniMap::LOOT);
 
-	FString AssetName = "Item_" + ItemInformation.ItemName.ToString();
-	FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
-
-	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *(PathToLoad)));
+	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *ItemInformation.GetSpritePath()));
 	if (tmpTexture)
 	{
 		ItemPicture->SetSprite(tmpTexture);

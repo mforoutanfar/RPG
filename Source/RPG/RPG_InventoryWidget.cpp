@@ -40,11 +40,18 @@ void URPG_InventoryWidget::NativeConstruct()
 	RPGEventManager->ItemWidgetClicked.AddDynamic(this, &URPG_InventoryWidget::OnItemWidgetClicked);
 }
 
-void URPG_InventoryWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget)
+void URPG_InventoryWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName)
 {
 	if (IsItemWidgetInInventoryWidget(ItemWidget))//Make sure it's not in equipment widget. TODO: Looks too complicated. Solution?
 	{
-		ClickedItemWidget = ItemWidget;
+		if (ButtonName == "LeftMouseButton")
+		{
+			LeftClickedItemWidget = ItemWidget;
+		}
+		else if (ButtonName == "RightMouseButton")
+		{
+			RightClickedItemWidget = ItemWidget;
+		}
 	}
 }
 
@@ -99,34 +106,73 @@ void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCre
 
 FReply URPG_InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (RPGGameHUD->PickedItem)
+	auto Button = InMouseEvent.GetEffectingButton();
+
+	if (Button.GetFName() == "LeftMouseButton")
 	{
-		auto MousePos = InMouseEvent.GetScreenSpacePosition();
+		if (RPGGameHUD->PickedItem)
+		{
+			auto MousePos = InMouseEvent.GetScreenSpacePosition();
 
-		auto BackgroundGeom = Background->GetCachedGeometry();
-		auto BGParGeom = Background->GetParent()->GetCachedGeometry();
-		auto BgPos = BGParGeom.LocalToAbsolute(BackgroundGeom.GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)));
+			auto BackgroundGeom = Background->GetCachedGeometry();
+			auto BGParGeom = Background->GetParent()->GetCachedGeometry();
+			auto BgPos = BGParGeom.LocalToAbsolute(BackgroundGeom.GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)));
 
-		FVector2D RelPos = MousePos - BgPos;
+			FVector2D RelPos = MousePos - BgPos;
 
-		auto Size = BackgroundGeom.GetAbsoluteSize();
-		auto RowHeight = Size.Y / Rows;
-		auto ColWidth = Size.X / Cols;
+			auto Size = BackgroundGeom.GetAbsoluteSize();
+			auto RowHeight = Size.Y / Rows;
+			auto ColWidth = Size.X / Cols;
 
-		int Col = RelPos.X / ColWidth;
-		int Row = RelPos.Y / RowHeight;
+			int Col = RelPos.X / ColWidth;
+			int Row = RelPos.Y / RowHeight;
 
-		auto CurrentCanvas = InventorySwitcher->GetActiveWidget();
-		auto RefUnit = Cast<ARPGCreature>(CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get());
+			auto CurrentCanvas = InventorySwitcher->GetActiveWidget();
+			auto RefUnit = Cast<ARPGCreature>(CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get());
 
-		RPGEventManager->AddItemToInventoryProposed.Broadcast(RefUnit, RPGGameHUD->PickedItem->ItemInfo, Row , Col);
+			RPGEventManager->AddItemToInventoryProposed.Broadcast(RefUnit, RPGGameHUD->PickedItem->ItemInfo, Row, Col);
+		}
+		else if (LeftClickedItemWidget)
+		{
+			RPGEventManager->ItemWidgetPicked.Broadcast(LeftClickedItemWidget);
+		}
 	}
-	else if (ClickedItemWidget)
+	else if (Button.GetFName() == "RightMouseButton")
 	{
-		RPGEventManager->ItemWidgetPicked.Broadcast(ClickedItemWidget);
+		if (RPGGameHUD->PickedItem && RightClickedItemWidget)
+		{
+			auto PickedInfo = RPGGameHUD->PickedItem->ItemInfo;
+			auto ClickedInfo = RightClickedItemWidget->ItemInfo;
+
+			if (PickedInfo.ItemCategory == ItemCategory::INGREDIENTS && ClickedInfo.ItemCategory == ItemCategory::INGREDIENTS)
+			{
+				auto ResultingItemName = RPGGameState->GetResultingItem(PickedInfo.ItemName, ClickedInfo.ItemName);
+
+				if (ResultingItemName != "")
+				{
+					auto CurrentCanvas = InventorySwitcher->GetActiveWidget();
+
+					auto RefUnit = Cast<ARPGCreature>(CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get());
+
+					RPGEventManager->RemoveItemProposed.Broadcast(RefUnit, RightClickedItemWidget->ItemRef);
+					
+					FRPGItemInfo ResultingInfo;
+					//TODO: Need a database or factory system for item info
+					ResultingInfo.ItemName = ResultingItemName;
+					ResultingInfo.HP = FMath::Max(PickedInfo.HP, ClickedInfo.HP);
+					ResultingInfo.Mana = FMath::Max(PickedInfo.Mana, ClickedInfo.Mana);
+					ResultingInfo.Width = FMath::Max(PickedInfo.Width, ClickedInfo.Width);
+					ResultingInfo.Height = FMath::Max(PickedInfo.Height, ClickedInfo.Height);
+					ResultingInfo.ItemCategory = ItemCategory::ItemCat::CONSUMABLE;
+
+					RPGEventManager->AddItemToInventoryProposed.Broadcast(RefUnit, ResultingInfo, ClickedInfo.InventoryY, ClickedInfo.InventoryX);
+				}
+			}
+		}
 	}
 
-	ClickedItemWidget = nullptr;
+	LeftClickedItemWidget = nullptr;
+	RightClickedItemWidget = nullptr;
 
 	return FReply::Handled();
 }

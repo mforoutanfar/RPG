@@ -37,7 +37,7 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget);
+	void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName);
 
 	bool IsItemWidgetInInventoryWidget(URPG_ItemWidget* ItemWidget);
 
@@ -58,5 +58,6 @@ protected:
 	const int Rows = 12;
 	const int Cols = 12;
 
-	URPG_ItemWidget* ClickedItemWidget = nullptr;
+	URPG_ItemWidget* LeftClickedItemWidget = nullptr;
+	URPG_ItemWidget* RightClickedItemWidget = nullptr;
 };

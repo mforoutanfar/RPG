@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RPGFunctionLibrary.h"
+
 #include "GameFramework/GameStateBase.h"
 #include "RPG_GameStateBase.generated.h"
 
@@ -21,9 +23,14 @@ public:
 		class URPG_EventManager* EventManager = nullptr;
 
 	TMap<FString, TArray<USoundBase*>> SoundMap;
+
 	void PopulateSoundsForKey(FString Key);
+
+	//TODO: Move recipe to seperate class?
+	FName GetResultingItem(FName Ingredient1, FName Ingredient2);
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform);
 
+	TMap<FName, TArray<FName>> Recepies;
 };

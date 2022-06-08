@@ -54,6 +54,18 @@ void ARPGCreature::BeginPlay()
 	Super::BeginPlay();
 
 	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &ARPGCreature::OnItemWidgetPicked);
+	RPGEventManager->RemoveItemProposed.AddDynamic(this, &ARPGCreature::OnRemoveItemProposed);
+}
+
+void ARPGCreature::OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item)
+{
+	if (Creature == this)
+	{
+		if (Inventory->Contains(Item))
+		{
+			Inventory->RemoveItem(Item);
+		}
+	}
 }
 
 void ARPGCreature::OnItemWidgetPicked(URPG_ItemWidget* Item)

@@ -21,13 +21,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, AActor*, Attacker
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetClicked, URPG_ItemWidget*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemWidgetClicked, URPG_ItemWidget*, Item, FName, ButtonName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetPicked, URPG_ItemWidget*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSafetyStateChanged, ARPGPlayerUnit*, Unit, TEnumAsByte<UnitSafety::SafetyState>, State);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarLeftClicked, ARPGPlayerUnit*, Unit);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAvatarRightClicked, ARPGPlayerUnit*, Unit);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAvatarClicked, ARPGPlayerUnit*, Unit, FName, ButtonName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAddItemToInventoryProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo, int, ProposedRow, int, ProposedCol);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAddItemToEquipmentProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRemoveItemProposed, ARPGCreature*, Creature, URPGInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipmentItemReplaced, FRPGItemInfo, PreviousItemInfo);
@@ -71,10 +71,7 @@ public:
 	FSafetyStateChanged SafetyStateChanged;
 
 	UPROPERTY(BlueprintAssignable)
-	FAvatarLeftClicked AvatarLeftClicked;
-
-	UPROPERTY(BlueprintAssignable)
-	FAvatarRightClicked AvatarRightClicked;
+	FAvatarClicked AvatarClicked;
 
 	UPROPERTY(BlueprintAssignable)
 	FAddItemToInventoryProposed AddItemToInventoryProposed;
@@ -93,4 +90,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FNearestInteractableChanged NearestInteractableChanged;
+
+	UPROPERTY(BlueprintAssignable)
+		FRemoveItemProposed RemoveItemProposed;
 };

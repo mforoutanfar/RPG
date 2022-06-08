@@ -12,6 +12,7 @@
 #define RPGPlayerController Cast<ARPGPlayerController>(GetWorld()->GetFirstPlayerController())
 #define RPGPlayer Cast<ARPGPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn())
 #define RPGGameHUD Cast<ARPG_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->GameHUD
+#define RPGGameState Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())
 
 /**
  * 
@@ -95,8 +96,8 @@ struct FRPGDice
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere)
-		int k1;
+	UPROPERTY(EditAnywhere)
+	int k1;
 
 	UPROPERTY(EditAnywhere)
 		int Dn;
@@ -128,6 +129,12 @@ struct FRPGItemInfo
 	FRPGDice MeleeDamage;
 
 	UPROPERTY(EditAnywhere)
+	float HP = 0.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Mana = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 	float CriticalChance;
 
 	UPROPERTY(EditAnywhere)
@@ -150,6 +157,24 @@ struct FRPGItemInfo
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
+
+	FString GetSpritePath()
+	{
+		FString ModifName = "";
+		for (auto c : ItemName.ToString())
+		{
+			if (c == ' ')
+			{
+				continue;
+			}
+
+			ModifName += c;
+		}
+
+		FString AssetName = "Item_" + ModifName;
+		FString PathToLoad = FString("/Game/Assets/Items/") + AssetName + FString(".") + AssetName;
+		return PathToLoad;
+	};
 };
 
 USTRUCT(BlueprintType)
