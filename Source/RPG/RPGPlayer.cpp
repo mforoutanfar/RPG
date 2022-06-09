@@ -340,6 +340,34 @@ void ARPGPlayer::OnAttackPressed()
 	}
 }
 
+void ARPGPlayer::OnSpellPressed()
+{
+	ARPGPlayerUnit* UnitToAttack = nullptr;
+
+	if (SelectedUnit.IsValid())
+	{
+		if (!SelectedUnit->IsInRecovery())
+		{
+			UnitToAttack = SelectedUnit.Get();
+		}
+		else
+		{
+			UnitToAttack = FindFirstOutOfRecoveryUnit();
+			SetSelectedUnit(UnitToAttack);
+		}
+	}
+	else
+	{
+		UnitToAttack = FindFirstOutOfRecoveryUnit();
+		SetSelectedUnit(UnitToAttack);
+	}
+
+	if (UnitToAttack)
+	{
+		UnitToAttack->CastReadySpell();
+	}
+}
+
 void ARPGPlayer::OnSwitchUnitPressed()
 {
 	if (!SelectedUnit.IsValid())

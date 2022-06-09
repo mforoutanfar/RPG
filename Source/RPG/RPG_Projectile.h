@@ -23,7 +23,7 @@ public:
 	ARPG_Projectile();
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UPROPERTY(EditDefaultsOnly)
 	float Accuracy = 1.0f;
@@ -37,11 +37,16 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FRPGDice BaseMeleeDamage;
 
+	UPROPERTY(EditDefaultsOnly)
+	float Life = 5.0f;
+
 protected:
 	/**
 	 * Called when the game starts or when spawned
 	*/
 	virtual void BeginPlay() override;
+
+	void OnLifeEnded();
 
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* MovementComponent = nullptr;
@@ -50,6 +55,8 @@ protected:
 	class USphereComponent* SphereComponent = nullptr;
 
 	void CalculateDamage(FRPGAttackData& OutData, FRPGAttackResults& Results);
+
+	FTimerHandle LifeHandle;
 
 	/**
  * Called every frame

@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BeginAttack();
 
+	UFUNCTION(BlueprintCallable)
+	void CastReadySpell();
+
 	UPROPERTY(EditAnywhere)
 	float MaxHP = 30000.0f;
 
@@ -78,6 +81,23 @@ public:
 
 	virtual bool IsAttackable() override;
 
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+		FVector ActionLocation;
+
+	//Put in public so spells can access them. TODO: Better solution?
+	UPROPERTY(EditDefaultsOnly)
+		class USphereComponent* MeleeSphere = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+		class USphereComponent* RangeSphere = nullptr;
+
+	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true, bool ShouldBeVisible = true);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		class URPGRandomAudioComponent* AudioComponent;
+
+	//
+
 protected:
 	bool InRecovery = false;
 	void EnterRecovery(float Duration);
@@ -86,30 +106,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	FName CreatureName = "Corpse";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class URPGRandomAudioComponent* AudioComponent;
 
 	bool Dead = false;
 	virtual void Die();
 
-	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true, bool ShouldBeVisible = true);
-
 	FTimerHandle RecoveryTimerHandle;
 
 	TWeakObjectPtr<UCapsuleComponent> HitBox;
-
-	UPROPERTY(EditDefaultsOnly)
-		class USphereComponent* MeleeSphere = nullptr;
-
-	UPROPERTY(EditDefaultsOnly)
-		class USphereComponent* RangeSphere = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		FVector ActionLocation;
 
 	class URPGInventory* Inventory;
 	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();
 	void CalculateMeleeDamage(FRPGAttackData &OutData, FRPGAttackResults &Results);
+
+	//TODO: Probably for development only.
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<class URPG_Spell>> SpellClassess = {};
+
+	UPROPERTY()
+	TArray<class URPG_Spell*> Spells = {};
+
+	int ReadySpellIndex = 0;
 };

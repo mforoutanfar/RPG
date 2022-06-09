@@ -44,6 +44,9 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			
 		RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 	}
+
+	GetWorld()->GetTimerManager().ClearTimer(LifeHandle);
+
 	Destroy();
 }
 
@@ -70,6 +73,12 @@ void ARPG_Projectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GetWorld()->GetTimerManager().SetTimer(LifeHandle, this, &ARPG_Projectile::OnLifeEnded, Life, false);
+}
+
+void ARPG_Projectile::OnLifeEnded()
+{
+	Destroy();
 }
 
 /**

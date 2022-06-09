@@ -11,7 +11,7 @@
  * 
  */
 
-UCLASS()
+UCLASS(Blueprintable)
 class RPG_API URPGRandomAudioComponent : public UAudioComponent
 {
 	GENERATED_BODY()

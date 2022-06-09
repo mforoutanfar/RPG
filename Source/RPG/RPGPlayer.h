@@ -38,6 +38,7 @@ public:
 	void OnRunReleased();
 	void OnInteractPressed();
 	void OnAttackPressed();
+	void OnSpellPressed();
 	void OnSwitchUnitPressed();
 
 	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);

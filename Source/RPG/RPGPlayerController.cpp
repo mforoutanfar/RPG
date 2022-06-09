@@ -22,6 +22,8 @@ void ARPGPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Run", EInputEvent::IE_Released, this, &ARPGPlayerController::OnRunReleased);
 	InputComponent->BindAction("Interact", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnInteractPressed);
 	InputComponent->BindAction("Attack", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnAttackPressed);	
+	InputComponent->BindAction("Spell", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnSpellPressed);
+
 	auto& Binding1 = InputComponent->BindAction("SwitchUnit", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnSwitchUnitPressed);
 	Binding1.bExecuteWhenPaused = true;
 	auto &Binding2 = InputComponent->BindAction("Open Inventory", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnOpenInventoryPressed);
@@ -103,6 +105,11 @@ void ARPGPlayerController::OnInteractPressed()
 void ARPGPlayerController::OnAttackPressed()
 {
 	Cast<ARPGPlayer>(GetPawn())->OnAttackPressed();
+}
+
+void ARPGPlayerController::OnSpellPressed()
+{
+	Cast<ARPGPlayer>(GetPawn())->OnSpellPressed();
 }
 
 void ARPGPlayerController::OnSwitchUnitPressed()

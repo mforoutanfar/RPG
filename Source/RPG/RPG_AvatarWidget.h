@@ -20,7 +20,8 @@ enum AvatarState
 	DISAPPOINTED,
 	HAPPY,
 	PAIN,
-	COCKY
+	COCKY,
+	SPELL
 };
 
 /**
@@ -64,6 +65,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 
 	UFUNCTION()
 		void OnCreatureStateChanged(ARPGCreature* Creature);
+
+	UFUNCTION()
+		void OnSpellCast(ARPGCreature* Creature);
 
 	UFUNCTION()
 	void OnSafetyStateChanged(ARPGPlayerUnit* Unit, TEnumAsByte<UnitSafety::SafetyState> State);

@@ -35,7 +35,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNearestInteractableChanged, AActor*
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConsumeItemProposed, FRPGItemInfo, ItemInfo, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemovePickedItemProposed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureStateChanged, ARPGCreature*, Creature);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellCast, ARPGCreature*, Creature);
 
 /**
  * 
@@ -105,4 +105,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FCreatureStateChanged CreatureStateChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+		FSpellCast SpellCast;
 };

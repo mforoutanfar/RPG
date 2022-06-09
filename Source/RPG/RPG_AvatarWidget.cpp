@@ -23,7 +23,8 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
 	RPGEventManager->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
 	RPGEventManager->CreatureStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnCreatureStateChanged);
-	
+	RPGEventManager->SpellCast.AddDynamic(this, &URPG_AvatarWidget::OnSpellCast);
+
 	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Modify!
 	DefaultSafetyColor = SafeColor;
 }
@@ -40,6 +41,17 @@ void URPG_AvatarWidget::OnCreatureStateChanged(ARPGCreature* Creature)
 	}
 }
 
+void URPG_AvatarWidget::OnSpellCast(ARPGCreature* Creature)
+{
+	if (Creature == ReferencedUnit.Get())
+	{
+		Portrait->SetBrushFromTexture(AvatarMap[SPELL]);
+
+		GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
+		GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+	}
+}
+
 void URPG_AvatarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -49,9 +61,9 @@ void URPG_AvatarWidget::NativeConstruct()
 
 URPG_AvatarWidget::URPG_AvatarWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	FString Codes[8] = {"normal", "angry", "sad", "dead", "disappointed", "happy", "pain", "cocky"};
+	FString Codes[9] = {"normal", "angry", "sad", "dead", "disappointed", "happy", "pain", "cocky", "spell"};
 		
-	for (size_t i = 0; i < 8; i++)
+	for (size_t i = 0; i < 9; i++)
 	{
 		FString AssetName = "avatar_dummy_" + Codes[i];
 		FString PathToLoad = FString("/Game/Assets/Avatars/") + AssetName + FString(".") + AssetName;

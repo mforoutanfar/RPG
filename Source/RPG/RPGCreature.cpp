@@ -18,6 +18,7 @@
 #include "RPG_EventManager.h"
 #include "RPG_ItemWidget.h"
 #include "RPGInventoryItem.h"
+#include "RPG_Spell.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -60,6 +61,13 @@ void ARPGCreature::BeginPlay()
 	RPGEventManager->ItemWidgetPicked.AddDynamic(this, &ARPGCreature::OnItemWidgetPicked);
 	RPGEventManager->RemoveItemProposed.AddDynamic(this, &ARPGCreature::OnRemoveItemProposed);
 	RPGEventManager->ConsumeItemProposed.AddDynamic(this, &ARPGCreature::OnConsumeItemProposed);
+
+	for (auto i : SpellClassess)
+	{
+		auto Spell = NewObject<URPG_Spell>(this, i);
+		Spell->Caster = this;
+		Spells.Add(Spell);
+	}
 }
 
 void ARPGCreature::OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Creature)
@@ -163,6 +171,22 @@ void ARPGCreature::BeginAttack()
 {
 	auto Results = Attack();
 	EnterRecovery(Results.RecoveryDuration);
+}
+
+void ARPGCreature::CastReadySpell()
+{
+	if (ReadySpellIndex < Spells.Num())
+	{
+		auto Spell = Spells[ReadySpellIndex];
+		if (Mana > Spell->RequiredMana)
+		{
+			Spell->CastSpell();
+			Mana -= Spell->RequiredMana;
+			RPGEventManager->CreatureStateChanged.Broadcast(this);
+			RPGEventManager->SpellCast.Broadcast(this);
+			EnterRecovery(Spell->RecoveryDuration);
+		}
+	}
 }
 
 FRPGAttackResults ARPGCreature::Attack()

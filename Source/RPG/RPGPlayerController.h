@@ -32,6 +32,7 @@ protected:
 	void OnRunReleased();
 	void OnInteractPressed();
 	void OnAttackPressed();
+	void OnSpellPressed();
 	void OnSwitchUnitPressed();
 
 	bool InventoryOpen = false;
