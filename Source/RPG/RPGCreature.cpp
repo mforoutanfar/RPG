@@ -133,6 +133,7 @@ void ARPGCreature::OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Res
 	{
 		RecoveryDuration = 0.0f;
 		Results.Missed = true;
+		DamageDealt = 0.0f;
 	}
 	else if (Results.Crit)
 	{

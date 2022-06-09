@@ -51,11 +51,12 @@ protected:
 
 	void CalculateDamage(FRPGAttackData& OutData, FRPGAttackResults& Results);
 
-public:	
 	/**
-	 * Called every frame
-	 * @param DeltaTime Game time elapsed during last frame modified by the time dilation 
-	*/
+ * Called every frame
+ * @param DeltaTime Game time elapsed during last frame modified by the time dilation
+*/
 	virtual void Tick(float DeltaTime) override;
+
+public:	
 
 };

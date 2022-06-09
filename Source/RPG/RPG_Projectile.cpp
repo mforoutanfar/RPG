@@ -81,4 +81,3 @@ void ARPG_Projectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-

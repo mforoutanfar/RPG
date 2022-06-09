@@ -155,8 +155,13 @@ void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, F
 		HPBar->SetPercent(percent);
 
 		GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
-
-		if (percent > 0)
+		
+		if (Results.Missed)
+		{
+			Portrait->SetBrushFromTexture(AvatarMap[COCKY]);
+			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
+		}
+		else if (percent > 0)
 		{
 			Portrait->SetBrushFromTexture(AvatarMap[PAIN]);
 			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
