@@ -83,6 +83,7 @@ protected:
 	void EnterRecovery(float Duration);
 	void ExitRecovery();
 
+	UPROPERTY(EditDefaultsOnly)
 	FName CreatureName = "Corpse";
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

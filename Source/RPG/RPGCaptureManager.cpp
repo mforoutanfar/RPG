@@ -27,6 +27,7 @@ ARPGCaptureManager::ARPGCaptureManager()
 void ARPGCaptureManager::BeginPlay()
 {
 	Super::BeginPlay();
+
 	Init();
 	GetWorld()->GetFirstPlayerController()->SetViewTargetWithBlend(Camera.Get());
 	ChangeAnimation();
@@ -151,7 +152,7 @@ void ARPGCaptureManager::TakeShot()
 		}
 	}	
 
-	FString FileName = "Corpse_" + EighthSuffix[CurrentEighth] + "_" + AnimStateSuffix[CurrentAnimState] +"_" + FString::Printf(TEXT("%d"), FrameNumber);
+	FString FileName = "Archer_" + EighthSuffix[CurrentEighth] + "_" + AnimStateSuffix[CurrentAnimState] +"_" + FString::Printf(TEXT("%d"), FrameNumber);
 
 	GetHighResScreenshotConfig().SetFilename(FileName);
 	GetWorld()->GetGameViewport()->Viewport->TakeHighResScreenShot();
