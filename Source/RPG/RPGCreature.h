@@ -85,7 +85,7 @@ protected:
 
 	FName CreatureName = "Corpse";
 
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class URPGRandomAudioComponent* AudioComponent;
 
 	bool Dead = false;

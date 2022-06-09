@@ -17,6 +17,7 @@ class RPG_API URPGRandomAudioComponent : public UAudioComponent
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void PlayRandom(FString BaseFileName);
 
 	FTimerHandle WalkingHandle;
