@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "RPGFunctionLibrary.h"
 
 #include "RPGPlayer.generated.h"
 
@@ -47,6 +48,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		float RunCoeff = 3.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+		FRPGDice DamagePerFallDuration;
+
+	UPROPERTY(EditDefaultsOnly)
+		float SafeFallDuration = 1.0f;
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void AddUnit();
@@ -72,6 +79,11 @@ protected:
 	bool Walking = false;
 	bool Running = false;
 	bool OnGround = false;
+
+	FTimerHandle FallingHandle;
+
+	UFUNCTION()
+	void OnOnReachedJumpApex();	
 
 private:
 

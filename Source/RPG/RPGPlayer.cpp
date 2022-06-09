@@ -45,6 +45,9 @@ ARPGPlayer::ARPGPlayer()
 	//For AI Sight Detection. TODO: Better alternative?
 	Tags.Add(FName("Player"));
 
+	DamagePerFallDuration.k1 = 5;
+	DamagePerFallDuration.Dn = 2;
+	DamagePerFallDuration.k2 = 20;
 	//SightSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(FName("SightSource"));
 	//SightSource->RegisterForSense(UAISense_Sight::StaticClass());	
 }
@@ -94,6 +97,7 @@ void ARPGPlayer::BeginPlay()
 
 	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 	RPGEventManager->AvatarClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarClicked);
+	OnReachedJumpApex.AddDynamic(this, &ARPGPlayer::OnOnReachedJumpApex);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
 	MiniMapCamera->SetActorLocation(GetActorLocation() + FVector(0.0f,0.0f,10000.0f));
@@ -133,6 +137,11 @@ void ARPGPlayer::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
+void ARPGPlayer::OnOnReachedJumpApex()
+{
+	GetWorld()->GetTimerManager().SetTimer(FallingHandle, 600.0f, false);
+}
+
 // Called every frame
 void ARPGPlayer::Tick(float DeltaTime)
 {
@@ -155,7 +164,7 @@ void ARPGPlayer::Tick(float DeltaTime)
 		RPGEventManager->NearestInteractableChanged.Broadcast(NearestInteractable);
 	}
 
-	UpdateWalkingSoundState();
+	UpdateWalkingSoundState();	
 }
 
 //TODO: Implement State Machine?
@@ -165,11 +174,48 @@ void ARPGPlayer::UpdateWalkingSoundState()
 
 	bool IsOnGround = !mc->IsFalling();
 
-	float Velocity = mc->Velocity.SizeSquared();
+	float VelocitySq = mc->Velocity.SizeSquared();
 
-	bool IsWalking = !FMath::IsNearlyZero(Velocity);
+	bool IsWalking = !FMath::IsNearlyZero(VelocitySq);
 
-	bool IsRunning = FMath::IsNearlyEqual(Velocity, (RunCoeff * WalkSpeed)* (RunCoeff * WalkSpeed), WalkSpeed* WalkSpeed);
+	bool IsRunning = FMath::IsNearlyEqual(VelocitySq, (RunCoeff * WalkSpeed)* (RunCoeff * WalkSpeed), WalkSpeed* WalkSpeed);
+
+	if (OnGround != IsOnGround)
+	{
+		if (IsOnGround)
+		{
+			float FallDuration = GetWorld()->GetTimerManager().GetTimerElapsed(FallingHandle);
+
+			if (FallDuration > SafeFallDuration)
+			{
+				for (auto i : Units)
+				{
+					float FallDamage = DamagePerFallDuration.GetResult() * FallDuration;
+
+					FRPGAttackData AttackData;
+					FRPGAttackResults Results;
+					float RecoveryDuration = 1.0f;
+
+					AttackData.Attacker = nullptr;
+					AttackData.Target = i;
+					AttackData.Accuracy = 1.0f;
+
+					AttackData.Damage = FallDamage;
+
+					auto Attackable = Cast<IRPGAttackable>(i);
+					Attackable->OnAttacked(AttackData, Results);
+
+					Results.RecoveryDuration = RecoveryDuration;
+
+					RPGEventManager->AttackOccured.Broadcast(nullptr, AttackData, Results);
+				}
+			}
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(FallingHandle, 600.0f, false);
+		}
+	}
 
 	if (OnGround != IsOnGround || Walking != IsWalking || Running != IsRunning)
 	{
@@ -226,6 +272,7 @@ void ARPGPlayer::OnLookPitch(float Value)
 
 void ARPGPlayer::OnJumpPressed()
 {
+	GetCharacterMovement()->bNotifyApex = true;
 	Jump();
 }
 
