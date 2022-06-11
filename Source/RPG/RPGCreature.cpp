@@ -19,6 +19,7 @@
 #include "RPG_ItemWidget.h"
 #include "RPGInventoryItem.h"
 #include "RPG_Spell.h"
+#include "RPGPickUpItem.h"
 
 // Sets default values
 ARPGCreature::ARPGCreature()
@@ -67,6 +68,23 @@ void ARPGCreature::BeginPlay()
 		auto Spell = NewObject<URPG_Spell>(this, i);
 		Spell->Caster = this;
 		Spells.Add(Spell);
+	}
+
+	float Probability = 0.7f;
+
+	for (auto i : StartingInventoryItems)
+	{
+		auto Rand = FMath::FRandRange(0.0f, 1.0f);
+		
+		if (Rand > Probability)
+		{
+			continue;
+		}
+
+		//TODO: Better solution for storing item data and creating items.
+		auto Item = NewObject<ARPGPickUpItem>(this, i);		
+		Inventory->AddItem(Item->ItemInformation);
+		Item->Destroy();
 	}
 }
 

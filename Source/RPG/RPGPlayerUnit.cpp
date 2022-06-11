@@ -17,7 +17,7 @@
 #include "RPG_GameStateBase.h"
 #include "RPGInventory.h"
 #include "RPG_Equipment.h"
-
+#include "RPGInventoryItem.h"
 
 /**
  * Sets default values
@@ -162,11 +162,44 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 		bool Successful = Inventory->AddItem(Item->ItemInformation);
 		Interactable->OnInteracted(Successful);
 
-		//TODO: Put here because pickupItem is destroyed along with its audio component! 
 		if (Successful)
 		{
 			AudioComponent->PlayRandom("cash");
 		}
+		else
+		{
+			AudioComponent->PlayRandom("error");
+		}
+	}
+	else if (Type == CORPSE)
+	{
+		auto Corpse = Cast<ARPGCreature>(Target);
+
+		bool LootedAnything = false;
+		bool LootedEverything = true;
+
+		//TODO: Loot equipment as well?
+		for (auto i : Corpse->Inventory->GetItems())
+		{
+			bool Successful = Inventory->AddItem(i->ItemInformation);
+
+			if (Successful)
+			{
+				LootedAnything = true;
+				Corpse->Inventory->RemoveItem(i);
+			}
+			else
+			{
+				LootedEverything = false;
+			}
+		}
+
+		if (LootedAnything)
+		{
+			AudioComponent->PlayRandom("cash");
+		}
+
+		Interactable->OnInteracted(LootedEverything);
 	}
 }
 

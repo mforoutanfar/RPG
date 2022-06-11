@@ -62,8 +62,9 @@ InteractableCat ARPGUnit::GetInteractableType()
 
 void ARPGUnit::OnInteracted(bool Successful)
 {
-	if (Dead)
+	if (Successful && Dead)
 	{
+		UnregisterFromMiniMap(this);
 		Destroy();
 	}
 }
@@ -93,6 +94,7 @@ void ARPGUnit::Die()
 
 	//TODO: Replace Enemy ping with Loot ping.
 	UnregisterFromMiniMap(this);
+	RegisterOnMiniMap(this, MiniMap::LOOT);
 }
 
 void ARPGUnit::BeginAttack()

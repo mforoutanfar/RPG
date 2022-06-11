@@ -55,7 +55,7 @@ void URPG_MiniMapWidget::AddPing(AActor* Actor, MiniMap::ObjectType Type)
 		break;
 	}
 
-	auto Ping = WidgetTree->ConstructWidget<URPGPingWidget>(PingClass, FName(FString::Printf(TEXT("Ping%d"), ActorMap.Num())));
+	auto Ping = WidgetTree->ConstructWidget<URPGPingWidget>(PingClass);
 	PingCanvas->AddChildToCanvas(Ping);
 	auto CanvasSlot = Cast<UCanvasPanelSlot>(Ping->Slot);
 	auto Anchors = FAnchors();

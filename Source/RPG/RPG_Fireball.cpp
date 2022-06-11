@@ -11,7 +11,7 @@
 ARPG_Fireball::ARPG_Fireball()
 {
 	ExplosionSphereComponent = CreateDefaultSubobject<USphereComponent>("ExplosionSphereComponent");
-	ExplosionSphereComponent->SetCollisionProfileName(FName("PlayerDamageSource"));
+	ExplosionSphereComponent->SetCollisionProfileName(FName("GeneralDamageSource"));
 }
 
 
@@ -37,17 +37,20 @@ void ARPG_Fireball::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	{
 		if (auto Attackable = Cast<IRPGAttackable>(i))
 		{
-			FRPGAttackData AttackData;
-			FRPGAttackResults Results;
+			if (Attackable->IsAttackable())
+			{
+				FRPGAttackData AttackData;
+				FRPGAttackResults Results;
 
-			AttackData.Attacker = this;
-			AttackData.Target = i;
-			AttackData.Accuracy = Accuracy;
-			CalculateDamage(AttackData, Results);
+				AttackData.Attacker = this;
+				AttackData.Target = i;
+				AttackData.Accuracy = Accuracy;
+				CalculateDamage(AttackData, Results);
 
-			Attackable->OnAttacked(AttackData, Results);
+				Attackable->OnAttacked(AttackData, Results);
 
-			RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
+				RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
+			}
 		}
 	}
 

@@ -139,4 +139,9 @@ bool URPGInventory::DoesItemFit(int Width, int Height, int Row, int Col)
 	return true;
 }
 
+TArray<URPGInventoryItem*> URPGInventory::GetItems()
+{
+	return Items;
+}
+
 

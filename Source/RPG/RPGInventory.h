@@ -27,6 +27,8 @@ public:
 
 	class ARPGCreature* OwnerUnit = nullptr;
 
+	TArray<URPGInventoryItem*> GetItems();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

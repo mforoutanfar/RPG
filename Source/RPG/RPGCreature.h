@@ -95,8 +95,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		class URPGRandomAudioComponent* AudioComponent;
-
 	//
+
+	class URPGInventory* Inventory;
+
+	UPROPERTY(EditDefaultsOnly)
+		TArray<TSubclassOf<class ARPGPickUpItem>> StartingInventoryItems;
 
 protected:
 	bool InRecovery = false;
@@ -114,7 +118,6 @@ protected:
 
 	TWeakObjectPtr<UCapsuleComponent> HitBox;
 
-	class URPGInventory* Inventory;
 	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();

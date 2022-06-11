@@ -19,8 +19,6 @@ ARPGPickUpItem::ARPGPickUpItem()
 
 	ItemPicture = CreateDefaultSubobject<UBillboardComponent>(FName("ItemPicture"));
 	ItemPicture->SetHiddenInGame(false);
-
-	AudioComponent = CreateDefaultSubobject<URPGRandomAudioComponent>(FName("AudioComponent"));
 }
 
 void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
@@ -28,7 +26,6 @@ void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	ItemPicture->SetRelativeLocation(FVector::ZeroVector);
 	ItemPicture->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
-	AudioComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale);
 }
 
 void ARPGPickUpItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -72,7 +69,6 @@ void ARPGPickUpItem::OnInteracted(bool Successful)
 	}
 	else
 	{
-		AudioComponent->PlayRandom("error");
 		HitBox->AddImpulse(7000*GetActorUpVector());
 	}
 }

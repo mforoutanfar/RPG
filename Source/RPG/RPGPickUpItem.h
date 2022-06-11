@@ -58,6 +58,4 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	class USphereComponent* HitBox;
-
-	class URPGRandomAudioComponent* AudioComponent;
 };
