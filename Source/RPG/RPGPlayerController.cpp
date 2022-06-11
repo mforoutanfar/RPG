@@ -28,6 +28,8 @@ void ARPGPlayerController::SetupInputComponent()
 	Binding1.bExecuteWhenPaused = true;
 	auto &Binding2 = InputComponent->BindAction("Open Inventory", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnOpenInventoryPressed);
 	Binding2.bExecuteWhenPaused = true;	
+	auto& Binding3 = InputComponent->BindAction("Pause", EInputEvent::IE_Pressed, this, &ARPGPlayerController::OnPausePressed);
+	Binding3.bExecuteWhenPaused = true;
 }
 
 void ARPGPlayerController::OnOpenInventoryPressed()
@@ -35,6 +37,21 @@ void ARPGPlayerController::OnOpenInventoryPressed()
 	ToggleInventory();
 
 	Cast<ARPG_HUD>(GetHUD())->OnOpenInventoryPressed(InventoryOpen);	
+}
+
+
+void ARPGPlayerController::OnPausePressed()
+{
+	//Close inventory if open.
+	if (InventoryOpen)
+	{
+		OnOpenInventoryPressed();
+	}
+	else
+	{
+		TogglePauseMenu();
+		Cast<ARPG_HUD>(GetHUD())->OnPausePressed(PauseMenuOpen);
+	}
 }
 
 void ARPGPlayerController::ToggleInventory()
@@ -55,6 +72,26 @@ void ARPGPlayerController::ToggleInventory()
 	}
 
 	SetPause(InventoryOpen);
+}
+
+void ARPGPlayerController::TogglePauseMenu()
+{
+	PauseMenuOpen = !PauseMenuOpen;
+
+	SetShowMouseCursor(PauseMenuOpen);
+
+	if (PauseMenuOpen)
+	{
+		auto InputMode = FInputModeGameAndUI();
+		InputMode.SetHideCursorDuringCapture(false);
+		SetInputMode(InputMode);
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly());
+	}
+
+	SetPause(PauseMenuOpen);
 }
 
 void ARPGPlayerController::OnForwardBackwardPressed(float Value)

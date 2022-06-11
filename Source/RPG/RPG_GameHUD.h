@@ -32,6 +32,8 @@ public:
 
 	void OnOpenInventoryPressed(bool InventoryOpen);
 
+	void OnPausePressed(bool PauseMenuOpen);
+
 	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
 	void UnregisterFromMinimap(AActor* Actor);
 
@@ -66,6 +68,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* Inventory;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidget* PauseMenu;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* Equipment;

@@ -21,6 +21,12 @@ public:
 
 	void ToggleInventory();
 
+	void TogglePauseMenu();
+
+	//Made blueprint callable for access from pause menu. TODO: Cleaner solution?
+	UFUNCTION(BlueprintCallable)
+		void OnPausePressed();
+
 protected:
 	void OnForwardBackwardPressed(float Value);
 	void OnStrafePressed(float Value);
@@ -36,6 +42,6 @@ protected:
 	void OnSwitchUnitPressed();
 
 	bool InventoryOpen = false;
-
+	bool PauseMenuOpen = false;
 };
 

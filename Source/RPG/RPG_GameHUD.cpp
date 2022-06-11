@@ -141,6 +141,20 @@ void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
 	}
 }
 
+void URPG_GameHUD::OnPausePressed(bool PauseMenuOpen)
+{
+	if (PauseMenuOpen)
+	{
+		PauseMenu->SetVisibility(ESlateVisibility::Visible);
+		MiniMap->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		PauseMenu->SetVisibility(ESlateVisibility::Collapsed);
+		MiniMap->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
 void URPG_GameHUD::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
 {
 	MiniMap->RegisterOnMinimap(Actor, Type);

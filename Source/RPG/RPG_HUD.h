@@ -25,6 +25,7 @@ protected:
 
 public:
 	void OnOpenInventoryPressed(bool InventoryOpen);
+	void OnPausePressed(bool PauseMenuOpen);
 
 	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
 	void UnregisterFromMinimap(AActor* Actor);
