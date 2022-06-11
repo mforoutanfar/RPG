@@ -110,6 +110,8 @@ protected:
 
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+		
+	bool InRecovery = false;
 
 public:
 	void Init(ARPGPlayerUnit* Unit);

@@ -4,6 +4,9 @@
 #include "RPGPlayerController.h"
 #include "RPGPlayer.h"
 #include "RPG_HUD.h"
+#include "RPG_GameStateBase.h"
+#include "RPG_EventManager.h"
+
 #include "Kismet/GameplayStatics.h"
 
 void ARPGPlayerController::SetupInputComponent()
@@ -34,6 +37,11 @@ void ARPGPlayerController::SetupInputComponent()
 
 void ARPGPlayerController::OnOpenInventoryPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	ToggleInventory();
 
 	Cast<ARPG_HUD>(GetHUD())->OnOpenInventoryPressed(InventoryOpen);	
@@ -42,6 +50,11 @@ void ARPGPlayerController::OnOpenInventoryPressed()
 
 void ARPGPlayerController::OnPausePressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	//Close inventory if open.
 	if (InventoryOpen)
 	{
@@ -52,6 +65,21 @@ void ARPGPlayerController::OnPausePressed()
 		TogglePauseMenu();
 		Cast<ARPG_HUD>(GetHUD())->OnPausePressed(PauseMenuOpen);
 	}
+}
+
+void ARPGPlayerController::OnGameOverIssued()
+{
+	GameOver = true;
+
+	auto InputMode = FInputModeUIOnly();
+	SetInputMode(InputMode);
+
+	SetShowMouseCursor(true);
+}
+
+void ARPGPlayerController::BeginPlay()
+{
+	RPGEventManager->GameOverIssued.AddDynamic(this, &ARPGPlayerController::OnGameOverIssued);
 }
 
 void ARPGPlayerController::ToggleInventory()
@@ -96,60 +124,120 @@ void ARPGPlayerController::TogglePauseMenu()
 
 void ARPGPlayerController::OnForwardBackwardPressed(float Value)
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnForwardBackwardPressed(Value);
 }
 
 void ARPGPlayerController::OnStrafePressed(float Value)
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnStrafePressed(Value);
 }
 
 void ARPGPlayerController::OnLookYaw(float Value)
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnLookYaw(Value);
 }
 
 void ARPGPlayerController::OnLookPitch(float Value)
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnLookPitch(Value);
 }
 
 void ARPGPlayerController::OnJumpPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnJumpPressed();
 }
 
 void ARPGPlayerController::OnJumpReleased()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnJumpReleased();
 }
 
 void ARPGPlayerController::OnRunPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnRunPressed();
 }
 
 void ARPGPlayerController::OnRunReleased()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnRunReleased();
 }
 
 void ARPGPlayerController::OnInteractPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnInteractPressed();
 }
 
 void ARPGPlayerController::OnAttackPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnAttackPressed();
 }
 
 void ARPGPlayerController::OnSpellPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnSpellPressed();
 }
 
 void ARPGPlayerController::OnSwitchUnitPressed()
 {
+	if (GameOver)
+	{
+		return;
+	}
+
 	Cast<ARPGPlayer>(GetPawn())->OnSwitchUnitPressed();
 }

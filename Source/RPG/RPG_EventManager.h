@@ -36,6 +36,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FConsumeItemProposed, FRPGItemInfo,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRemovePickedItemProposed);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureStateChanged, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellCast, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverIssued);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureDied, ARPGCreature*, Creature);
 
 /**
  * 
@@ -108,4 +110,10 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 		FSpellCast SpellCast;
+
+	UPROPERTY(BlueprintAssignable)
+		FGameOverIssued GameOverIssued;
+
+	UPROPERTY(BlueprintAssignable)
+		FCreatureDied CreatureDied;
 };

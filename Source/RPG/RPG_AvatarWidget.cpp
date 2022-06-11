@@ -25,8 +25,9 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	RPGEventManager->CreatureStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnCreatureStateChanged);
 	RPGEventManager->SpellCast.AddDynamic(this, &URPG_AvatarWidget::OnSpellCast);
 
-	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Modify!
+	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Solution?
 	DefaultSafetyColor = SafeColor;
+	ResetToDefaultColor();
 }
 
 void URPG_AvatarWidget::OnCreatureStateChanged(ARPGCreature* Creature)
@@ -101,7 +102,11 @@ void URPG_AvatarWidget::OnSafetyStateChanged(ARPGPlayerUnit* Unit, TEnumAsByte<U
 		break;
 	}
 
-	ResetToDefaultColor();
+	//TODO: Multiple definitions of InRecovery (Both here and in Creature). Solution?
+	if (!InRecovery)
+	{
+		ResetToDefaultColor();
+	}	
 }
 
 void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
@@ -110,6 +115,8 @@ void URPG_AvatarWidget::OnRecoveryStateChanged(AActor* Unit, bool State)
 	{
 		return;
 	}
+
+	InRecovery = State;
 
 	if (State)
 	{

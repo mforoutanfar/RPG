@@ -97,6 +97,7 @@ void ARPGPlayer::BeginPlay()
 
 	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 	RPGEventManager->AvatarClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarClicked);
+	RPGEventManager->CreatureDied.AddDynamic(this, &ARPGPlayer::OnCreatureDied);
 	OnReachedJumpApex.AddDynamic(this, &ARPGPlayer::OnOnReachedJumpApex);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
@@ -293,23 +294,35 @@ void ARPGPlayer::OnRunReleased()
 
 void ARPGPlayer::OnInteractPressed()
 {
+	ARPGPlayerUnit* UnitToInteract = nullptr;
+
 	if (NearestInteractable)
 	{
 		if (SelectedUnit.IsValid())
 		{
-			SelectedUnit->InteractWithTarget(NearestInteractable);
+			if (!SelectedUnit.Get()->IsInRecovery())
+			{
+				UnitToInteract = SelectedUnit.Get();
+			}
 		}
 		else
 		{
-			auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
-			auto Type = Interactable->GetInteractableType();
-
-			if (Type == ITEM)
-			{
-				Units[0]->InteractWithTarget(NearestInteractable);
-			}
+			UnitToInteract = FindFirstOutOfRecoveryUnit();
 		}
-	}	
+
+		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
+		auto Type = Interactable->GetInteractableType();
+
+		if (Type == ITEM || Type == CORPSE)
+		{
+			if (!UnitToInteract)
+			{
+				UnitToInteract = Units[0];
+			}
+
+			UnitToInteract->InteractWithTarget(NearestInteractable);
+		}
+	}
 }
 
 void ARPGPlayer::OnAttackPressed()
@@ -403,6 +416,20 @@ void ARPGPlayer::OnInteractionColliderBeginOverlap(UPrimitiveComponent* Overlapp
 	{
 		InteractablesInRange++;
 	}
+}
+
+//TODO: Not very optimal. (Called whenever enemies die too)
+void ARPGPlayer::OnCreatureDied(ARPGCreature* Unit)
+{
+	for (auto i: Units)
+	{
+		if (!i->IsDead())
+		{
+			return;
+		}
+	}
+
+	RPGEventManager->GameOverIssued.Broadcast();
 }
 
 void ARPGPlayer::OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

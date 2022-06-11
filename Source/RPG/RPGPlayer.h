@@ -67,6 +67,9 @@ protected:
 	UFUNCTION()
 		void OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName);
 
+	UFUNCTION()
+		void OnCreatureDied(class ARPGCreature* Unit);
+
 	int InteractablesInRange = 0;
 
 	UFUNCTION()

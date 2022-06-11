@@ -27,6 +27,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void OnPausePressed();
 
+	UFUNCTION()
+		void OnGameOverIssued();
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	bool GameOver = false;
+
 protected:
 	void OnForwardBackwardPressed(float Value);
 	void OnStrafePressed(float Value);
