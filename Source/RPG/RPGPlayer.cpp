@@ -313,7 +313,7 @@ void ARPGPlayer::OnInteractPressed()
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
 		auto Type = Interactable->GetInteractableType();
 
-		if (Type == ITEM || Type == CORPSE)
+		if (Type == ITEM || Type == CORPSE || Type == BUTTON)
 		{
 			if (!UnitToInteract)
 			{

@@ -201,5 +201,9 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 
 		Interactable->OnInteracted(LootedEverything);
 	}
+	else if (Type == BUTTON)
+	{
+		Interactable->OnInteracted(true);
+	}
 }
 

@@ -59,6 +59,7 @@ namespace InteractableCategory
 		DOOR,
 		CHEST,
 		CORPSE,
+		BUTTON,
 		MISC
 	};
 }

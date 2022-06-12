@@ -48,7 +48,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 		float RunCoeff = 3.0f;
-
+		
 	UPROPERTY(EditDefaultsOnly)
 		FRPGDice DamagePerFallDuration;
 
