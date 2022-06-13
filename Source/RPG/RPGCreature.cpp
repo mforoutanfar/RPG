@@ -92,6 +92,11 @@ void ARPGCreature::OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Cr
 {
 	if (Creature == this)
 	{
+		if (IsDead())
+		{
+			return;
+		}
+
 		HP += ItemInfo.HP;
 		if (HP > MaxHP)
 		{
@@ -343,12 +348,15 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 			}
 		}
 
-		if (auto Attackable = Cast<IRPGAttackable>(Actor))
+		auto Attackable = Cast<IRPGAttackable>(Actor);
+
+		if (!Attackable)
 		{
-			if (!Attackable->IsAttackable())
-			{
-				continue;
-			}
+			continue;
+		}
+		else if (!Attackable->IsAttackable())
+		{
+			continue;
 		}
 
 		if (auto Creature = Cast<ARPGCreature>(Actor))
