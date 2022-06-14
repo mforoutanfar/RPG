@@ -45,8 +45,14 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class URPG_InteractablePing* InteractionPing = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* CoinValue = nullptr;
+
 protected:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnCoinValueChanged(int Value);
 
 	UFUNCTION()
 	void OnRemovePickedItemProposed();
@@ -67,7 +73,7 @@ protected:
 	class UVerticalBox* AvatarsBox;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* Inventory;
+	class UWidget* InventoryGroup;
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidget* PauseMenu;

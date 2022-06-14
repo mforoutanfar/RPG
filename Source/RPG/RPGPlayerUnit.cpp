@@ -18,6 +18,7 @@
 #include "RPGInventory.h"
 #include "RPG_Equipment.h"
 #include "RPGInventoryItem.h"
+#include "RPGPlayer.h"
 
 /**
  * Sets default values
@@ -177,6 +178,13 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 
 		bool LootedAnything = false;
 		bool LootedEverything = true;
+
+		if (Corpse->Coins > 0)
+		{
+			RPGPlayer->SetCoins(Corpse->Coins);
+			Corpse->Coins = 0;
+			LootedAnything = true;
+		}
 
 		//TODO: Loot equipment as well?
 		for (auto i : Corpse->Inventory->GetItems())

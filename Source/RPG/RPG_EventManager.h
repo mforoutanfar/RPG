@@ -38,6 +38,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureStateChanged, ARPGCreature*
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellCast, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverIssued);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureDied, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCoinChanged, int, Value);
 
 /**
  * 
@@ -116,4 +117,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FCreatureDied CreatureDied;
+
+	UPROPERTY(BlueprintAssignable)
+		FCoinChanged CoinChanged;
 };

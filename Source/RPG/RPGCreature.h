@@ -94,13 +94,15 @@ public:
 	AActor* GetNearestAttackTarget(class UShapeComponent* Collider, bool ExcludeOwnType = true, bool ShouldBeVisible = true);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		class URPGRandomAudioComponent* AudioComponent;
-	//
+		class URPGRandomAudioComponent* AudioComponent;	//
 
 	class URPGInventory* Inventory;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		TArray<TSubclassOf<class ARPGPickUpItem>> StartingInventoryItems;
+
+	UPROPERTY(EditAnywhere)
+		int Coins = 0;
 
 protected:
 	bool InRecovery = false;

@@ -23,6 +23,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "RPG_InteractablePing.h"
 #include "RPGInteractable.h"
+#include "Components/TextBlock.h"
 
 void URPG_GameHUD::NativeConstruct()
 {
@@ -33,6 +34,12 @@ void URPG_GameHUD::NativeConstruct()
 	RPGEventManager->EquipmentItemReplaced.AddDynamic(this, &URPG_GameHUD::OnEquipmentItemReplaced);
 	RPGEventManager->NearestInteractableChanged.AddDynamic(this, &URPG_GameHUD::OnNearestInteractableChanged);
 	RPGEventManager->RemovePickedItemProposed.AddDynamic(this, &URPG_GameHUD::OnRemovePickedItemProposed);
+	RPGEventManager->CoinChanged.AddDynamic(this, &URPG_GameHUD::OnCoinValueChanged);
+}
+
+void URPG_GameHUD::OnCoinValueChanged(int Value)
+{		
+	CoinValue->SetText(FText::FromString(FString::Printf(TEXT("%d"), Value)));
 }
 
 void URPG_GameHUD::OnRemovePickedItemProposed()
@@ -127,14 +134,14 @@ void URPG_GameHUD::OnOpenInventoryPressed(bool InventoryOpen)
 {
 	if (InventoryOpen)
 	{
-		Inventory->SetVisibility(ESlateVisibility::Visible);
+		InventoryGroup->SetVisibility(ESlateVisibility::Visible);
 		Background->SetVisibility(ESlateVisibility::Visible);
 		Equipment->SetVisibility(ESlateVisibility::Visible);
 		MiniMap->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	else
 	{
-		Inventory->SetVisibility(ESlateVisibility::Collapsed);
+		InventoryGroup->SetVisibility(ESlateVisibility::Collapsed);
 		Background->SetVisibility(ESlateVisibility::Collapsed);
 		Equipment->SetVisibility(ESlateVisibility::Collapsed);
 		MiniMap->SetVisibility(ESlateVisibility::Visible);

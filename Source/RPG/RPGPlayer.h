@@ -55,9 +55,13 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		float SafeFallDuration = 1.0f;
 
+	void SetCoins(int Value);
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void AddUnit();
+
+	int Coins = 0;
 
 	const int UnitCapacity = 4;
 

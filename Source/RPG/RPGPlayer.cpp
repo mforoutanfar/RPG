@@ -90,6 +90,13 @@ void ARPGPlayer::AddUnit()
 	RPGEventManager->UnitAdded.Broadcast(Unit);
 }
 
+void ARPGPlayer::SetCoins(int Value)
+{
+	Coins = Value;
+
+	RPGEventManager->CoinChanged.Broadcast(Value);
+}
+
 // Called when the game starts or when spawned
 void ARPGPlayer::BeginPlay()
 {
@@ -136,6 +143,8 @@ void ARPGPlayer::BeginPlay()
 	InteractablesInRange = NumOfInteractables;
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+	SetCoins(0);
 }
 
 void ARPGPlayer::OnOnReachedJumpApex()
