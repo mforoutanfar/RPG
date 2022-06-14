@@ -213,5 +213,9 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 	{
 		Interactable->OnInteracted(true);
 	}
+	else if (Type == DOOR)
+	{
+		Interactable->OnInteracted(true);
+	}
 }
 

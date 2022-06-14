@@ -4,6 +4,7 @@
 #include "RPGPlayerController.h"
 #include "RPGPlayer.h"
 #include "RPG_HUD.h"
+#include "RPG_GameHUD.h"
 #include "RPG_GameStateBase.h"
 #include "RPG_EventManager.h"
 
@@ -42,9 +43,14 @@ void ARPGPlayerController::OnOpenInventoryPressed()
 		return;
 	}
 
+	if (EventOpen)
+	{
+		return;
+	}
+
 	ToggleInventory();
 
-	Cast<ARPG_HUD>(GetHUD())->OnOpenInventoryPressed(InventoryOpen);	
+	RPGGameHUD->OnOpenInventoryPressed(InventoryOpen);	
 }
 
 
@@ -55,15 +61,18 @@ void ARPGPlayerController::OnPausePressed()
 		return;
 	}
 
-	//Close inventory if open.
-	if (InventoryOpen)
+	if (EventOpen)
+	{
+		CloseStoryEvent();
+	}
+	else if (InventoryOpen)
 	{
 		OnOpenInventoryPressed();
 	}
 	else
 	{
 		TogglePauseMenu();
-		Cast<ARPG_HUD>(GetHUD())->OnPausePressed(PauseMenuOpen);
+		RPGGameHUD->OnPausePressed(PauseMenuOpen);
 	}
 }
 
@@ -77,9 +86,39 @@ void ARPGPlayerController::OnGameOverIssued()
 	SetShowMouseCursor(true);
 }
 
+void ARPGPlayerController::OnStoryEventTriggered(FString EventName)
+{
+	SetShowMouseCursor(true);
+
+	auto InputMode = FInputModeGameAndUI();
+	InputMode.SetHideCursorDuringCapture(false);
+	SetInputMode(InputMode);
+
+	RPGGameHUD->OnStoryEventTriggered(EventName);
+
+	EventOpen = true;
+
+	SetPause(true);
+}
+
+void ARPGPlayerController::CloseStoryEvent()
+{
+	EventOpen = false;
+
+	SetShowMouseCursor(false);
+
+	SetInputMode(FInputModeGameOnly());
+
+	RPGGameHUD->CloseStoryEvent();
+
+	SetPause(false);
+}
+
+
 void ARPGPlayerController::BeginPlay()
 {
 	RPGEventManager->GameOverIssued.AddDynamic(this, &ARPGPlayerController::OnGameOverIssued);
+	RPGEventManager->StoryEventTriggered.AddDynamic(this, &ARPGPlayerController::OnStoryEventTriggered);
 }
 
 void ARPGPlayerController::ToggleInventory()

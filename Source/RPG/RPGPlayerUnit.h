@@ -32,6 +32,18 @@ public:
 
 	int UnitIndex = -1;
 
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+		FString ClassName = "";
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+		FString AbilitiesDescription = "";
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+		int HiringFee = 0;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+		FColor AvatarColor;
+
 protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;

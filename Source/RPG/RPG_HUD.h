@@ -24,11 +24,5 @@ protected:
 		TSubclassOf <class URPG_GameHUD> GameHUDClass;
 
 public:
-	void OnOpenInventoryPressed(bool InventoryOpen);
-	void OnPausePressed(bool PauseMenuOpen);
-
-	void RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type);
-	void UnregisterFromMinimap(AActor* Actor);
-
 	class URPG_GameHUD* GameHUD = nullptr;
 };

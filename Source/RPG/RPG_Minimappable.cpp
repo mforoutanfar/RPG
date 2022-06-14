@@ -4,6 +4,8 @@
 #include "RPG_Minimappable.h"
 #include "RPG_MiniMapWidget.h"
 #include "RPG_HUD.h"
+#include "RPG_GameHUD.h"
+#include "RPGFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 // Add default functionality here for any IRPG_Minimappable functions that are not pure virtual.
@@ -14,7 +16,10 @@ void IRPG_Minimappable::RegisterOnMiniMap(AActor* Actor, MiniMap::ObjectType Typ
 	{
 		if (auto RPGHUD = Cast<ARPG_HUD>(PC->GetHUD()))
 		{
-			RPGHUD->RegisterOnMinimap(Actor, Type);
+			if (auto GameHUD = RPGHUD->GameHUD)
+			{
+				GameHUD->RegisterOnMinimap(Actor, Type);
+			}
 		}
 	}
 }
@@ -26,7 +31,10 @@ void IRPG_Minimappable::UnregisterFromMiniMap(AActor* Actor)
 	{
 		if (auto RPGHUD = Cast<ARPG_HUD>(PC->GetHUD()))
 		{
-			RPGHUD->UnregisterFromMinimap(Actor);
+			if (auto GameHUD = RPGHUD->GameHUD)
+			{
+				GameHUD->UnregisterFromMinimap(Actor);
+			}
 		}
 	}
 }

@@ -28,6 +28,8 @@ void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Solution?
 	DefaultSafetyColor = SafeColor;
 	ResetToDefaultColor();
+
+	Portrait->SetColorAndOpacity(Unit->AvatarColor);
 }
 
 void URPG_AvatarWidget::OnCreatureStateChanged(ARPGCreature* Creature)

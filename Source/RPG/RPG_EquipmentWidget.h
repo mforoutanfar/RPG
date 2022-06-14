@@ -13,6 +13,7 @@ class UWidgetSwitcher;
 class USizeBox;
 class URPGInventoryItem;
 class ARPGCreature;
+class UImage;
 
 /**
  *
@@ -50,6 +51,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 		UWidgetSwitcher* ArmorSwitcher;
+
+	UPROPERTY(meta = (BindWidget))
+		UImage* Background = nullptr;
 
 	bool HasUpdatedSize = false;
 

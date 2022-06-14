@@ -55,13 +55,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		float SafeFallDuration = 1.0f;
 
+	UFUNCTION(BlueprintCallable)
 	void SetCoins(int Value);
 
+	UPROPERTY(EditDefaultsOnly)
+		int StarterCoins = 0;
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
-	void AddUnit();
+	void AddUnit(TSubclassOf<ARPGPlayerUnit> UnitClass);
 
-	int Coins = 0;
+	UPROPERTY(BlueprintReadWrite)
+		int Coins = 0;
 
 	const int UnitCapacity = 4;
 
@@ -81,6 +85,10 @@ protected:
 
 	UFUNCTION()
 		void OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+	UFUNCTION()
+		void OnAddUnitProposed(TSubclassOf<ARPGPlayerUnit> UnitClass);
+
 
 	AActor* NearestInteractable = nullptr;
 
@@ -102,7 +110,7 @@ private:
 		class UBoxComponent* InteractionCollider;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<ARPGPlayerUnit> UnitClass;
+		TSubclassOf<ARPGPlayerUnit> StarterUnitClass;
 
 	class URPGRandomAudioComponent* AudioComponent;
 

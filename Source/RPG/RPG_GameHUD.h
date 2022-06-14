@@ -48,6 +48,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* CoinValue = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+		class UHorizontalBox* HorBox = nullptr;
+
+	void OnStoryEventTriggered(FString EventName);
+
+	void CloseStoryEvent();
+
+	UUserWidget* CurrentStoryEvent = nullptr;
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -94,4 +103,7 @@ protected:
 	void OnAttackOccured(AActor* Attacker, FRPGAttackData Data, FRPGAttackResults Results);
 
 	TMap<ARPGPlayerUnit*, URPG_AvatarWidget*> AvatarMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSubclassOf<UUserWidget>> StoryEventMap;
 };

@@ -18,23 +18,3 @@ void ARPG_HUD::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
-void ARPG_HUD::OnOpenInventoryPressed(bool InventoryOpen)
-{
-	GameHUD->OnOpenInventoryPressed(InventoryOpen);
-}
-
-void ARPG_HUD::OnPausePressed(bool PauseMenuOpen)
-{
-	GameHUD->OnPausePressed(PauseMenuOpen);
-}
-
-void ARPG_HUD::RegisterOnMinimap(AActor* Actor, TEnumAsByte<MiniMap::ObjectType> Type)
-{
-	GameHUD->RegisterOnMinimap(Actor, Type);
-}
-
-void ARPG_HUD::UnregisterFromMinimap(AActor* Actor)
-{
-	GameHUD->UnregisterFromMinimap(Actor);
-}

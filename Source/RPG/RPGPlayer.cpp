@@ -63,7 +63,7 @@ void ARPGPlayer::OnConstruction(const FTransform& Transform)
 }
 
 //TODO: Get Unit Info as Input
-void ARPGPlayer::AddUnit()
+void ARPGPlayer::AddUnit(TSubclassOf<ARPGPlayerUnit> UnitClass)
 {
 	if (Units.Num() == UnitCapacity)
 	{
@@ -105,6 +105,8 @@ void ARPGPlayer::BeginPlay()
 	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &ARPGPlayer::OnUnitRecoveryStateChanged);
 	RPGEventManager->AvatarClicked.AddDynamic(this, &ARPGPlayer::OnUnitAvatarClicked);
 	RPGEventManager->CreatureDied.AddDynamic(this, &ARPGPlayer::OnCreatureDied);
+	RPGEventManager->AddUnitProposed.AddDynamic(this, &ARPGPlayer::OnAddUnitProposed);
+
 	OnReachedJumpApex.AddDynamic(this, &ARPGPlayer::OnOnReachedJumpApex);
 
 	MiniMapCamera = GetWorld()->SpawnActor<ASceneCapture2D>(ASceneCapture2D::StaticClass());
@@ -126,7 +128,7 @@ void ARPGPlayer::BeginPlay()
 
 	for (int i = 0; i < StarterUnits; i++)
 	{
-		AddUnit();
+		AddUnit(StarterUnitClass);
 		SetSelectedUnit(FindFirstOutOfRecoveryUnit());
 	}
 
@@ -144,7 +146,12 @@ void ARPGPlayer::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-	SetCoins(0);
+	SetCoins(StarterCoins);
+}
+
+void ARPGPlayer::OnAddUnitProposed(TSubclassOf<ARPGPlayerUnit> UnitClass)
+{
+	AddUnit(UnitClass);
 }
 
 void ARPGPlayer::OnOnReachedJumpApex()
@@ -322,15 +329,12 @@ void ARPGPlayer::OnInteractPressed()
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
 		auto Type = Interactable->GetInteractableType();
 
-		if (Type == ITEM || Type == CORPSE || Type == BUTTON)
+		if (!UnitToInteract)
 		{
-			if (!UnitToInteract)
-			{
-				UnitToInteract = Units[0];
-			}
-
-			UnitToInteract->InteractWithTarget(NearestInteractable);
+			UnitToInteract = Units[0];
 		}
+
+		UnitToInteract->InteractWithTarget(NearestInteractable);
 	}
 }
 

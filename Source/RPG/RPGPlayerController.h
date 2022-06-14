@@ -30,6 +30,11 @@ public:
 	UFUNCTION()
 		void OnGameOverIssued();
 
+	UFUNCTION()
+		void OnStoryEventTriggered(FString EventName);
+
+	void CloseStoryEvent();
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -51,5 +56,6 @@ protected:
 
 	bool InventoryOpen = false;
 	bool PauseMenuOpen = false;
+	bool EventOpen = false;
 };
 

@@ -13,6 +13,7 @@
 #include "Blueprint/WidgetTree.h"
 
 #include "Components/SizeBox.h"
+#include "Components/Image.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/WidgetSwitcherSlot.h"
 
@@ -94,6 +95,8 @@ void URPG_EquipmentWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 
 	if (Unit)//It is possible that no unit is selected.
 	{
+		Background->SetColorAndOpacity(Unit->AvatarColor);
+
 		for (auto i : EquipmentMap)
 		{
 			if (i.Value[Unit])

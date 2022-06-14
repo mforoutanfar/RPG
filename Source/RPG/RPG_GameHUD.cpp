@@ -24,6 +24,41 @@
 #include "RPG_InteractablePing.h"
 #include "RPGInteractable.h"
 #include "Components/TextBlock.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+
+void URPG_GameHUD::OnStoryEventTriggered(FString EventName)
+{
+	if (StoryEventMap.Contains(EventName))
+	{
+		if (auto EventClass = StoryEventMap[EventName])
+		{
+			CurrentStoryEvent = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), EventClass);
+			auto HorSlot = HorBox->AddChildToHorizontalBox(CurrentStoryEvent);
+			HorSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+			HorSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+
+			FSlateChildSize Size;
+
+			HorSlot->SetSize(Size);
+
+			Background->SetVisibility(ESlateVisibility::Visible);
+			MiniMap->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}	
+}
+
+void URPG_GameHUD::CloseStoryEvent()
+{
+	if (CurrentStoryEvent)
+	{
+		CurrentStoryEvent->RemoveFromParent();
+		CurrentStoryEvent = nullptr;
+
+		Background->SetVisibility(ESlateVisibility::Collapsed);
+		MiniMap->SetVisibility(ESlateVisibility::Visible);
+	}
+}
 
 void URPG_GameHUD::NativeConstruct()
 {

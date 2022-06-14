@@ -14,6 +14,7 @@ class ARPGPlayerUnit;
 class IRPGAttackable;
 class URPGInventoryItem;
 class URPG_ItemWidget;
+class UUserWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Unit, bool, State);
@@ -39,6 +40,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellCast, ARPGCreature*, Creature)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverIssued);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureDied, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCoinChanged, int, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStoryEventTriggered, FString, EventName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddUnitProposed, TSubclassOf<ARPGPlayerUnit>, UnitClass);
 
 /**
  * 
@@ -120,4 +123,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FCoinChanged CoinChanged;
+
+	UPROPERTY(BlueprintAssignable)
+		FStoryEventTriggered StoryEventTriggered;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+		FAddUnitProposed AddUnitProposed;
 };
