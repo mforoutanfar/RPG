@@ -51,14 +51,24 @@ public:
 	UPROPERTY(meta = (BindWidget))
 		class UHorizontalBox* HorBox = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* MessageText = nullptr;
+
 	void OnStoryEventTriggered(FString EventName);
 
 	void CloseStoryEvent();
 
 	UUserWidget* CurrentStoryEvent = nullptr;
 
+	UFUNCTION(BlueprintCallable)
+	void ShowMessage(FString Message, float Duration = 5.0f);
+
 protected:
 	virtual void NativeConstruct() override;
+
+	FTimerHandle MessageTimerHandle;
+
+	void HideMessage();
 
 	UFUNCTION()
 	void OnCoinValueChanged(int Value);

@@ -124,7 +124,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FCoinChanged CoinChanged;
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 		FStoryEventTriggered StoryEventTriggered;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)

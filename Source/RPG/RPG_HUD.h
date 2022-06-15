@@ -24,5 +24,6 @@ protected:
 		TSubclassOf <class URPG_GameHUD> GameHUDClass;
 
 public:
+	UPROPERTY(BlueprintReadWrite)
 	class URPG_GameHUD* GameHUD = nullptr;
 };

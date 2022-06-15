@@ -29,6 +29,9 @@ public:
 	//TODO: Move recipe to seperate class?
 	FName GetResultingItem(FName Ingredient1, FName Ingredient2);
 
+	UPROPERTY(BlueprintReadWrite)
+		class ARPG_SpawnManager* SpawnManager = nullptr;
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform);
 

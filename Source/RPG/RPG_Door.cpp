@@ -42,13 +42,6 @@ void ARPG_Door::Tick(float DeltaTime)
 
 void ARPG_Door::OnInteracted_Implementation(bool Successful)
 {
-	if (Successful)
-	{
-		if (EventName != "")
-		{
-			RPGEventManager->StoryEventTriggered.Broadcast(EventName);
-		}
-	}
 }
 
 bool ARPG_Door::IsInteractable_Implementation()

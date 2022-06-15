@@ -21,7 +21,6 @@ UCLASS()
 class RPG_API URPGFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
 };
 
 UENUM(BlueprintType)
@@ -218,4 +217,16 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 		bool Crit = false;
+};
+
+USTRUCT(BlueprintType)
+struct FRPGLevelCombination
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+		int NumberOfMelees = 0;
+
+	UPROPERTY(EditAnywhere)
+		int NumberOfRanged = 0;
 };

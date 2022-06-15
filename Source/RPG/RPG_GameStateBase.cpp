@@ -3,6 +3,7 @@
 
 #include "RPG_GameStateBase.h"
 #include "RPG_EventManager.h"
+#include "RPG_SpawnManager.h"
 
 ARPG_GameStateBase::ARPG_GameStateBase()
 {

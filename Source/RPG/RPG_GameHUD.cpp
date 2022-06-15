@@ -60,6 +60,22 @@ void URPG_GameHUD::CloseStoryEvent()
 	}
 }
 
+void URPG_GameHUD::ShowMessage(FString Message, float Duration)
+{
+	GetWorld()->GetTimerManager().ClearTimer(MessageTimerHandle);
+
+	MessageText->SetText(FText::FromString(Message));
+	
+	GetWorld()->GetTimerManager().SetTimer(MessageTimerHandle, this, &URPG_GameHUD::HideMessage, Duration, false);
+
+	MessageText->SetVisibility(ESlateVisibility::Visible);
+}
+
+void URPG_GameHUD::HideMessage()
+{
+	MessageText->SetVisibility(ESlateVisibility::Collapsed);
+}
+
 void URPG_GameHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
