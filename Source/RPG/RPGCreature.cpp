@@ -149,7 +149,7 @@ void ARPGCreature::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ARPGCreature::OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results)
+void ARPGCreature::OnAttacked_Implementation(FRPGAttackData& AttackData, FRPGAttackResults& Results)
 {
 	AttackData.Target = this;
 
@@ -186,7 +186,7 @@ void ARPGCreature::OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Res
 		RecoveryDuration = 1.0f;
 		EnterRecovery(RecoveryDuration);
 		//Dead creature should never exit recovery.
-		GetWorld()->GetTimerManager().ClearTimer(RecoveryTimerHandle);
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 		return;
 	}
 
@@ -237,7 +237,7 @@ FRPGAttackResults ARPGCreature::Attack()
 		CalculateMeleeDamage(AttackData, Results);
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
-		Attackable->OnAttacked(AttackData, Results);
+		Attackable->Execute_OnAttacked(NearestMelee, AttackData, Results);
 	}
 	else
 	{
@@ -324,11 +324,10 @@ void ARPGCreature::Die()
 	RPGEventManager->CreatureDied.Broadcast(this);
 }
 
-bool ARPGCreature::IsAttackable()
+bool ARPGCreature::IsAttackable_Implementation()
 {
 	return !Dead;
 }
-
 
 AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool ExcludeOwnType, bool ShouldBeVisible)
 {
@@ -348,15 +347,18 @@ AActor* ARPGCreature::GetNearestAttackTarget(UShapeComponent* Collider, bool Exc
 			}
 		}
 
-		auto Attackable = Cast<IRPGAttackable>(Actor);
-
-		if (!Attackable)
+		if (!Actor->Implements<URPGAttackable>())
 		{
 			continue;
 		}
-		else if (!Attackable->IsAttackable())
+		else
 		{
-			continue;
+			auto Attackable = Cast<IRPGAttackable>(Actor);
+
+			if (!Attackable->Execute_IsAttackable(Actor))
+			{
+				continue;
+			}			
 		}
 
 		if (auto Creature = Cast<ARPGCreature>(Actor))

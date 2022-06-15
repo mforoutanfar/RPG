@@ -35,9 +35,11 @@ void ARPG_Fireball::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 	for (auto i : OverlappingActors)
 	{
-		if (auto Attackable = Cast<IRPGAttackable>(i))
+		if (i->Implements<URPGAttackable>())
 		{
-			if (Attackable->IsAttackable())
+			auto Attackable = Cast<IRPGAttackable>(i);
+			
+			if (Attackable->Execute_IsAttackable(i))
 			{
 				FRPGAttackData AttackData;
 				FRPGAttackResults Results;
@@ -47,7 +49,7 @@ void ARPG_Fireball::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 				AttackData.Accuracy = Accuracy;
 				CalculateDamage(AttackData, Results);
 
-				Attackable->OnAttacked(AttackData, Results);
+				Attackable->Execute_OnAttacked(i, AttackData, Results);
 
 				RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 			}

@@ -24,15 +24,15 @@ public:
 	*/
 	ARPG_Button();
 
-	virtual void OnInteracted(bool Successful) override;
+	void OnInteracted_Implementation(bool Successful) override;
 
 	//TODO: Implement Button Group (multiple buttons connected to same functionality).
 	UFUNCTION(BlueprintCallable)
 	void SetIsPressed(bool InIsPressed);
 
-	virtual bool IsInteractable() override;
+	bool IsInteractable_Implementation() override;
 
-	virtual InteractableCat GetInteractableType() override;
+	InteractableCat GetInteractableType_Implementation() override;
 
 protected:
 	/**

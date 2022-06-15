@@ -9,7 +9,7 @@
 #include "RPGAttackable.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class URPGAttackable : public UInterface
 {
 	GENERATED_BODY()
@@ -24,7 +24,9 @@ class RPG_API IRPGAttackable
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results) = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results);
 
-	virtual bool IsAttackable() = 0;
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool IsAttackable();
 };

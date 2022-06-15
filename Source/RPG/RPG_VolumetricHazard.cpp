@@ -43,9 +43,10 @@ void ARPG_VolumetricHazard::ApplyDamage()
 	Collider->GetOverlappingActors(OverlappingActors, AActor::StaticClass());
 	for (auto Object : OverlappingActors)
 	{
-		if (auto Attackable = Cast<IRPGAttackable>(Object))
-		{
-			if (Attackable ->IsAttackable())
+		if (Object->Implements<URPGAttackable>())
+		{			
+			auto Attackable = Cast<IRPGAttackable>(Object);
+			if (Attackable ->Execute_IsAttackable(Object))
 			{
 				FRPGAttackData AttackData;
 				FRPGAttackResults Results;
@@ -58,7 +59,7 @@ void ARPG_VolumetricHazard::ApplyDamage()
 
 				AttackData.Damage = Damage;
 
-				Attackable->OnAttacked(AttackData, Results);
+				Attackable->Execute_OnAttacked(Object, AttackData, Results);
 
 				RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 			}

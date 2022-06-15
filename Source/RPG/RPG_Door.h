@@ -35,11 +35,11 @@ public:
 	*/
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnInteracted(bool Successful) override;
+	void OnInteracted_Implementation(bool Successful) override;
 
-	virtual bool IsInteractable() override;
+	bool IsInteractable_Implementation() override;
 
-	virtual InteractableCat GetInteractableType() override;
+	InteractableCat GetInteractableType_Implementation() override;
 
 	UPROPERTY(EditDefaultsOnly)
 		class UBoxComponent* HitBox;

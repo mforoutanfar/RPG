@@ -137,7 +137,7 @@ void ARPGPlayer::BeginPlay()
 	int NumOfInteractables = 0;
 	for (auto i : OverlappingActors)
 	{
-		if (auto Interactable = Cast<IRPGInteractable>(i))
+		if (i->Implements<URPGInteractable>())
 		{
 			NumOfInteractables++;
 		}
@@ -220,7 +220,7 @@ void ARPGPlayer::UpdateWalkingSoundState()
 					AttackData.Damage = FallDamage;
 
 					auto Attackable = Cast<IRPGAttackable>(i);
-					Attackable->OnAttacked(AttackData, Results);
+					Attackable->Execute_OnAttacked(i, AttackData, Results);
 
 					Results.RecoveryDuration = RecoveryDuration;
 
@@ -327,7 +327,7 @@ void ARPGPlayer::OnInteractPressed()
 		}
 
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
-		auto Type = Interactable->GetInteractableType();
+		auto Type = Interactable->Execute_GetInteractableType(NearestInteractable);
 
 		if (!UnitToInteract)
 		{
@@ -425,7 +425,7 @@ void ARPGPlayer::OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName)
 
 void ARPGPlayer::OnInteractionColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (auto Interactable = Cast<IRPGInteractable>(OtherActor))
+	if (OtherActor->Implements<URPGInteractable>())
 	{
 		InteractablesInRange++;
 	}
@@ -447,15 +447,23 @@ void ARPGPlayer::OnCreatureDied(ARPGCreature* Unit)
 
 void ARPGPlayer::OnInteractionColliderEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (auto Interactable = Cast<IRPGInteractable>(OtherActor))
+	if (OtherActor->Implements<URPGInteractable>())
 	{
 		InteractablesInRange--;
 	}
 }
 
-bool ARPGPlayer::CanGenerallyInteractWithTarget(IRPGInteractable* Target)
+bool ARPGPlayer::CanGenerallyInteractWithTarget(AActor* Target)
 {
-	auto Type = Target->GetInteractableType();
+	if (Target->Implements<URPGInteractable>())
+	{
+		return false;
+	}
+
+	auto Interactable = Cast<IRPGInteractable>(Target);
+
+	auto Type = Interactable->Execute_GetInteractableType(Target);
+
 	switch (Type)
 	{
 	case InteractableCategory::MISC:
@@ -499,15 +507,19 @@ AActor* ARPGPlayer::GetNearestTarget(UShapeComponent* Collider, bool ShouldBeVis
 		}
 
 		if (ShouldBeInteractable)
-		{
-			auto Interactable = Cast<IRPGInteractable>(Actor);
-			if (!Interactable)
+		{	
+			if (!Actor->Implements<URPGInteractable>())
 			{
 				continue;
 			}
-			else if (!Interactable->IsInteractable())
+			else
 			{
-				continue;
+				auto Interactable = Cast<IRPGInteractable>(Actor);
+
+				if (!Interactable->Execute_IsInteractable(Actor))
+				{
+					continue;
+				}				
 			}
 		}
 

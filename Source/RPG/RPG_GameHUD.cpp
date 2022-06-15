@@ -115,7 +115,7 @@ void URPG_GameHUD::OnNearestInteractableChanged(AActor* NearestInteractable)
 	if (NearestInteractable)
 	{
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
-		InteractionPing->SetPingString(Interactable->GetInteractableType());
+		InteractionPing->SetPingString(Interactable->Execute_GetInteractableType(NearestInteractable));
 	}
 }
 

@@ -12,6 +12,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework\CharacterMovementComponent.h"
 
+#include "RPG_MinimapComponent.h"
+
 ARPGUnit::ARPGUnit()
 {
 	CreatureType = CreatureType::ENEMY;
@@ -23,6 +25,8 @@ ARPGUnit::ARPGUnit()
 	MeleeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 	RangeSphere->SetCollisionProfileName(FName("EnemyDamageSource"));
 	HitBox->SetCollisionProfileName(FName("EnemyHitBox"));
+
+	MinimapComponent = CreateDefaultSubobject<URPG_MinimapComponent>(FName("MinimapComponent"));
 }
 
 void ARPGUnit::BeginPlay()
@@ -37,12 +41,12 @@ void ARPGUnit::BeginPlay()
 		break;
 	case ARPGCreature::CreatureType::ENEMY:
 	{
-		RegisterOnMiniMap(this, MiniMap::ENEMY);
+		MinimapComponent->RegisterOnMiniMap(MiniMap::ENEMY);
 		break;
 	}
 	case ARPGCreature::CreatureType::NPC:
 	{
-		RegisterOnMiniMap(this, MiniMap::NPC);
+		MinimapComponent->RegisterOnMiniMap(MiniMap::NPC);
 		break;
 	}
 	default:
@@ -50,7 +54,7 @@ void ARPGUnit::BeginPlay()
 	}
 }
 
-InteractableCat ARPGUnit::GetInteractableType()
+InteractableCat ARPGUnit::GetInteractableType_Implementation()
 {
 	if (Dead)
 	{
@@ -60,16 +64,16 @@ InteractableCat ARPGUnit::GetInteractableType()
 	return InteractableCat::NONE;
 }
 
-void ARPGUnit::OnInteracted(bool Successful)
+void ARPGUnit::OnInteracted_Implementation(bool Successful)
 {
 	if (Successful && Dead)
 	{
-		UnregisterFromMiniMap(this);
+		MinimapComponent->UnregisterFromMiniMap();
 		Destroy();
 	}
 }
 
-bool ARPGUnit::IsInteractable()
+bool ARPGUnit::IsInteractable_Implementation()
 {
 	return Dead;
 }
@@ -93,8 +97,8 @@ void ARPGUnit::Die()
 	RangeSphere->DestroyComponent();
 
 	//TODO: Replace Enemy ping with Loot ping.
-	UnregisterFromMiniMap(this);
-	RegisterOnMiniMap(this, MiniMap::LOOT);
+	MinimapComponent->UnregisterFromMiniMap();
+	MinimapComponent->RegisterOnMiniMap(MiniMap::LOOT);
 }
 
 void ARPGUnit::BeginAttack()

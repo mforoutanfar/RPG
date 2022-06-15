@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "RPGFunctionLibrary.h"
 #include  "RPG\RPGInteractable.h"
-#include "RPG_Minimappable.h"
 
 #include "RPGPickUpItem.generated.h"
 
@@ -16,7 +15,7 @@ using namespace ItemCategory;
  *
 */
 UCLASS()
-class RPG_API ARPGPickUpItem : public AActor, public IRPGInteractable, public IRPG_Minimappable
+class RPG_API ARPGPickUpItem : public AActor, public IRPGInteractable
 {
 	GENERATED_BODY()
 	
@@ -39,6 +38,8 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
+	class URPG_MinimapComponent* MinimapComponent = nullptr;
+
 public:	
 	/**
 	 * Called every frame
@@ -46,11 +47,11 @@ public:
 	*/
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnInteracted(bool Successful) override;
+	void OnInteracted_Implementation(bool Successful) override;
 
-	virtual bool IsInteractable() override;
+	bool IsInteractable_Implementation() override;
 
-	virtual InteractableCat GetInteractableType() override;
+	InteractableCat GetInteractableType_Implementation() override;
 
 private:
 	UPROPERTY(EditDefaultsOnly)

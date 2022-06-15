@@ -40,7 +40,7 @@ void ARPG_Door::Tick(float DeltaTime)
 
 }
 
-void ARPG_Door::OnInteracted(bool Successful)
+void ARPG_Door::OnInteracted_Implementation(bool Successful)
 {
 	if (Successful)
 	{
@@ -51,12 +51,12 @@ void ARPG_Door::OnInteracted(bool Successful)
 	}
 }
 
-bool ARPG_Door::IsInteractable()
+bool ARPG_Door::IsInteractable_Implementation()
 {
 	return true;
 }
 
-InteractableCat ARPG_Door::GetInteractableType()
+InteractableCat ARPG_Door::GetInteractableType_Implementation()
 {
 	return DOOR;
 }

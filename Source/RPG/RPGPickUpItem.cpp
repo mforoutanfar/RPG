@@ -5,6 +5,7 @@
 #include "Components/BillboardComponent.h"
 #include "Components/SphereComponent.h"
 #include "RPGRandomAudioComponent.h"
+#include "RPG_MinimapComponent.h"
 
 /**
  * Sets default values
@@ -14,11 +15,13 @@ ARPGPickUpItem::ARPGPickUpItem()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	HitBox = CreateDefaultSubobject<USphereComponent>(TEXT("HitBox"));
+	HitBox = CreateDefaultSubobject<USphereComponent>(FName("HitBox"));
 	HitBox->SetCollisionProfileName(FName("Interactable"));
 
 	ItemPicture = CreateDefaultSubobject<UBillboardComponent>(FName("ItemPicture"));
 	ItemPicture->SetHiddenInGame(false);
+
+	MinimapComponent = CreateDefaultSubobject<URPG_MinimapComponent>(FName("MinimapComponent"));
 }
 
 void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
@@ -30,7 +33,7 @@ void ARPGPickUpItem::OnConstruction(const FTransform& Transform)
 
 void ARPGPickUpItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UnregisterFromMiniMap(this);
+	MinimapComponent->UnregisterFromMiniMap();
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -41,7 +44,7 @@ void ARPGPickUpItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	RegisterOnMiniMap(this, MiniMap::LOOT);
+	MinimapComponent->RegisterOnMiniMap(MiniMap::LOOT);
 
 	UTexture2D* tmpTexture = Cast<UTexture2D>(StaticLoadObject(UTexture2D::StaticClass(), NULL, *ItemInformation.GetSpritePath()));
 	if (tmpTexture)
@@ -61,8 +64,8 @@ void ARPGPickUpItem::Tick(float DeltaTime)
 
 }
 
-void ARPGPickUpItem::OnInteracted(bool Successful)
-{
+void ARPGPickUpItem::OnInteracted_Implementation(bool Successful)
+{	
 	if (Successful)
 	{
 		Destroy();
@@ -73,12 +76,12 @@ void ARPGPickUpItem::OnInteracted(bool Successful)
 	}
 }
 
-bool ARPGPickUpItem::IsInteractable()
+bool ARPGPickUpItem::IsInteractable_Implementation()
 {
 	return true;
 }
 
-InteractableCat ARPGPickUpItem::GetInteractableType()
+InteractableCat ARPGPickUpItem::GetInteractableType_Implementation()
 {
 	return ITEM;
 }

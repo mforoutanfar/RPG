@@ -9,7 +9,6 @@
 #include "RPGPlayer.generated.h"
 
 class ARPGPlayerUnit;
-class IRPGInteractable;
 
 UCLASS(Blueprintable/*, HideCategories = (Character)*/)
 class RPG_API ARPGPlayer : public ACharacter
@@ -41,7 +40,7 @@ public:
 	void OnSpellPressed();
 	void OnSwitchUnitPressed();
 
-	bool CanGenerallyInteractWithTarget(IRPGInteractable* Target);
+	bool CanGenerallyInteractWithTarget(AActor* Target);
 
 	UPROPERTY(EditDefaultsOnly)
 		float WalkSpeed = 600.f;

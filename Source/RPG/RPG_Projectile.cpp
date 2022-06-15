@@ -30,8 +30,10 @@ ARPG_Projectile::ARPG_Projectile()
 
 void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (auto Attackable = Cast<IRPGAttackable>(OtherActor))
+	if (OtherActor->Implements<URPGAttackable>())
 	{
+		auto Attackable = Cast<IRPGAttackable>(OtherActor);
+
 		FRPGAttackData AttackData;
 		FRPGAttackResults Results;
 
@@ -40,7 +42,7 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		AttackData.Accuracy = Accuracy;
 		CalculateDamage(AttackData, Results);
 
-		Attackable->OnAttacked(AttackData, Results);
+		Attackable->Execute_OnAttacked(OtherActor, AttackData, Results);
 			
 		RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
 	}

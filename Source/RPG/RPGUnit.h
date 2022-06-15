@@ -6,7 +6,6 @@
 #include "RPGCreature.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "RPGInteractable.h"
-#include "RPG_Minimappable.h"
 
 #include "RPGUnit.generated.h"
 
@@ -14,7 +13,7 @@
  * 
  */
 UCLASS()
-class RPG_API ARPGUnit : public ARPGCreature, public IRPGInteractable, public IRPG_Minimappable
+class RPG_API ARPGUnit : public ARPGCreature, public IRPGInteractable
 {
 	GENERATED_BODY()
 
@@ -23,16 +22,18 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual InteractableCat GetInteractableType() override;
-	virtual void OnInteracted(bool Successful) override;
+	InteractableCat GetInteractableType_Implementation() override;
+	void OnInteracted_Implementation(bool Successful) override;
 
-	virtual bool IsInteractable() override;
+	bool IsInteractable_Implementation() override;
 
 	UFUNCTION(BlueprintCallable)
 		void SetIsWalking(bool IsWalking);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 		class URPGBillboardVisuals* Visuals = nullptr;
+
+	class URPG_MinimapComponent* MinimapComponent = nullptr;
 
 	int SpeedZeroCounter = 0;
 

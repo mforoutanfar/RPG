@@ -154,14 +154,14 @@ void ARPGPlayerUnit::UpdateSafetyState()
 void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 {
 	auto Interactable = Cast<IRPGInteractable>(Target);
-	auto Type = Interactable->GetInteractableType();
+	auto Type = Interactable->Execute_GetInteractableType(Target);
 
 	if (Type == ITEM)
 	{
 		auto Item = Cast<ARPGPickUpItem>(Target);
 
 		bool Successful = Inventory->AddItem(Item->ItemInformation);
-		Interactable->OnInteracted(Successful);
+		Interactable->Execute_OnInteracted(Target, Successful);
 
 		if (Successful)
 		{
@@ -207,15 +207,19 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 			AudioComponent->PlayRandom("cash");
 		}
 
-		Interactable->OnInteracted(LootedEverything);
+		Interactable->Execute_OnInteracted(Target, LootedEverything);
 	}
 	else if (Type == BUTTON)
 	{
-		Interactable->OnInteracted(true);
+		Interactable->Execute_OnInteracted(Target, true);
 	}
 	else if (Type == DOOR)
 	{
-		Interactable->OnInteracted(true);
+		Interactable->Execute_OnInteracted(Target, true);
+	}
+	else if (Type == InteractableCat::MISC)
+	{
+		Interactable->Execute_OnInteracted(Target, true);
 	}
 }
 

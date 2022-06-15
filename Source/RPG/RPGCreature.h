@@ -40,7 +40,9 @@ public:
 	UFUNCTION()
 	void OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item);
 
-	virtual void OnAttacked(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
+	void OnAttacked_Implementation(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
+
+	bool IsAttackable_Implementation() override;
 
 	UFUNCTION()
 	void OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Creature);
@@ -78,8 +80,6 @@ public:
 		TSubclassOf<class ARPG_Projectile> ProjectileClass = nullptr;
 
 	bool IsDead() { return Dead; }
-
-	virtual bool IsAttackable() override;
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 		FVector ActionLocation;

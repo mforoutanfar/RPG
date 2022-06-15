@@ -16,7 +16,7 @@ ARPG_Button::ARPG_Button()
 	HitBox->SetCollisionProfileName(FName("Interactable"));
 }
 
-void ARPG_Button::OnInteracted(bool Successful)
+void ARPG_Button::OnInteracted_Implementation(bool Successful)
 {
 	if (!IsPressed)
 	{
@@ -30,12 +30,12 @@ void ARPG_Button::SetIsPressed(bool InIsPressed)
 	IsPressed = InIsPressed;
 }
 
-bool ARPG_Button::IsInteractable()
+bool ARPG_Button::IsInteractable_Implementation()
 {
 	return !IsPressed;
 }
 
-InteractableCat ARPG_Button::GetInteractableType()
+InteractableCat ARPG_Button::GetInteractableType_Implementation()
 {
 	return InteractableCat::BUTTON;
 }
