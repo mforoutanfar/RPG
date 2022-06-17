@@ -53,8 +53,24 @@ void ARPG_SpawnManager::SpawnNewWave()
 		for (size_t i = 0; i < NumberOfMelee; i++)
 		{
 			UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+
+			float RadiusSquared = 0.0f;
+
+			int Tries = 100;
+			FVector Pos;
+
+			//Don't spawn too close to player
+			while (RadiusSquared < 2500.0f* 2500.0f)
+			{
+				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, 10000.f);
+				RadiusSquared = Pos.SizeSquared2D();
+				Tries--;
+				if (Tries == 0)
+				{
+					break;
+				}
+			}
 			
-			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, 10000.f);
 			FActorSpawnParameters Params = FActorSpawnParameters();
 			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(MeleeClass, Pos, FRotator::ZeroRotator, Params);

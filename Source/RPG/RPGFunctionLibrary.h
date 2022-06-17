@@ -135,6 +135,9 @@ struct FRPGItemInfo
 	float Mana = 0.0f;
 
 	UPROPERTY(EditAnywhere)
+		float Armor = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 	float CriticalChance;
 
 	UPROPERTY(EditAnywhere)
@@ -229,4 +232,16 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		int NumberOfRanged = 0;
+};
+
+USTRUCT(BlueprintType)
+struct FRPGLootChance
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ARPGPickUpItem> ItemClass = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		float Chance = 1.0f;
 };

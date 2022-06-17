@@ -74,6 +74,9 @@ public:
 	float BaseCriticalMultiplier = 2.0f;
 
 	UPROPERTY(EditAnywhere)
+		float BaseArmor = 0.0f;
+
+	UPROPERTY(EditAnywhere)
 	FRPGDice BaseMeleeDamage;	
 
 	UPROPERTY(EditDefaultsOnly)
@@ -99,7 +102,7 @@ public:
 	class URPGInventory* Inventory;
 
 	UPROPERTY(EditAnywhere)
-		TArray<TSubclassOf<class ARPGPickUpItem>> StartingInventoryItems;
+		TArray<FRPGLootChance> StartingInventoryItems;		
 
 	UPROPERTY(EditAnywhere)
 		int Coins = 0;

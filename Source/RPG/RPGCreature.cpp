@@ -70,19 +70,17 @@ void ARPGCreature::BeginPlay()
 		Spells.Add(Spell);
 	}
 
-	float Probability = 0.7f;
-
 	for (auto i : StartingInventoryItems)
 	{
 		auto Rand = FMath::FRandRange(0.0f, 1.0f);
 		
-		if (Rand > Probability)
+		if (Rand > i.Chance)
 		{
 			continue;
 		}
 
 		//TODO: Better solution for storing item data and creating items.
-		auto Item = NewObject<ARPGPickUpItem>(this, i);		
+		auto Item = NewObject<ARPGPickUpItem>(this, i.ItemClass);		
 		Inventory->AddItem(Item->ItemInformation);
 		Item->Destroy();
 	}
@@ -153,8 +151,16 @@ void ARPGCreature::OnAttacked_Implementation(FRPGAttackData& AttackData, FRPGAtt
 {
 	AttackData.Target = this;
 
-	float DamageDealt = 0.0f;
-	DamageDealt += AttackData.Damage;
+	int DamageDealt = AttackData.Damage;
+
+	auto Armor = BaseArmor;
+
+	if (auto ArmorItem = Equipment->GetItem(ItemCategory::ItemCat::ARMOR))
+	{
+		Armor = ArmorItem->ItemInformation.Armor;
+	}
+
+	DamageDealt = DamageDealt * (1.0f - Armor/ 100.f);//TODO: Change armor system?
 
 	auto rand = FMath::RandRange(0.0f,1.0f);
 

@@ -132,6 +132,11 @@ void URPG_GameHUD::OnNearestInteractableChanged(AActor* NearestInteractable)
 	{
 		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
 		InteractionPing->SetPingString(Interactable->Execute_GetInteractableType(NearestInteractable));
+		InteractionPing->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		InteractionPing->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
@@ -139,9 +144,11 @@ void URPG_GameHUD::OnUnitAdded(ARPGPlayerUnit* Unit)
 {
 	auto Avatar = CreateWidget<URPG_AvatarWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), AvatarClass);
 	Avatar->Init(Unit);
-	AvatarsBox->AddChildToVerticalBox(Avatar);
+	auto VertBoxSlot = AvatarsBox->AddChildToVerticalBox(Avatar);
+	
+	VertBoxSlot->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
 
-	Cast<UVerticalBoxSlot>(Avatar->Slot)->SetSize(FSlateChildSize(ESlateSizeRule::Fill));
+	VertBoxSlot->SetPadding(FMargin(10.0f, 0.0f, 10.0f, 0.0f));
 
 	AvatarMap.Add(Unit, Avatar);
 }
