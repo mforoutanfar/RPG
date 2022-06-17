@@ -52,7 +52,10 @@ public:
 		TMap<TSubclassOf<class ARPGPickUpItem>, int> InitialLoot;
 
 	UPROPERTY(EditAnywhere)
-		float Range = 10000.0f;
+		float MinRange = 4000.0f;
+
+	UPROPERTY(EditAnywhere)
+		float MaxRange = 4000.0f;
 
 	TArray<AActor*> SpawnedActors;
 

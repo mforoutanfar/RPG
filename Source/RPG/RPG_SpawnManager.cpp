@@ -37,7 +37,7 @@ void ARPG_SpawnManager::BeginPlay()
 	{
 		for (size_t j = 0; j < i.Value; j++)
 		{
-			auto Pos = navSystem->GetRandomPointInNavigableRadius(this, FVector::ZeroVector, Range);
+			auto Pos = navSystem->GetRandomPointInNavigableRadius(this, FVector::ZeroVector, MaxRange);
 			auto Actor = GetWorld()->SpawnActor<ARPGPickUpItem>(i.Key, Pos, FRotator::ZeroRotator, Params);
 		}
 	}
@@ -57,6 +57,8 @@ void ARPG_SpawnManager::SpawnNewWave()
 {
 	CurrentLevel++;
 
+	FDateTime UTCTime1 = FDateTime::UtcNow();	
+
 	if (LevelCombinationMap.Contains(CurrentLevel))
 	{
 		int NumberOfMelee = LevelCombinationMap[CurrentLevel].NumberOfMelees;
@@ -73,10 +75,24 @@ void ARPG_SpawnManager::SpawnNewWave()
 			int Tries = 100;
 			FVector Pos;
 
+			//float RandX = FMath::RandRange(-MaxRange, MaxRange);
+			//float RandY;
+			//if (FMath::Abs(RandX) < MinRange)
+			//{
+			//	RandY = FMath::FRandRange(MinRange, MaxRange) * (1 - 2 * FMath::RandRange(0, 1));;
+			//}
+			//else
+			//{
+			//	RandY = FMath::RandRange(-MaxRange, MaxRange);
+			//}
+
+			//Pos = navSystem->ProjectPointToNavigation(this, FVector(RandX, RandY, 0.0f));
+			//Pos = FVector(RandX, RandY, -2000.0f);
+
 			//Don't spawn too close to player
-			while (RadiusSquared < 2500.0f* 2500.0f)
+			while (RadiusSquared < MinRange * MinRange)
 			{
-				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, Range);
+				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
 				RadiusSquared = Pos.SizeSquared2D();
 				Tries--;
 				if (Tries == 0)
@@ -91,11 +107,19 @@ void ARPG_SpawnManager::SpawnNewWave()
 
 		for (size_t i = 0; i < NumberOfRanged; i++)
 		{
-			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, Range);
+			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
 			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(RangedClass, Pos, FRotator::ZeroRotator, Params);
 			SpawnedActors.Add(Actor);
 		}
 	}
+
+	FDateTime UTCTime2 = FDateTime::UtcNow();
+
+	auto Delta = UTCTime2 - UTCTime1;
+	auto Milli = Delta.GetSeconds() + Delta.GetTotalMilliseconds() / 1000.f;
+
+	GEngine->AddOnScreenDebugMessage(-1, 1000, FColor::Yellow, FString::Printf(TEXT("%f"), Milli));
+
 
 	RPGEventManager->HostileStateChanged.Broadcast(false);
 }
