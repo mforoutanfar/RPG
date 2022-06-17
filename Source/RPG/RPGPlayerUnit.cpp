@@ -155,12 +155,13 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 {
 	auto Interactable = Cast<IRPGInteractable>(Target);
 	auto Type = Interactable->Execute_GetInteractableType(Target);
+	bool Successful = false;
 
 	if (Type == ITEM)
 	{
 		auto Item = Cast<ARPGPickUpItem>(Target);
 
-		bool Successful = Inventory->AddItem(Item->ItemInformation);
+		Successful = Inventory->AddItem(Item->ItemInformation);
 		Interactable->Execute_OnInteracted(Target, Successful);
 
 		if (Successful)
@@ -189,7 +190,7 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 		//TODO: Loot equipment as well?
 		for (auto i : Corpse->Inventory->GetItems())
 		{
-			bool Successful = Inventory->AddItem(i->ItemInformation);
+			Successful = Inventory->AddItem(i->ItemInformation);
 
 			if (Successful)
 			{
@@ -207,19 +208,48 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 			AudioComponent->PlayRandom("cash");
 		}
 
-		Interactable->Execute_OnInteracted(Target, LootedEverything);
+		Successful = LootedEverything;
+		Interactable->Execute_OnInteracted(Target, Successful);
 	}
 	else if (Type == BUTTON)
 	{
-		Interactable->Execute_OnInteracted(Target, true);
+		Successful = true;
+		Interactable->Execute_OnInteracted(Target, Successful);
 	}
 	else if (Type == DOOR)
 	{
-		Interactable->Execute_OnInteracted(Target, true);
+		Successful = true;
+		Interactable->Execute_OnInteracted(Target, Successful);
+	}
+	else if (Type == LOCKED_DOOR)//Assuming it's not pickable. TODO: Better solution.
+	{
+		Successful = false;
+		Interactable->Execute_OnInteracted(Target, Successful);
 	}
 	else if (Type == InteractableCat::MISC)
 	{
-		Interactable->Execute_OnInteracted(Target, true);
+		Successful = true;
+		Interactable->Execute_OnInteracted(Target, Successful);
 	}
+	else if (Type == InteractableCat::LOCKED_CHEST)
+	{
+		if (ClassName == "Thief")
+		{
+			Successful = true;
+			Interactable->Execute_OnInteracted(Target, Successful);
+		}
+		else
+		{
+			Successful = false;
+			Interactable->Execute_OnInteracted(Target, Successful);
+		}
+	}
+	else if (Type == InteractableCat::CHEST)
+	{
+		Successful = true;
+		Interactable->Execute_OnInteracted(Target, Successful);
+	}
+
+	RPGEventManager->InteractionOccured.Broadcast(this, Type, Successful);
 }
 

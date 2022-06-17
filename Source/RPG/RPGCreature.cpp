@@ -206,7 +206,7 @@ void ARPGCreature::BeginAttack()
 	EnterRecovery(Results.RecoveryDuration);
 }
 
-void ARPGCreature::CastReadySpell()
+bool ARPGCreature::CastReadySpell()
 {
 	if (ReadySpellIndex < Spells.Num())
 	{
@@ -218,8 +218,12 @@ void ARPGCreature::CastReadySpell()
 			RPGEventManager->CreatureStateChanged.Broadcast(this);
 			RPGEventManager->SpellCast.Broadcast(this);
 			EnterRecovery(Spell->RecoveryDuration);
+
+			return true;
 		}
 	}
+
+	return false;
 }
 
 FRPGAttackResults ARPGCreature::Attack()

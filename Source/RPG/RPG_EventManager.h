@@ -19,6 +19,7 @@ class UUserWidget;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUnitAdded, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Unit, bool, State);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, AActor*, Attacker, FRPGAttackData, AttackData, FRPGAttackResults, Results);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInteractionOccured, AActor*, Interactor, TEnumAsByte<InteractableCategory::InteractableCat>, Category, bool, Successful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
@@ -42,11 +43,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureDied, ARPGCreature*, Creatu
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCoinChanged, int, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStoryEventTriggered, FString, EventName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddUnitProposed, TSubclassOf<ARPGPlayerUnit>, UnitClass);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHostileStateChanged, bool, Clear);
 
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class RPG_API URPG_EventManager : public UObject
 {
 	GENERATED_BODY()
@@ -129,4 +131,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 		FAddUnitProposed AddUnitProposed;
+
+	UPROPERTY(BlueprintAssignable)
+		FInteractionOccured InteractionOccured;
+
+	UPROPERTY(BlueprintAssignable)
+		FHostileStateChanged HostileStateChanged;
 };

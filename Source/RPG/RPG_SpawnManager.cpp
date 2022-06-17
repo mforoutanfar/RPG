@@ -5,6 +5,7 @@
 #include "RPGFunctionLibrary.h"
 #include "RPG_GameStateBase.h"
 #include "RPGUnit.h"
+#include "RPGPickupItem.h"
 #include "NavigationSystem.h"
 #include "RPG_EventManager.h"
 
@@ -26,9 +27,20 @@ void ARPG_SpawnManager::BeginPlay()
 	
 	RPGGameState->SpawnManager = this;
 
-	SetLevelCleared(true);
-
 	RPGEventManager->CreatureDied.AddDynamic(this, &ARPG_SpawnManager::OnCreatureDied);
+
+	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	FActorSpawnParameters Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (auto i : InitialLoot)
+	{
+		for (size_t j = 0; j < i.Value; j++)
+		{
+			auto Pos = navSystem->GetRandomPointInNavigableRadius(this, FVector::ZeroVector, Range);
+			auto Actor = GetWorld()->SpawnActor<ARPGPickUpItem>(i.Key, Pos, FRotator::ZeroRotator, Params);
+		}
+	}
 }
 
 /**
@@ -50,10 +62,12 @@ void ARPG_SpawnManager::SpawnNewWave()
 		int NumberOfMelee = LevelCombinationMap[CurrentLevel].NumberOfMelees;
 		int NumberOfRanged = LevelCombinationMap[CurrentLevel].NumberOfRanged;
 
+		UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+		FActorSpawnParameters Params = FActorSpawnParameters();
+		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
 		for (size_t i = 0; i < NumberOfMelee; i++)
 		{
-			UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-
 			float RadiusSquared = 0.0f;
 
 			int Tries = 100;
@@ -62,7 +76,7 @@ void ARPG_SpawnManager::SpawnNewWave()
 			//Don't spawn too close to player
 			while (RadiusSquared < 2500.0f* 2500.0f)
 			{
-				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, 10000.f);
+				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, Range);
 				RadiusSquared = Pos.SizeSquared2D();
 				Tries--;
 				if (Tries == 0)
@@ -71,25 +85,19 @@ void ARPG_SpawnManager::SpawnNewWave()
 				}
 			}
 			
-			FActorSpawnParameters Params = FActorSpawnParameters();
-			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(MeleeClass, Pos, FRotator::ZeroRotator, Params);
 			SpawnedActors.Add(Actor);
 		}
 
 		for (size_t i = 0; i < NumberOfRanged; i++)
 		{
-			UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-
-			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, 10000.f);
-			FActorSpawnParameters Params = FActorSpawnParameters();
-			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, Range);
 			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(RangedClass, Pos, FRotator::ZeroRotator, Params);
 			SpawnedActors.Add(Actor);
 		}
 	}
 
-	SetLevelCleared(false);
+	RPGEventManager->HostileStateChanged.Broadcast(false);
 }
 
 void ARPG_SpawnManager::OnCreatureDied(ARPGCreature* Unit)
@@ -98,12 +106,6 @@ void ARPG_SpawnManager::OnCreatureDied(ARPGCreature* Unit)
 
 	if (SpawnedActors.Num() == 0)
 	{
-		SetLevelCleared(true);
+		RPGEventManager->HostileStateChanged.Broadcast(true);
 	}
 }
-
-void ARPG_SpawnManager::SetLevelCleared(bool Cleared)
-{
-	LevelCleared = Cleared;
-}
-

@@ -390,7 +390,10 @@ void ARPGPlayer::OnSpellPressed()
 
 	if (UnitToAttack)
 	{
-		UnitToAttack->CastReadySpell();
+		if (!UnitToAttack->CastReadySpell())
+		{
+			UnitToAttack->BeginAttack();
+		}
 	}
 }
 

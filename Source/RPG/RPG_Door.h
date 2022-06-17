@@ -46,4 +46,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		FString EventName = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool Locked = false;
 };

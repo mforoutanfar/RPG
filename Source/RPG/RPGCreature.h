@@ -53,7 +53,7 @@ public:
 	virtual void BeginAttack();
 
 	UFUNCTION(BlueprintCallable)
-	void CastReadySpell();
+	bool CastReadySpell();
 
 	UPROPERTY(EditAnywhere)
 	float MaxHP = 30000.0f;
@@ -61,7 +61,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	float HP = 30000.0f;
 
+	UPROPERTY(EditAnywhere)
 	float MaxMana = 300.0f;
+	
+	UPROPERTY(EditAnywhere)
 	float Mana = 300.0f;
 
 	UPROPERTY(EditAnywhere)
@@ -115,8 +118,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	FName CreatureName = "Corpse";
 
-
 	bool Dead = false;
+
 	virtual void Die();
 
 	FTimerHandle RecoveryTimerHandle;

@@ -13,12 +13,14 @@
 #include "RPG_HUD.h"
 #include "RPG_GameHUD.h"
 #include "RPG_ItemWidget.h"
+#include "RPGInteractable.h"
 
 void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
 {
 	ReferencedUnit = Unit;
 	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
 	RPGEventManager->AttackOccured.AddDynamic(this, &URPG_AvatarWidget::OnAttackOccured);
+	RPGEventManager->InteractionOccured.AddDynamic(this, &URPG_AvatarWidget::OnInteractionOccured);
 	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
 	RPGEventManager->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
@@ -146,6 +148,60 @@ void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreatu
 
 			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
 			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);			
+		}
+	}
+}
+
+void URPG_AvatarWidget::OnInteractionOccured(AActor* Interactor, TEnumAsByte<InteractableCategory::InteractableCat> Category, bool Successful)
+{
+	if (Interactor == ReferencedUnit.Get())
+	{
+		AvatarState Reaction = NORMAL;
+
+		if (Successful)
+		{
+			switch (Category)
+			{
+			case InteractableCategory::ITEM:
+			case InteractableCategory::CHEST:
+			case InteractableCategory::CORPSE:
+			{
+				Reaction = HAPPY;
+				break;
+			}			
+			case InteractableCategory::LOCKED_CHEST:
+			{
+				Reaction = COCKY;
+				break;
+			}			
+			default:
+				break;
+			}
+		}
+		else
+		{
+			switch (Category)
+			{
+			case InteractableCategory::ITEM:
+			case InteractableCategory::DOOR:
+			case InteractableCategory::LOCKED_DOOR:
+			case InteractableCategory::CHEST:
+			case InteractableCategory::LOCKED_CHEST:
+			case InteractableCategory::BUTTON:
+			{
+				Reaction = DISAPPOINTED;
+			}
+			default:
+				break;
+			}
+		}
+
+		if (Reaction != NORMAL)
+		{
+			Portrait->SetBrushFromTexture(AvatarMap[Reaction]);
+
+			GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
+			GetWorld()->GetTimerManager().SetTimer(ResetAvatarHandle, this, &URPG_AvatarWidget::ResetAvatar, ResetDelay, true);
 		}
 	}
 }

@@ -56,7 +56,9 @@ namespace InteractableCategory
 		NONE,
 		ITEM,
 		DOOR,
+		LOCKED_DOOR,
 		CHEST,
+		LOCKED_CHEST,
 		CORPSE,
 		BUTTON,
 		MISC

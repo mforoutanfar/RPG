@@ -48,13 +48,14 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class ARPGUnit> RangedClass = nullptr;
 
+	UPROPERTY(EditAnywhere)
+		TMap<TSubclassOf<class ARPGPickUpItem>, int> InitialLoot;
+
+	UPROPERTY(EditAnywhere)
+		float Range = 10000.0f;
+
 	TArray<AActor*> SpawnedActors;
 
 	UFUNCTION()
 		void OnCreatureDied(class ARPGCreature* Unit);
-
-	void SetLevelCleared(bool Cleared);
-
-	UPROPERTY(BlueprintReadOnly)
-		bool LevelCleared = false;
 };
