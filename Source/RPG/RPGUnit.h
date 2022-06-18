@@ -46,4 +46,7 @@ public:
 
 protected:
 
+	UFUNCTION(BlueprintNativeEvent)
+	void ShowSpawnEffect();
+
 };

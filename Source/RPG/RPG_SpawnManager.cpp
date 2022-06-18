@@ -57,6 +57,18 @@ void ARPG_SpawnManager::BeginPlay()
 		auto Actor = GetWorld()->SpawnActor<ARPGUnit>(RangedClass, FVector(-100.f * i, -100.f * i, -5000.f), FRotator::ZeroRotator, Params);
 		AddUnitToPool(Actor, RangedPool);
 	}
+
+	int MaxEffects = 0;
+
+	for (auto i : LevelCombinationMap)
+	{
+		int Tot = i.Value.NumberOfMelees + i.Value.NumberOfRanged;
+
+		if (Tot > MaxEffects)
+		{
+			MaxEffects = Tot;
+		}
+	}
 }
 
 ARPGUnit* ARPG_SpawnManager::GetUnitFromPool(TArray<ARPGUnit*>& Pool)
@@ -116,16 +128,7 @@ void ARPG_SpawnManager::SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number)
 		Actor->RPGSetActive(true);
 
 		SpawnedActors.Add(Actor);
-
-		SpawnSpawnEffect(AdjustedLocation);
 	}
-}
-
-void ARPG_SpawnManager::SpawnSpawnEffect(FVector Pos)
-{
-	FActorSpawnParameters Params = FActorSpawnParameters();
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	GetWorld()->SpawnActor<AActor>(SpawnEffectClass, Pos, FRotator::ZeroRotator, Params);
 }
 
 void ARPG_SpawnManager::SpawnNewWave()

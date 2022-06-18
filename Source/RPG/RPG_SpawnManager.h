@@ -44,8 +44,6 @@ public:
 
 	void SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number);
 
-	void SpawnSpawnEffect(FVector Pos);
-
 	UFUNCTION(BlueprintCallable)
 	void SpawnNewWave();
 
@@ -83,7 +81,4 @@ public:
 
 	TArray<ARPGUnit*> MeleePool;
 	TArray<ARPGUnit*> RangedPool;
-
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<AActor> SpawnEffectClass;
 };

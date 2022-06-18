@@ -57,6 +57,8 @@ void ARPGUnit::RPGSetActive(bool Active)
 		Mana = MaxMana;
 
 		AddStartingInventoryItems();
+
+		ShowSpawnEffect();
 	}	
 	else
 	{
@@ -147,4 +149,8 @@ void ARPGUnit::BeginAttack()
 
 	//TODO: Hack! Entering recovery before actually attacking because otherwise behavior tree will misbehave.
 	EnterRecovery(1.25f);
+}
+
+void ARPGUnit::ShowSpawnEffect_Implementation()
+{
 }
