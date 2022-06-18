@@ -14,6 +14,62 @@
 
 #include "RPG_MinimapComponent.h"
 
+void ARPGUnit::RPGSetActive(bool Active)
+{
+	SetActorHiddenInGame(!Active);
+	SetActorTickEnabled(Active);
+	GetCharacterMovement()->SetComponentTickEnabled(Active);
+	SetActorEnableCollision(Active);
+	GetCapsuleComponent()->SetEnableGravity(Active);
+
+	if (Active)
+	{
+		switch (CreatureType)
+		{
+		case ARPGCreature::CreatureType::PLAYER:
+			break;
+		case ARPGCreature::CreatureType::ENEMY:
+		{
+			MinimapComponent->RegisterOnMiniMap(MiniMap::ENEMY);
+			break;
+		}
+		case ARPGCreature::CreatureType::NPC:
+		{
+			MinimapComponent->RegisterOnMiniMap(MiniMap::NPC);
+			break;
+		}
+		default:
+			break;
+		}
+
+		SpawnDefaultController();
+
+		GetCharacterMovement()->GravityScale = 1.0f;
+
+		Dead = false;
+
+		MeleeSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		RangeSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+		Visuals->SetAnimState(AnimState::AST_IDLE);
+
+		HP = MaxHP;
+		Mana = MaxMana;
+
+		AddStartingInventoryItems();
+	}	
+	else
+	{
+		MinimapComponent->UnregisterComponent();
+		if (Controller)
+		{
+			Controller->UnPossess();
+		}
+
+		GetCharacterMovement()->GravityScale = 0.0f;
+	}
+}
+
 ARPGUnit::ARPGUnit()
 {
 	CreatureType = CreatureType::ENEMY;
@@ -27,6 +83,8 @@ ARPGUnit::ARPGUnit()
 	HitBox->SetCollisionProfileName(FName("EnemyHitBox"));
 
 	MinimapComponent = CreateDefaultSubobject<URPG_MinimapComponent>(FName("MinimapComponent"));
+
+	RPGSetActive(false);
 }
 
 void ARPGUnit::BeginPlay()
@@ -34,24 +92,6 @@ void ARPGUnit::BeginPlay()
 	Super::BeginPlay();
 	Visuals->Init(CreatureName.ToString());
 	SetIsWalking(false);
-
-	switch (CreatureType)
-	{
-	case ARPGCreature::CreatureType::PLAYER:
-		break;
-	case ARPGCreature::CreatureType::ENEMY:
-	{
-		MinimapComponent->RegisterOnMiniMap(MiniMap::ENEMY);
-		break;
-	}
-	case ARPGCreature::CreatureType::NPC:
-	{
-		MinimapComponent->RegisterOnMiniMap(MiniMap::NPC);
-		break;
-	}
-	default:
-		break;
-	}
 }
 
 InteractableCat ARPGUnit::GetInteractableType_Implementation()
@@ -69,7 +109,7 @@ void ARPGUnit::OnInteracted_Implementation(bool Successful)
 	if (Successful && Dead)
 	{
 		MinimapComponent->UnregisterFromMiniMap();
-		Destroy();
+		RPGEventManager->CreatureExpired.Broadcast(this);
 	}
 }
 
@@ -93,8 +133,8 @@ void ARPGUnit::Die()
 	}
 
 	//Removes threat to PlayerUnits (Affects safety)
-	MeleeSphere->DestroyComponent();
-	RangeSphere->DestroyComponent();
+	MeleeSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RangeSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//TODO: Replace Enemy ping with Loot ping.
 	MinimapComponent->UnregisterFromMiniMap();

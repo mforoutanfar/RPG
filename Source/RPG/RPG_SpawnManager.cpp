@@ -28,9 +28,11 @@ void ARPG_SpawnManager::BeginPlay()
 	RPGGameState->SpawnManager = this;
 
 	RPGEventManager->CreatureDied.AddDynamic(this, &ARPG_SpawnManager::OnCreatureDied);
+	RPGEventManager->CreatureExpired.AddDynamic(this, &ARPG_SpawnManager::OnCreatureExpired);
 
 	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
 	FActorSpawnParameters Params = FActorSpawnParameters();
+
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	for (auto i : InitialLoot)
@@ -41,6 +43,32 @@ void ARPG_SpawnManager::BeginPlay()
 			auto Actor = GetWorld()->SpawnActor<ARPGPickUpItem>(i.Key, Pos, FRotator::ZeroRotator, Params);
 		}
 	}
+
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (size_t i = 0; i < MeleePoolSize; i++)
+	{
+		auto Actor = GetWorld()->SpawnActor<ARPGUnit>(MeleeClass, FVector(100.f*i, 100.f * i,-5000.f), FRotator::ZeroRotator, Params);
+		AddUnitToPool(Actor, MeleePool);
+	}
+
+	for (size_t i = 0; i < RangedPoolSize; i++)
+	{
+		auto Actor = GetWorld()->SpawnActor<ARPGUnit>(RangedClass, FVector(-100.f * i, -100.f * i, -5000.f), FRotator::ZeroRotator, Params);
+		AddUnitToPool(Actor, RangedPool);
+	}
+}
+
+ARPGUnit* ARPG_SpawnManager::GetUnitFromPool(TArray<ARPGUnit*>& Pool)
+{
+	auto Actor = Pool.Last();
+	Pool.Remove(Actor);
+	return Actor;
+}
+
+void ARPG_SpawnManager::AddUnitToPool(ARPGUnit* Unit, TArray<ARPGUnit*>& Pool)
+{
+	Pool.Add(Unit);
 }
 
 /**
@@ -50,7 +78,54 @@ void ARPG_SpawnManager::BeginPlay()
 void ARPG_SpawnManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void ARPG_SpawnManager::SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number)
+{
+	UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
+	FActorSpawnParameters Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (size_t i = 0; i < Number; i++)
+	{
+		float RadiusSquared = 0.0f;
+
+		int Tries = 100;
+		FVector Pos;
+
+		//Don't spawn too close to player
+		while (RadiusSquared < MinRange * MinRange)
+		{
+			Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
+			RadiusSquared = Pos.SizeSquared2D();
+			Tries--;
+			if (Tries == 0)
+			{
+				break;
+			}
+		}
+
+		auto Actor = GetUnitFromPool(Pool);
+		FVector AdjustedLocation = Pos;
+		AdjustedLocation.Z += 100.f;
+		FRotator AdjustedRotation = FRotator::ZeroRotator;
+		if (GetWorld()->FindTeleportSpot(Actor, AdjustedLocation, AdjustedRotation))
+		{
+			Actor->SetActorLocationAndRotation(AdjustedLocation, AdjustedRotation, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+		Actor->RPGSetActive(true);
+
+		SpawnedActors.Add(Actor);
+
+		SpawnSpawnEffect(AdjustedLocation);
+	}
+}
+
+void ARPG_SpawnManager::SpawnSpawnEffect(FVector Pos)
+{
+	FActorSpawnParameters Params = FActorSpawnParameters();
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	GetWorld()->SpawnActor<AActor>(SpawnEffectClass, Pos, FRotator::ZeroRotator, Params);
 }
 
 void ARPG_SpawnManager::SpawnNewWave()
@@ -61,56 +136,8 @@ void ARPG_SpawnManager::SpawnNewWave()
 
 	if (LevelCombinationMap.Contains(CurrentLevel))
 	{
-		int NumberOfMelee = LevelCombinationMap[CurrentLevel].NumberOfMelees;
-		int NumberOfRanged = LevelCombinationMap[CurrentLevel].NumberOfRanged;
-
-		UNavigationSystemV1* navSystem = UNavigationSystemV1::GetCurrent(GetWorld());
-		FActorSpawnParameters Params = FActorSpawnParameters();
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		for (size_t i = 0; i < NumberOfMelee; i++)
-		{
-			float RadiusSquared = 0.0f;
-
-			int Tries = 100;
-			FVector Pos;
-
-			//float RandX = FMath::RandRange(-MaxRange, MaxRange);
-			//float RandY;
-			//if (FMath::Abs(RandX) < MinRange)
-			//{
-			//	RandY = FMath::FRandRange(MinRange, MaxRange) * (1 - 2 * FMath::RandRange(0, 1));;
-			//}
-			//else
-			//{
-			//	RandY = FMath::RandRange(-MaxRange, MaxRange);
-			//}
-
-			//Pos = navSystem->ProjectPointToNavigation(this, FVector(RandX, RandY, 0.0f));
-			//Pos = FVector(RandX, RandY, -2000.0f);
-
-			//Don't spawn too close to player
-			while (RadiusSquared < MinRange * MinRange)
-			{
-				Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
-				RadiusSquared = Pos.SizeSquared2D();
-				Tries--;
-				if (Tries == 0)
-				{
-					break;
-				}
-			}
-			
-			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(MeleeClass, Pos, FRotator::ZeroRotator, Params);
-			SpawnedActors.Add(Actor);
-		}
-
-		for (size_t i = 0; i < NumberOfRanged; i++)
-		{
-			auto Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
-			auto Actor = GetWorld()->SpawnActor<ARPGUnit>(RangedClass, Pos, FRotator::ZeroRotator, Params);
-			SpawnedActors.Add(Actor);
-		}
+		SpawnUnitsFromPool(MeleePool, LevelCombinationMap[CurrentLevel].NumberOfMelees);
+		SpawnUnitsFromPool(RangedPool, LevelCombinationMap[CurrentLevel].NumberOfRanged);
 	}
 
 	FDateTime UTCTime2 = FDateTime::UtcNow();
@@ -118,8 +145,7 @@ void ARPG_SpawnManager::SpawnNewWave()
 	auto Delta = UTCTime2 - UTCTime1;
 	auto Milli = Delta.GetSeconds() + Delta.GetTotalMilliseconds() / 1000.f;
 
-	GEngine->AddOnScreenDebugMessage(-1, 1000, FColor::Yellow, FString::Printf(TEXT("%f"), Milli));
-
+	//GEngine->AddOnScreenDebugMessage(-1, 1000, FColor::Yellow, FString::Printf(TEXT("%f"), Milli));
 
 	RPGEventManager->HostileStateChanged.Broadcast(false);
 }
@@ -131,5 +157,22 @@ void ARPG_SpawnManager::OnCreatureDied(ARPGCreature* Unit)
 	if (SpawnedActors.Num() == 0)
 	{
 		RPGEventManager->HostileStateChanged.Broadcast(true);
+	}
+}
+
+void ARPG_SpawnManager::OnCreatureExpired(ARPGCreature* Creature)
+{
+	if (auto Unit = Cast<ARPGUnit>(Creature))
+	{
+		Unit->RPGSetActive(false);
+
+		if (Unit->CreatureName == "Archer")
+		{
+			AddUnitToPool(Unit, RangedPool);
+		}
+		else
+		{
+			AddUnitToPool(Unit, MeleePool);
+		}
 	}
 }

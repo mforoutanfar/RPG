@@ -18,6 +18,7 @@ class RPG_API ARPGUnit : public ARPGCreature, public IRPGInteractable
 	GENERATED_BODY()
 
 public:
+	void RPGSetActive(bool Active);
 	ARPGUnit();
 
 	virtual void BeginPlay() override;

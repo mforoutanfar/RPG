@@ -70,17 +70,22 @@ void ARPGCreature::BeginPlay()
 		Spells.Add(Spell);
 	}
 
+	AddStartingInventoryItems();
+}
+
+void ARPGCreature::AddStartingInventoryItems()
+{
 	for (auto i : StartingInventoryItems)
 	{
 		auto Rand = FMath::FRandRange(0.0f, 1.0f);
-		
+
 		if (Rand > i.Chance)
 		{
 			continue;
 		}
 
 		//TODO: Better solution for storing item data and creating items.
-		auto Item = NewObject<ARPGPickUpItem>(this, i.ItemClass);		
+		auto Item = NewObject<ARPGPickUpItem>(this, i.ItemClass);
 		Inventory->AddItem(Item->ItemInformation);
 		Item->Destroy();
 	}

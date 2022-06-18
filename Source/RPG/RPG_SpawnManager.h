@@ -7,6 +7,8 @@
 #include "RPGFunctionLibrary.h"
 #include "RPG_SpawnManager.generated.h"
 
+class ARPGUnit;
+
 /**
  *
 */
@@ -27,6 +29,10 @@ protected:
 	*/
 	virtual void BeginPlay() override;
 
+	ARPGUnit* GetUnitFromPool(TArray<ARPGUnit*>& Pool);
+
+	void AddUnitToPool(ARPGUnit* Unit, TArray<ARPGUnit*>& Pool);
+
 	int CurrentLevel = -1;
 
 public:
@@ -36,16 +42,20 @@ public:
 	*/
 	virtual void Tick(float DeltaTime) override;
 
+	void SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number);
+
+	void SpawnSpawnEffect(FVector Pos);
+
 	UFUNCTION(BlueprintCallable)
 	void SpawnNewWave();
 
 	UPROPERTY(EditAnywhere)
 		TMap<int, FRPGLevelCombination> LevelCombinationMap;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ARPGUnit> MeleeClass = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ARPGUnit> RangedClass = nullptr;
 
 	UPROPERTY(EditAnywhere)
@@ -61,4 +71,19 @@ public:
 
 	UFUNCTION()
 		void OnCreatureDied(class ARPGCreature* Unit);
+
+	UFUNCTION()
+		void OnCreatureExpired(class ARPGCreature* Unit);
+
+	UPROPERTY(EditAnywhere)
+	int MeleePoolSize = 100;
+
+	UPROPERTY(EditAnywhere)
+	int RangedPoolSize = 100;
+
+	TArray<ARPGUnit*> MeleePool;
+	TArray<ARPGUnit*> RangedPool;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AActor> SpawnEffectClass;
 };

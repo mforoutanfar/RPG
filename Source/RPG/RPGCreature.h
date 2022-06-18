@@ -110,13 +110,13 @@ public:
 	UPROPERTY(EditAnywhere)
 		int Coins = 0;
 
+	UPROPERTY(EditDefaultsOnly)
+		FName CreatureName = "Corpse";
+
 protected:
 	bool InRecovery = false;
 	void EnterRecovery(float Duration);
 	void ExitRecovery();
-
-	UPROPERTY(EditDefaultsOnly)
-	FName CreatureName = "Corpse";
 
 	bool Dead = false;
 
@@ -139,4 +139,6 @@ protected:
 	TArray<class URPG_Spell*> Spells = {};
 
 	int ReadySpellIndex = 0;
+
+	void AddStartingInventoryItems();
 };

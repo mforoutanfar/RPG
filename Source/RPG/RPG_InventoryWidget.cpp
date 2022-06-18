@@ -115,15 +115,18 @@ void URPG_InventoryWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 
 void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, AActor* Owner)
 {
-	if (auto Canvas = CanvasMap[Owner])
+	if (CanvasMap.Contains(Owner))
 	{
-		auto ItemWidget = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
-		Canvas->AddChildToCanvas(ItemWidget);
+		if (auto Canvas = CanvasMap[Owner])
+		{
+			auto ItemWidget = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
+			Canvas->AddChildToCanvas(ItemWidget);
 
-		ItemWidget->Init(Item, Item->ItemInformation);
-		ItemWidget->UpdateSizeForInventory();
+			ItemWidget->Init(Item, Item->ItemInformation);
+			ItemWidget->UpdateSizeForInventory();
 
-		Item->RefWidget = ItemWidget;
+			Item->RefWidget = ItemWidget;
+		}
 	}
 }
 

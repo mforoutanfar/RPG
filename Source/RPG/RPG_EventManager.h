@@ -40,6 +40,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureStateChanged, ARPGCreature*
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellCast, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameOverIssued);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureDied, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCreatureExpired, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCoinChanged, int, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStoryEventTriggered, FString, EventName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddUnitProposed, TSubclassOf<ARPGPlayerUnit>, UnitClass);
@@ -147,4 +148,7 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 		FContainerClosed ContainerClosed;
+
+	UPROPERTY(BlueprintAssignable)
+		FCreatureExpired CreatureExpired;
 };
