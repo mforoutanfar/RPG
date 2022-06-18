@@ -72,7 +72,7 @@ protected:
 	int StarterUnits = 1;
 
 	UFUNCTION()
-		void OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName);
+		void OnUnitAvatarClicked(AActor* Unit, FName ButtonName);
 
 	UFUNCTION()
 		void OnCreatureDied(class ARPGCreature* Unit);

@@ -60,11 +60,16 @@ public:
 
 	UUserWidget* CurrentStoryEvent = nullptr;
 
+	FString CurrentEventName = "";
+
 	UFUNCTION(BlueprintCallable)
 	void ShowMessage(FString Message, float Duration = 5.0f);
 
 protected:
 	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnContainerFocusStateChanged(AActor* Container, bool IsFocused);
 
 	FTimerHandle MessageTimerHandle;
 
@@ -92,16 +97,22 @@ protected:
 	class UVerticalBox* AvatarsBox;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* InventoryGroup;
+	UWidget* InventoryGroup;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* PauseMenu;
+	UWidget* PauseMenu;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* Equipment;
+	UWidget* Equipment;
 
 	UPROPERTY(meta = (BindWidget))
-	class UWidget* Background;
+	UWidget* Background;
+
+	UPROPERTY(meta = (BindWidget))
+		URPG_AvatarWidget* ContainerAvatar;
+
+	UPROPERTY(meta = (BindWidget))
+		UWidget* ContainerGroup;
 
 	UPROPERTY(meta = (BindWidget))
 	class URPG_MiniMapWidget* MiniMap;

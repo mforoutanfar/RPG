@@ -25,7 +25,7 @@ public:
 
 	bool DoesItemFit(int width, int height, int row, int col);
 
-	class ARPGCreature* OwnerUnit = nullptr;
+	AActor* OwnerUnit = nullptr;
 
 	TArray<URPGInventoryItem*> GetItems();
 

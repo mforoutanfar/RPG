@@ -414,11 +414,11 @@ void ARPGPlayer::OnSwitchUnitPressed()
 	}
 }
 
-void ARPGPlayer::OnUnitAvatarClicked(ARPGPlayerUnit* Unit, FName ButtonName)
+void ARPGPlayer::OnUnitAvatarClicked(AActor* Unit, FName ButtonName)
 {
 	if (ButtonName == "LeftMouseButton")
 	{
-		SetSelectedUnit(Unit);
+		SetSelectedUnit(Cast<ARPGPlayerUnit>(Unit));
 	}
 	else if (ButtonName == "RightMouseButton")
 	{

@@ -45,5 +45,5 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
-	void OnItemRemoved(URPGInventoryItem* Item, class ARPGCreature* Creature);
+	void OnItemRemoved(URPGInventoryItem* Item, AActor* Owner);
 };

@@ -51,7 +51,7 @@ void URPG_ItemWidget::NativeConstruct()
 	RPGEventManager->InventoryItemRemoved.AddDynamic(this, &URPG_ItemWidget::OnItemRemoved);
 }
 
-void URPG_ItemWidget::OnItemRemoved(URPGInventoryItem* Item, ARPGCreature* Creature)
+void URPG_ItemWidget::OnItemRemoved(URPGInventoryItem* Item, AActor* Owner)
 {
 	if (Item == ItemRef)
 	{

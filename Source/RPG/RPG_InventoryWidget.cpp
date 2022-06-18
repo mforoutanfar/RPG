@@ -18,7 +18,6 @@
 #include "RPG_HUD.h"
 #include "RPG_GameHUD.h"
 
-
 int32 URPG_InventoryWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	int32 ret = Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
@@ -38,6 +37,33 @@ void URPG_InventoryWidget::NativeConstruct()
 	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_InventoryWidget::OnUnitAdded);
 	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_InventoryWidget::OnSelectedUnitChanged);
 	RPGEventManager->ItemWidgetClicked.AddDynamic(this, &URPG_InventoryWidget::OnItemWidgetClicked);
+	RPGEventManager->ContainerFocusStateChanged.AddDynamic(this, &URPG_InventoryWidget::OnContainerFocusStateChanged);
+	RPGEventManager->ContainerClosed.AddDynamic(this, &URPG_InventoryWidget::OnContainerClosed);
+}
+
+void URPG_InventoryWidget::OnContainerClosed(AActor* Container)
+{
+	CanvasMap[Container]->RemoveFromParent();
+	CanvasMap.Remove(Container);
+}
+
+void URPG_InventoryWidget::OnContainerFocusStateChanged(AActor* Container, bool IsFocused)
+{
+	if (IsFocused)
+	{
+		if (!CanvasMap.Contains(Container))
+		{
+			//Assuming we have max 4 units. TODO: Better solution?
+			int UnitIndex = 5;
+
+			auto Canvas = WidgetTree->ConstructWidget<UCanvasPanel>(UCanvasPanel::StaticClass(), FName(FString("Canvas") + FString::Printf(TEXT("%d"), UnitIndex)));
+			InventorySwitcher->AddChild(Canvas);
+			TWeakObjectPtr<AActor> WeakPtr = Container;
+			CanvasMap.Add(WeakPtr, Canvas);
+		}
+
+		InventorySwitcher->SetActiveWidget(CanvasMap[Container]);
+	}
 }
 
 void URPG_InventoryWidget::OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName)
@@ -87,20 +113,17 @@ void URPG_InventoryWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 	}
 }
 
-void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
+void URPG_InventoryWidget::OnInventoryItemAdded(URPGInventoryItem* Item, AActor* Owner)
 {
-	if (auto PlayerUnit = Cast<ARPGPlayerUnit>(Creature))
+	if (auto Canvas = CanvasMap[Owner])
 	{
-		if (auto Canvas = CanvasMap[PlayerUnit])
-		{
-			auto ItemWidget = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
-			Canvas->AddChildToCanvas(ItemWidget);
+		auto ItemWidget = CreateWidget<URPG_ItemWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), ItemClass);
+		Canvas->AddChildToCanvas(ItemWidget);
 
-			ItemWidget->Init(Item, Item->ItemInformation);
-			ItemWidget->UpdateSizeForInventory();
+		ItemWidget->Init(Item, Item->ItemInformation);
+		ItemWidget->UpdateSizeForInventory();
 
-			Item->RefWidget = ItemWidget;
-		}
+		Item->RefWidget = ItemWidget;
 	}
 }
 

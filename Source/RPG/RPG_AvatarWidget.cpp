@@ -14,24 +14,41 @@
 #include "RPG_GameHUD.h"
 #include "RPG_ItemWidget.h"
 #include "RPGInteractable.h"
+#include "RPG_Container.h"
 
-void URPG_AvatarWidget::Init(ARPGPlayerUnit* Unit)
+void URPG_AvatarWidget::Init(AActor* Unit)
 {
 	ReferencedUnit = Unit;
-	RPGEventManager->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
-	RPGEventManager->AttackOccured.AddDynamic(this, &URPG_AvatarWidget::OnAttackOccured);
-	RPGEventManager->InteractionOccured.AddDynamic(this, &URPG_AvatarWidget::OnInteractionOccured);
-	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
-	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
-	RPGEventManager->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
-	RPGEventManager->CreatureStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnCreatureStateChanged);
-	RPGEventManager->SpellCast.AddDynamic(this, &URPG_AvatarWidget::OnSpellCast);
-
+	AddListenersOnce();
 	//Put here because when OnSafetyStateChanged is called on PlayerUnit's BeginPlay, AvatarWidget is not created yet and doesn't hear it. TODO: Solution?
-	DefaultSafetyColor = SafeColor;
-	ResetToDefaultColor();
 
-	Portrait->SetColorAndOpacity(Unit->AvatarColor);
+	if (auto Player = Cast<ARPGPlayerUnit>(Unit))
+	{
+		DefaultSafetyColor = SafeColor;
+		ResetToDefaultColor();
+		Portrait->SetColorAndOpacity(Player->AvatarColor);
+	}
+	else//Assuming it's container.
+	{
+		SelectedIndicator->SetBrushTintColor(SelectedColor);
+	}
+}
+
+void URPG_AvatarWidget::AddListenersOnce()
+{
+	if (!HasAddedListeners)
+	{
+		RPGEventManager->RecoveryStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnRecoveryStateChanged);
+		RPGEventManager->AttackOccured.AddDynamic(this, &URPG_AvatarWidget::OnAttackOccured);
+		RPGEventManager->InteractionOccured.AddDynamic(this, &URPG_AvatarWidget::OnInteractionOccured);
+		RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_AvatarWidget::OnSelectedUnitChanged);
+		RPGEventManager->ContainerFocusStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnContainerFocusStateChanged);
+		RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_AvatarWidget::OnInventoryItemAdded);
+		RPGEventManager->SafetyStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnSafetyStateChanged);
+		RPGEventManager->CreatureStateChanged.AddDynamic(this, &URPG_AvatarWidget::OnCreatureStateChanged);
+		RPGEventManager->SpellCast.AddDynamic(this, &URPG_AvatarWidget::OnSpellCast);
+		HasAddedListeners = true;
+	}
 }
 
 void URPG_AvatarWidget::OnCreatureStateChanged(ARPGCreature* Creature)
@@ -138,9 +155,9 @@ void URPG_AvatarWidget::ResetToDefaultColor()
 }
 
 //TODO: All avatar changes can be made using UMG animations in editor. This way they won't pause when the game is paused.
-void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, ARPGCreature* Creature)
+void URPG_AvatarWidget::OnInventoryItemAdded(URPGInventoryItem* Item, AActor* Owner)
 {
-	if (auto Unit = Cast<ARPGPlayerUnit>(Creature))
+	if (auto Unit = Cast<ARPGPlayerUnit>(Owner))
 	{
 		if (Unit == ReferencedUnit.Get())
 		{
@@ -227,8 +244,10 @@ void URPG_AvatarWidget::OnAttackOccured(AActor* Attacker, FRPGAttackData Data, F
 	}
 	else if (ReferencedUnit.Get() == Data.Target)//Is Attacked
 	{
+		auto Creature = Cast<ARPGCreature>(Data.Target);
+
 		//TODO: Unify with OnCreatureStateChanged?
-		auto percent = HPBar->Percent - Results.DamageDealt / Unit->MaxHP;
+		auto percent = HPBar->Percent - Results.DamageDealt / Creature->MaxHP;
 		HPBar->SetPercent(percent);
 
 		GetWorld()->GetTimerManager().ClearTimer(ResetAvatarHandle);
@@ -263,6 +282,22 @@ void URPG_AvatarWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 	}
 }
 
+void URPG_AvatarWidget::OnContainerFocusStateChanged(AActor* Container, bool IsFocused)
+{
+	if (Container == ReferencedUnit.Get())
+	{
+		if (IsFocused)
+		{
+			SelectedIndicator->SetBrushTintColor(SelectedColor);
+		}
+		else
+		{
+			SelectedIndicator->SetBrushTintColor(DeselectedColor);
+		}
+	}
+}
+
+
 void URPG_AvatarWidget::ResetAvatar()
 {
 	Portrait->SetBrushFromTexture(AvatarMap[NORMAL]);
@@ -274,20 +309,46 @@ FReply URPG_AvatarWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, con
 
 	if (Button.GetFName() == "LeftMouseButton")
 	{
-		RPGEventManager->AvatarClicked.Broadcast(ReferencedUnit.Get(), Button.GetFName());
+		OnLeftClick(Button);
 	}
 	else if (Button.GetFName() == "RightMouseButton")
 	{
-		if (RPGGameHUD->PickedItem)
-		{
-			if (RPGGameHUD->PickedItem->ItemInfo.ItemCategory == ItemCategory::ItemCat::CONSUMABLE)
-			{
-				RPGEventManager->ConsumeItemProposed.Broadcast(RPGGameHUD->PickedItem->ItemInfo, ReferencedUnit.Get());
-			}
-		}
+		OnRightClick();
 	}	
 
 	return FReply::Handled();
+}
+
+void URPG_AvatarWidget::OnRightClick()
+{
+	if (RPGGameHUD->PickedItem)
+	{
+		if (auto Creature = Cast<ARPGCreature>(ReferencedUnit.Get()))
+		{
+			if (RPGGameHUD->PickedItem->ItemInfo.ItemCategory == ItemCategory::ItemCat::CONSUMABLE)
+			{
+				RPGEventManager->ConsumeItemProposed.Broadcast(RPGGameHUD->PickedItem->ItemInfo, Creature);
+			}
+		}
+	}
+}
+
+void URPG_AvatarWidget::OnLeftClick(FKey& Button)
+{
+	if (RPGGameHUD->PickedItem)
+	{
+		RPGEventManager->AddItemToInventoryProposed.Broadcast(ReferencedUnit.Get(), RPGGameHUD->PickedItem->ItemInfo, 0,0);
+	}
+	else
+	{
+		RPGEventManager->AvatarClicked.Broadcast(ReferencedUnit.Get(), Button.GetFName());
+
+		if (auto Container = Cast<ARPG_Container>(ReferencedUnit.Get()))
+		{
+			SelectedIndicator->SetBrushTintColor(SelectedColor);
+			RPGEventManager->ContainerFocusStateChanged.Broadcast(Container, true);
+		}
+	}
 }
 
 FReply URPG_AvatarWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)

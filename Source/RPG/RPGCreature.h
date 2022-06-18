@@ -38,7 +38,7 @@ public:
 	void OnItemWidgetPicked(class URPG_ItemWidget* Item);
 
 	UFUNCTION()
-	void OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item);
+	void OnRemoveItemProposed(AActor* InvOwner, URPGInventoryItem* Item);
 
 	void OnAttacked_Implementation(FRPGAttackData& AttackData, FRPGAttackResults& Results) override;
 

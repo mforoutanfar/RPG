@@ -21,15 +21,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRecoveryStateChanged, AActor*, Uni
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttackOccured, AActor*, Attacker, FRPGAttackData, AttackData, FRPGAttackResults, Results);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FInteractionOccured, AActor*, Interactor, TEnumAsByte<InteractableCategory::InteractableCat>, Category, bool, Successful);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSelectedUnitChanged, ARPGPlayerUnit*, Unit);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemAdded, URPGInventoryItem*, Item, AActor*, Owner);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInventoryItemRemoved, URPGInventoryItem*, Item, AActor*, Owner);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemWidgetClicked, URPG_ItemWidget*, Item, FName, ButtonName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemWidgetPicked, URPG_ItemWidget*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSafetyStateChanged, ARPGPlayerUnit*, Unit, TEnumAsByte<UnitSafety::SafetyState>, State);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAvatarClicked, ARPGPlayerUnit*, Unit, FName, ButtonName);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAddItemToInventoryProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo, int, ProposedRow, int, ProposedCol);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAvatarClicked, AActor*, Actor, FName, ButtonName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAddItemToInventoryProposed, AActor*, Owner, FRPGItemInfo, ItemInfo, int, ProposedRow, int, ProposedCol);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAddItemToEquipmentProposed, ARPGCreature*, Creature, FRPGItemInfo, ItemInfo);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRemoveItemProposed, ARPGCreature*, Creature, URPGInventoryItem*, Item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FRemoveItemProposed, AActor*, Owner, URPGInventoryItem*, Item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemAdded, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FEquipmentItemRemoved, URPGInventoryItem*, Item, ARPGCreature*, Creature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipmentItemReplaced, FRPGItemInfo, PreviousItemInfo);
@@ -44,6 +44,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCoinChanged, int, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStoryEventTriggered, FString, EventName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAddUnitProposed, TSubclassOf<ARPGPlayerUnit>, UnitClass);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHostileStateChanged, bool, Clear);
+//TODO: Can we use AvatarClicked instead?
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FContainerFocusStateChanged, AActor*, Container, bool, Open);
+//
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FContainerClosed, AActor*, Container);
 
 /**
  * 
@@ -137,4 +141,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 		FHostileStateChanged HostileStateChanged;
+
+	UPROPERTY(BlueprintAssignable)
+		FContainerFocusStateChanged ContainerFocusStateChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+		FContainerClosed ContainerClosed;
 };

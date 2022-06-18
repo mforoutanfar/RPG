@@ -55,7 +55,7 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	void ResetToDefaultColor();
 
 	UFUNCTION()
-	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
+	void OnInventoryItemAdded(class URPGInventoryItem* Item, AActor* Owner);
 
 	UFUNCTION()
 	void OnInteractionOccured(AActor* Interactor, TEnumAsByte<InteractableCategory::InteractableCat> Category, bool Successful);
@@ -65,6 +65,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 		
 	UFUNCTION()
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
+
+	UFUNCTION()
+	void OnContainerFocusStateChanged(AActor* Container, bool IsFocused);
 
 	UFUNCTION()
 		void OnCreatureStateChanged(ARPGCreature* Creature);
@@ -109,13 +112,17 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	TWeakObjectPtr<ARPGPlayerUnit> ReferencedUnit = nullptr;
-
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	void OnRightClick();
+	void OnLeftClick(FKey& Button);
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 		
 	bool InRecovery = false;
 
+	bool HasAddedListeners = false;
+
 public:
-	void Init(ARPGPlayerUnit* Unit);
+	TWeakObjectPtr<AActor> ReferencedUnit = nullptr;
+	void Init(AActor* Unit);
+	void AddListenersOnce();
 };

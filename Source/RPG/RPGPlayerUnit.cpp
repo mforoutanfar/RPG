@@ -117,9 +117,9 @@ void ARPGPlayerUnit::OnHitboxEndOverlap(UPrimitiveComponent* OverlappedComponent
 	}
 }
 
-void ARPGPlayerUnit::OnAddItemToInventoryProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol)
+void ARPGPlayerUnit::OnAddItemToInventoryProposed(AActor* InvOwner, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol)
 {
-	if (Creature == this)
+	if (InvOwner == this)
 	{
 		Inventory->AddItem(ItemInfo, ProposedRow, ProposedCol);
 	}

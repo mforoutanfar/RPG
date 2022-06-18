@@ -37,6 +37,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION()
+		void OnContainerFocusStateChanged(AActor* Container, bool IsFocused);
+
+	UFUNCTION()
 	void OnItemWidgetClicked(URPG_ItemWidget* ItemWidget, FName ButtonName);
 
 	bool IsItemWidgetInInventoryWidget(URPG_ItemWidget* ItemWidget);
@@ -48,9 +51,12 @@ protected:
 	void OnSelectedUnitChanged(ARPGPlayerUnit* Unit);
 
 	UFUNCTION()
-	void OnInventoryItemAdded(class URPGInventoryItem* Item, class ARPGCreature* Creature);
+	void OnInventoryItemAdded(class URPGInventoryItem* Item, AActor* Owner);
 
-	TMap <TWeakObjectPtr<class ARPGPlayerUnit>, class UCanvasPanel* > CanvasMap;
+	UFUNCTION()
+		void OnContainerClosed(AActor* Container);
+
+	TMap <TWeakObjectPtr<AActor>, class UCanvasPanel* > CanvasMap;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 

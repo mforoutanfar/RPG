@@ -29,11 +29,20 @@
 
 void URPG_GameHUD::OnStoryEventTriggered(FString EventName)
 {
-	if (StoryEventMap.Contains(EventName))
+	if (EventName == "Container")
+	{
+		OnOpenInventoryPressed(true);
+		CurrentEventName = EventName;
+
+		ContainerGroup->SetVisibility(ESlateVisibility::Visible);
+		Equipment->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else if (StoryEventMap.Contains(EventName))
 	{
 		if (auto EventClass = StoryEventMap[EventName])
 		{
 			CurrentStoryEvent = CreateWidget<UUserWidget>(UGameplayStatics::GetPlayerController(GetWorld(), 0), EventClass);
+			CurrentEventName = EventName;
 			auto HorSlot = HorBox->AddChildToHorizontalBox(CurrentStoryEvent);
 			HorSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
 			HorSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
@@ -50,14 +59,20 @@ void URPG_GameHUD::OnStoryEventTriggered(FString EventName)
 
 void URPG_GameHUD::CloseStoryEvent()
 {
-	if (CurrentStoryEvent)
+	if (CurrentEventName == "Container")
+	{
+		ContainerGroup->SetVisibility(ESlateVisibility::Collapsed);
+		InventoryGroup->SetVisibility(ESlateVisibility::Collapsed);
+		RPGEventManager->ContainerClosed.Broadcast(ContainerAvatar->ReferencedUnit.Get());
+	}
+	else if (CurrentStoryEvent)
 	{
 		CurrentStoryEvent->RemoveFromParent();
 		CurrentStoryEvent = nullptr;
-
-		Background->SetVisibility(ESlateVisibility::Collapsed);
-		MiniMap->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	Background->SetVisibility(ESlateVisibility::Collapsed);
+	MiniMap->SetVisibility(ESlateVisibility::Visible);
 }
 
 void URPG_GameHUD::ShowMessage(FString Message, float Duration)
@@ -86,6 +101,12 @@ void URPG_GameHUD::NativeConstruct()
 	RPGEventManager->NearestInteractableChanged.AddDynamic(this, &URPG_GameHUD::OnNearestInteractableChanged);
 	RPGEventManager->RemovePickedItemProposed.AddDynamic(this, &URPG_GameHUD::OnRemovePickedItemProposed);
 	RPGEventManager->CoinChanged.AddDynamic(this, &URPG_GameHUD::OnCoinValueChanged);
+	RPGEventManager->ContainerFocusStateChanged.AddDynamic(this, &URPG_GameHUD::OnContainerFocusStateChanged);
+}
+
+void URPG_GameHUD::OnContainerFocusStateChanged(AActor* Container, bool IsFocused)
+{
+	ContainerAvatar->Init(Container);
 }
 
 void URPG_GameHUD::OnCoinValueChanged(int Value)

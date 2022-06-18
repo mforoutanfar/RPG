@@ -55,7 +55,7 @@ protected:
 		void OnHitboxEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-	void OnAddItemToInventoryProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol);
+	void OnAddItemToInventoryProposed(AActor* InvOwner, FRPGItemInfo ItemInfo, int ProposedRow, int ProposedCol);
 
 	UFUNCTION()
 	void OnAddItemToEquipmentProposed(ARPGCreature* Creature, FRPGItemInfo ItemInfo);

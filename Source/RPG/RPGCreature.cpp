@@ -115,9 +115,10 @@ void ARPGCreature::OnConsumeItemProposed(FRPGItemInfo ItemInfo, ARPGCreature* Cr
 	}
 }
 
-void ARPGCreature::OnRemoveItemProposed(ARPGCreature* Creature, URPGInventoryItem* Item)
+//TODO: Move all inventory related functions to RPGInventory?
+void ARPGCreature::OnRemoveItemProposed(AActor* InvOwner, URPGInventoryItem* Item)
 {
-	if (Creature == this)
+	if (InvOwner == this)
 	{
 		if (Inventory->Contains(Item))
 		{
