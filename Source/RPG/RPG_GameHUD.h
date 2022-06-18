@@ -90,6 +90,9 @@ protected:
 	UFUNCTION()
 	void OnNearestInteractableChanged(AActor* NearestInteractable);
 	
+	UFUNCTION(BlueprintCallable)
+		void OnTakeAllButtonClicked();
+
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* Canvas;
 

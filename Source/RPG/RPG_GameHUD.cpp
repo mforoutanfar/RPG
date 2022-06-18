@@ -26,6 +26,10 @@
 #include "Components/TextBlock.h"
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
+#include "Components/Button.h"
+#include "RPG_Container.h"
+#include "RPGInventory.h"
+#include "RPGPlayer.h"
 
 void URPG_GameHUD::OnStoryEventTriggered(FString EventName)
 {
@@ -158,6 +162,26 @@ void URPG_GameHUD::OnNearestInteractableChanged(AActor* NearestInteractable)
 	else
 	{
 		InteractionPing->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void URPG_GameHUD::OnTakeAllButtonClicked()
+{
+	auto Container = Cast<ARPG_Container>(ContainerAvatar->ReferencedUnit.Get());
+
+	auto SelectedUnit = RPGPlayer->SelectedUnit.Get();
+
+	if (!SelectedUnit)
+	{
+		SelectedUnit = RPGPlayer->Units[0];
+	}
+
+	for (auto i: Container->Inventory->GetItems())
+	{
+		//TODO: We have no way of knowing if adding was successful.
+		RPGEventManager->AddItemToInventoryProposed.Broadcast(SelectedUnit, i->ItemInformation, 0,0);
+
+		RPGEventManager->RemoveItemProposed.Broadcast(Container, i);
 	}
 }
 

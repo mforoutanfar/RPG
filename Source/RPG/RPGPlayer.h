@@ -59,6 +59,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 		int StarterCoins = 0;
+
+	TWeakObjectPtr<ARPGPlayerUnit> SelectedUnit = nullptr;
+
+	TArray<ARPGPlayerUnit*> Units = {};
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void AddUnit(TSubclassOf<ARPGPlayerUnit> UnitClass);
@@ -116,8 +121,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	class UAIPerceptionStimuliSourceComponent* SightSource;
 
-	TArray<ARPGPlayerUnit*> Units = {};
-
 	UPROPERTY()
 	class ASceneCapture2D* MiniMapCamera = nullptr;
 
@@ -129,6 +132,4 @@ private:
 	ARPGPlayerUnit* FindFirstOutOfRecoveryUnit();
 
 	void SetSelectedUnit(ARPGPlayerUnit* Unit);
-
-	TWeakObjectPtr<ARPGPlayerUnit> SelectedUnit = nullptr;
 };
