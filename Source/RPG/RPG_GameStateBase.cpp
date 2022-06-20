@@ -4,6 +4,8 @@
 #include "RPG_GameStateBase.h"
 #include "RPG_EventManager.h"
 #include "RPG_SpawnManager.h"
+#include "RPG_SafeAreaManager.h"
+#include "Kismet/GameplayStatics.h"
 
 ARPG_GameStateBase::ARPG_GameStateBase()
 {
@@ -11,6 +13,8 @@ ARPG_GameStateBase::ARPG_GameStateBase()
 
 	Recepies.Add("Health Potion", TArray<FName>({ "Bottle", "Berries" }));
 	Recepies.Add("Mana Potion", TArray<FName>({ "Bottle", "Blueberries" }));
+
+	SafeAreaManager = Cast<ARPG_SafeAreaManager>(UGameplayStatics::GetActorOfClass(this, ARPG_SafeAreaManager::StaticClass()));
 }
 
 void ARPG_GameStateBase::OnConstruction(const FTransform& Transform)

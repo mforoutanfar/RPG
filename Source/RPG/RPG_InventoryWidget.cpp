@@ -33,6 +33,10 @@ void URPG_InventoryWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	auto a = GetWorld();
+	auto b = GetWorld()->GetGameState();
+	auto c = Cast<ARPG_GameStateBase>(GetWorld()->GetGameState());
+
 	RPGEventManager->InventoryItemAdded.AddDynamic(this, &URPG_InventoryWidget::OnInventoryItemAdded);
 	RPGEventManager->UnitAdded.AddDynamic(this, &URPG_InventoryWidget::OnUnitAdded);
 	RPGEventManager->SelectedUnitChanged.AddDynamic(this, &URPG_InventoryWidget::OnSelectedUnitChanged);

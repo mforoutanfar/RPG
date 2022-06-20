@@ -19,8 +19,11 @@ class RPG_API ARPG_GameStateBase : public AGameStateBase
 	ARPG_GameStateBase();
 
 public:
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadOnly)
 		class URPG_EventManager* EventManager = nullptr;
+
+	UPROPERTY(BlueprintReadOnly)
+		class ARPG_SafeAreaManager* SafeAreaManager = nullptr;
 
 	TMap<FString, TArray<USoundBase*>> SoundMap;
 
@@ -29,8 +32,8 @@ public:
 	//TODO: Move recipe to seperate class?
 	FName GetResultingItem(FName Ingredient1, FName Ingredient2);
 
-	UPROPERTY(BlueprintReadWrite)
-		class ARPG_SpawnManager* SpawnManager = nullptr;
+	UPROPERTY(BlueprintReadOnly)
+		class ARPG_SpawnManager* SpawnManager = nullptr;	
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform);

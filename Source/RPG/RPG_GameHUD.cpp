@@ -87,7 +87,7 @@ void URPG_GameHUD::ShowMessage(FString Message, float Duration)
 	
 	GetWorld()->GetTimerManager().SetTimer(MessageTimerHandle, this, &URPG_GameHUD::HideMessage, Duration, false);
 
-	MessageText->SetVisibility(ESlateVisibility::Visible);
+	MessageText->SetVisibility(ESlateVisibility::HitTestInvisible);
 }
 
 void URPG_GameHUD::HideMessage()

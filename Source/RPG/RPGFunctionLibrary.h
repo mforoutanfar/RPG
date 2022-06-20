@@ -13,6 +13,7 @@
 #define RPGPlayer Cast<ARPGPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn())
 #define RPGGameHUD Cast<ARPG_HUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->GameHUD
 #define RPGGameState Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())
+#define RPGSafeAreaManager Cast<ARPG_GameStateBase>(GetWorld()->GetGameState())->SafeAreaManager
 
 /**
  * 

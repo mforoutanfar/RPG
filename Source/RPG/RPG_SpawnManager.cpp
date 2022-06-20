@@ -8,6 +8,7 @@
 #include "RPGPickupItem.h"
 #include "NavigationSystem.h"
 #include "RPG_EventManager.h"
+#include "RPG_SafeAreaManager.h"
 
 /**
  * Sets default values
@@ -39,7 +40,12 @@ void ARPG_SpawnManager::BeginPlay()
 	{
 		for (size_t j = 0; j < i.Value; j++)
 		{
-			auto Pos = navSystem->GetRandomPointInNavigableRadius(this, FVector::ZeroVector, MaxRange);
+			FNavLocation Pos;
+			do
+			{
+				navSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, MaxRange, Pos);
+			} while (!RPGSafeAreaManager->IsPointInSafeArea(Pos));
+
 			auto Actor = GetWorld()->SpawnActor<ARPGPickUpItem>(i.Key, Pos, FRotator::ZeroRotator, Params);
 		}
 	}
@@ -110,19 +116,19 @@ void ARPG_SpawnManager::SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number)
 		float RadiusSquared = 0.0f;
 
 		int Tries = 100;
-		FVector Pos;
+		FNavLocation Pos;
 
-		//Don't spawn too close to player
-		while (RadiusSquared < MinRange * MinRange)
+		//Don't spawn too close to player		
+		do
 		{
-			Pos = navSystem->GetRandomReachablePointInRadius(this, FVector::ZeroVector, MaxRange);
-			RadiusSquared = Pos.SizeSquared2D();
+			navSystem->GetRandomReachablePointInRadius(FVector::ZeroVector, MaxRange, Pos);
+			RadiusSquared = ((FVector)Pos).SizeSquared2D();
 			Tries--;
 			if (Tries == 0)
 			{
 				break;
 			}
-		}
+		} while (RadiusSquared < MinRange * MinRange || !RPGSafeAreaManager->IsPointInSafeArea(Pos));
 
 		if (auto Actor = GetUnitFromPool(Pool))
 		{
