@@ -5,6 +5,9 @@
 #include "RPGInventoryItem.h"
 #include "RPG_EventManager.h"
 #include "RPGCreature.h"
+#include "RPGPlayer.h"
+#include "RPGPlayerUnit.h"
+#include "RPGFunctionLibrary.h"
 #include "RPG_GameStateBase.h"
 #include "Components/ScaleBox.h"
 
@@ -43,6 +46,17 @@ bool URPGInventory::Contains(URPGInventoryItem* Item)
 
 bool URPGInventory::AddItem(FRPGItemInfo& OutItemInfo, int ProposedRow, int ProposedCol)
 {
+	if (OutItemInfo.ItemCategory == ItemCategory::ItemCat::COIN)
+	{
+		if (auto Unit = Cast<ARPGPlayerUnit>(OwnerUnit))
+		{
+			RPGPlayer->AddCoins(OutItemInfo.Price);
+			RPGEventManager->RemovePickedItemProposed.Broadcast();
+			return true;
+		}
+
+	}
+
 	int Width = OutItemInfo.Width;
 	int Height = OutItemInfo.Height;
 	int DestRow = ProposedRow;

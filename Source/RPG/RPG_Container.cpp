@@ -126,11 +126,12 @@ void ARPG_Container::Open()
 	for (auto i : StartingInventoryItems)
 	{
 		auto Item = NewObject<ARPGPickUpItem>(this, i.Key);
+		Item->SetRandomPrice();
 
 		for (size_t j = 0; j < i.Value; j++)
 		{
 			//Leads to creation of item widgets in inventory widget.
-			Inventory->AddItem(Item->ItemInformation);
+			Inventory->AddItem(Item->ItemInformation, FMath::RandRange(0,11), FMath::RandRange(0, 11));
 		}
 
 		Item->Destroy();

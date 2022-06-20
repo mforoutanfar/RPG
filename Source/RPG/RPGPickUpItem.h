@@ -53,6 +53,8 @@ public:
 
 	InteractableCat GetInteractableType_Implementation() override;
 
+	void SetRandomPrice();
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBillboardComponent* ItemPicture;

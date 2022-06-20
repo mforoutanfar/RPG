@@ -91,10 +91,10 @@ void URPG_EquipmentWidget::OnUnitAdded(ARPGPlayerUnit* Unit)
 
 void URPG_EquipmentWidget::OnSelectedUnitChanged(ARPGPlayerUnit* Unit)
 {
-	SelectedUnit = Unit;
-
 	if (Unit)//It is possible that no unit is selected.
 	{
+		SelectedUnit = Unit;
+
 		Background->SetColorAndOpacity(Unit->AvatarColor);
 
 		for (auto i : EquipmentMap)

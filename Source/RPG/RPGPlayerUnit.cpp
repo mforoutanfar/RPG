@@ -162,6 +162,7 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 		auto Item = Cast<ARPGPickUpItem>(Target);
 
 		Successful = Inventory->AddItem(Item->ItemInformation);
+
 		Interactable->Execute_OnInteracted(Target, Successful);
 
 		if (Successful)
@@ -182,7 +183,7 @@ void ARPGPlayerUnit::InteractWithTarget(AActor* Target)
 
 		if (Corpse->Coins > 0)
 		{
-			RPGPlayer->SetCoins(Corpse->Coins);
+			RPGPlayer->AddCoins(Corpse->Coins);
 			Corpse->Coins = 0;
 			LootedAnything = true;
 		}

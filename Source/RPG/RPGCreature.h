@@ -68,7 +68,7 @@ public:
 	float Mana = 300.0f;
 
 	UPROPERTY(EditAnywhere)
-	float Accuracy = 1.0f;
+	float BaseAccuracy = 1.0f;
 
 	UPROPERTY(EditAnywhere)
 	float BaseCriticalChance = 0.01f;
@@ -107,8 +107,13 @@ public:
 	UPROPERTY(EditAnywhere)
 		TArray<FRPGLootChance> StartingInventoryItems;		
 
+	int Coins = 0;
+
 	UPROPERTY(EditAnywhere)
-		int Coins = 0;
+		int MinCoins = 0;
+
+	UPROPERTY(EditAnywhere)
+		int MaxCoins = 0;
 
 	UPROPERTY(EditDefaultsOnly)
 		FName CreatureName = "Corpse";
@@ -129,7 +134,7 @@ protected:
 	class URPG_Equipment* Equipment;
 
 	FRPGAttackResults Attack();
-	void CalculateMeleeDamage(FRPGAttackData &OutData, FRPGAttackResults &Results);
+	void CalculateMeleeParams(FRPGAttackData &OutData, FRPGAttackResults &Results);
 
 	//TODO: Probably for development only.
 	UPROPERTY(EditDefaultsOnly)

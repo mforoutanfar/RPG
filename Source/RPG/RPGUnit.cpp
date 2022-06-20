@@ -56,6 +56,8 @@ void ARPGUnit::RPGSetActive(bool Active)
 		HP = MaxHP;
 		Mana = MaxMana;
 
+		Coins = FMath::RandRange(MinCoins, MaxCoins);
+
 		AddStartingInventoryItems();
 
 		ShowSpawnEffect();

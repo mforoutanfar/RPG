@@ -13,6 +13,8 @@
 #include "RPGAttackable.h"
 #include "RPGInteractable.h"
 
+#include "RPGPickUpItem.h"
+
 #include "RPGPlayerUnit.h"
 #include "RPGRandomAudioComponent.h"
 #include "RPG_EventManager.h"
@@ -90,11 +92,14 @@ void ARPGPlayer::AddUnit(TSubclassOf<ARPGPlayerUnit> UnitClass)
 	RPGEventManager->UnitAdded.Broadcast(Unit);
 }
 
-void ARPGPlayer::SetCoins(int Value)
+void ARPGPlayer::AddCoins(int Value)
 {
-	Coins = Value;
-
-	RPGEventManager->CoinChanged.Broadcast(Value);
+	Coins += Value;
+	if (Value > 0)
+	{
+		AudioComponent->PlayRandom("cash");
+	}
+	RPGEventManager->CoinChanged.Broadcast(Coins);
 }
 
 // Called when the game starts or when spawned
@@ -146,7 +151,7 @@ void ARPGPlayer::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 
-	SetCoins(StarterCoins);
+	AddCoins(StarterCoins);
 }
 
 void ARPGPlayer::OnAddUnitProposed(TSubclassOf<ARPGPlayerUnit> UnitClass)
@@ -325,9 +330,6 @@ void ARPGPlayer::OnInteractPressed()
 		{
 			UnitToInteract = FindFirstOutOfRecoveryUnit();
 		}
-
-		auto Interactable = Cast<IRPGInteractable>(NearestInteractable);
-		auto Type = Interactable->Execute_GetInteractableType(NearestInteractable);
 
 		if (!UnitToInteract)
 		{

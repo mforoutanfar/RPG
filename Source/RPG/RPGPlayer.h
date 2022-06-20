@@ -55,7 +55,10 @@ public:
 		float SafeFallDuration = 1.0f;
 
 	UFUNCTION(BlueprintCallable)
-	void SetCoins(int Value);
+	void AddCoins(int Value);
+
+	UPROPERTY(BlueprintReadWrite)
+		int Coins = 0;
 
 	UPROPERTY(EditDefaultsOnly)
 		int StarterCoins = 0;
@@ -67,9 +70,6 @@ public:
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void AddUnit(TSubclassOf<ARPGPlayerUnit> UnitClass);
-
-	UPROPERTY(BlueprintReadWrite)
-		int Coins = 0;
 
 	const int UnitCapacity = 4;
 

@@ -154,7 +154,7 @@ FReply URPG_InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 			int Row = RelPos.Y / RowHeight;
 
 			auto CurrentCanvas = InventorySwitcher->GetActiveWidget();
-			auto RefUnit = Cast<ARPGCreature>(CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get());
+			auto RefUnit = CanvasMap.FindKey(Cast<UCanvasPanel>(CurrentCanvas))->Get();
 
 			RPGEventManager->AddItemToInventoryProposed.Broadcast(RefUnit, RPGGameHUD->PickedItem->ItemInfo, Row, Col);
 		}

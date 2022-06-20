@@ -73,9 +73,16 @@ void ARPG_SpawnManager::BeginPlay()
 
 ARPGUnit* ARPG_SpawnManager::GetUnitFromPool(TArray<ARPGUnit*>& Pool)
 {
-	auto Actor = Pool.Last();
-	Pool.Remove(Actor);
-	return Actor;
+	if (Pool.Num() > 0)
+	{
+		auto Actor = Pool.Last();
+		Pool.Remove(Actor);
+		return Actor;
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 void ARPG_SpawnManager::AddUnitToPool(ARPGUnit* Unit, TArray<ARPGUnit*>& Pool)
@@ -117,17 +124,19 @@ void ARPG_SpawnManager::SpawnUnitsFromPool(TArray<ARPGUnit*>& Pool, int Number)
 			}
 		}
 
-		auto Actor = GetUnitFromPool(Pool);
-		FVector AdjustedLocation = Pos;
-		AdjustedLocation.Z += 100.f;
-		FRotator AdjustedRotation = FRotator::ZeroRotator;
-		if (GetWorld()->FindTeleportSpot(Actor, AdjustedLocation, AdjustedRotation))
+		if (auto Actor = GetUnitFromPool(Pool))
 		{
-			Actor->SetActorLocationAndRotation(AdjustedLocation, AdjustedRotation, false, nullptr, ETeleportType::TeleportPhysics);
-		}
-		Actor->RPGSetActive(true);
+			FVector AdjustedLocation = Pos;
+			AdjustedLocation.Z += 100.f;
+			FRotator AdjustedRotation = FRotator::ZeroRotator;
+			if (GetWorld()->FindTeleportSpot(Actor, AdjustedLocation, AdjustedRotation))
+			{
+				Actor->SetActorLocationAndRotation(AdjustedLocation, AdjustedRotation, false, nullptr, ETeleportType::TeleportPhysics);
+			}
+			Actor->RPGSetActive(true);
 
-		SpawnedActors.Add(Actor);
+			SpawnedActors.Add(Actor);
+		}
 	}
 }
 

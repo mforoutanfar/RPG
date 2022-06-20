@@ -27,6 +27,11 @@ void URPG_AvatarWidget::Init(AActor* Unit)
 		DefaultSafetyColor = SafeColor;
 		ResetToDefaultColor();
 		Portrait->SetColorAndOpacity(Player->AvatarColor);
+
+		if (FMath::IsNearlyZero(Player->MaxMana))
+		{
+			ManaGroup->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 	else//Assuming it's container.
 	{

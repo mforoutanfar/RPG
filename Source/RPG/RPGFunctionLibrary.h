@@ -77,6 +77,7 @@ namespace ItemCategory
 		CONSUMABLE,
 		INGREDIENTS,
 		QUEST,
+		COIN,
 		MISC
 	};
 }

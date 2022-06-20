@@ -49,6 +49,9 @@ class RPG_API URPG_AvatarWidget : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		class UProgressBar* ManaBar;
 
+	UPROPERTY(meta = (BindWidget))
+		class UWidget* ManaGroup;
+
 	UFUNCTION()
 	void OnRecoveryStateChanged(AActor* Unit, bool State);
 

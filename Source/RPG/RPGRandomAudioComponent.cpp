@@ -18,8 +18,9 @@ void URPGRandomAudioComponent::PlayRandom(FString BaseFileName)
 	if (Range != 0)
 	{
 		int rand = FMath::RandRange(0, Range-1);
-
-		SetSound(GS->SoundMap[BaseFileName][rand]);
+		auto SoundBase = GS->SoundMap[BaseFileName][rand];		
+		SetSound(SoundBase);
+		bIsUISound = true;
 		Play();
 	}
 }

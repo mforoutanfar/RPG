@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "RPG_EventManager.h"
 #include "RPG_GameStateBase.h"
+#include "RPGPlayer.h"
+#include "RPGPlayerUnit.h"
 
 float URPG_ItemWidget::InventoryScale = -1.0f;
 
@@ -37,10 +39,22 @@ void URPG_ItemWidget::UpdateSizeForHUD()
 FReply URPG_ItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	auto Button = InMouseEvent.GetEffectingButton();
-	RPGEventManager->ItemWidgetClicked.Broadcast(this, Button.GetFName());
 
+	if (Button.GetFName() == "LeftMouseButton")
+	{
+		if (ItemInfo.ItemCategory == ItemCategory::ItemCat::COIN)
+		{
+			//Removes coin from inventory (container).
+			RPGEventManager->ItemWidgetPicked.Broadcast(this);
+			RPGEventManager->AddItemToInventoryProposed.Broadcast(Cast<AActor>(RPGPlayer->Units[0]), ItemInfo, 0, 0);
+			return FReply::Handled();
+		}
+	}
+
+	RPGEventManager->ItemWidgetClicked.Broadcast(this, Button.GetFName());
 	//Unhandled So that Inventorywidget can handle it.
 	return FReply::Unhandled();
+
 }
 
 void URPG_ItemWidget::NativeConstruct()

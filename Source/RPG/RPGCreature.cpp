@@ -69,8 +69,6 @@ void ARPGCreature::BeginPlay()
 		Spell->Caster = this;
 		Spells.Add(Spell);
 	}
-
-	AddStartingInventoryItems();
 }
 
 void ARPGCreature::AddStartingInventoryItems()
@@ -249,8 +247,7 @@ FRPGAttackResults ARPGCreature::Attack()
 	{
 		AttackData.Attacker = this;
 		AttackData.Target = NearestMelee;
-		AttackData.Accuracy = Accuracy;
-		CalculateMeleeDamage(AttackData, Results);
+		CalculateMeleeParams(AttackData, Results);
 
 		auto Attackable = Cast<IRPGAttackable>(NearestMelee);
 		Attackable->Execute_OnAttacked(NearestMelee, AttackData, Results);
@@ -276,6 +273,10 @@ FRPGAttackResults ARPGCreature::Attack()
 				auto PointOfAction = GetActorLocation() + ModifActionLocation;
 				auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
 				auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjClass, PointOfAction, Direction);
+				Projectile->Accuracy = FMath::Max(Projectile->Accuracy, BaseAccuracy);
+				Projectile->BaseCriticalChance = FMath::Max(Projectile->BaseCriticalChance, BaseCriticalChance);
+				Projectile->BaseCriticalMultiplier = FMath::Max(Projectile->BaseCriticalMultiplier, BaseCriticalMultiplier);
+
 				AttackData.Ranged = true;
 			}
 		}
@@ -302,13 +303,13 @@ FRPGAttackResults ARPGCreature::Attack()
 //
 //}
 
-void ARPGCreature::CalculateMeleeDamage(FRPGAttackData& OutData, FRPGAttackResults& Results)
+void ARPGCreature::CalculateMeleeParams(FRPGAttackData& OutData, FRPGAttackResults& Results)
 {
 	if (auto Weapon = Equipment->GetItem(ItemCategory::ItemCat::MELEE_WEAPON))
 	{
 		auto Damage = Weapon->ItemInformation.MeleeDamage.GetResult();
 		float rand = FMath::RandRange(0.0f, 1.0f);
-		bool IsCrit = rand < Weapon->ItemInformation.CriticalChance;
+		bool IsCrit = rand < FMath::Max(Weapon->ItemInformation.CriticalChance, BaseCriticalChance);
 		if (IsCrit)
 		{
 			Damage *= Weapon->ItemInformation.CriticalMultiplier;
@@ -332,6 +333,8 @@ void ARPGCreature::CalculateMeleeDamage(FRPGAttackData& OutData, FRPGAttackResul
 
 		OutData.Damage = Damage;
 	}
+
+	OutData.Accuracy = BaseAccuracy;
 }
 
 void ARPGCreature::Die()
