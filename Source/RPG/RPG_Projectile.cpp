@@ -34,17 +34,20 @@ void ARPG_Projectile::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	{
 		auto Attackable = Cast<IRPGAttackable>(OtherActor);
 
-		FRPGAttackData AttackData;
-		FRPGAttackResults Results;
+		if (Attackable->Execute_IsAttackable(OtherActor))
+		{
+			FRPGAttackData AttackData;
+			FRPGAttackResults Results;
 
-		AttackData.Attacker = this;
-		AttackData.Target = OtherActor;
-		AttackData.Accuracy = Accuracy;
-		CalculateDamage(AttackData, Results);
+			AttackData.Attacker = this;
+			AttackData.Target = OtherActor;
+			AttackData.Accuracy = Accuracy;
+			CalculateDamage(AttackData, Results);
 
-		Attackable->Execute_OnAttacked(OtherActor, AttackData, Results);
-			
-		RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
+			Attackable->Execute_OnAttacked(OtherActor, AttackData, Results);
+
+			RPGEventManager->AttackOccured.Broadcast(this, AttackData, Results);
+		}
 	}
 
 	GetWorld()->GetTimerManager().ClearTimer(LifeHandle);

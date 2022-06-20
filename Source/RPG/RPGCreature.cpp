@@ -272,7 +272,11 @@ FRPGAttackResults ARPGCreature::Attack()
 				auto ModifActionLocation = GetActorRotation().RotateVector(ActionLocation);
 				auto PointOfAction = GetActorLocation() + ModifActionLocation;
 				auto Direction = (NearestRanged->GetActorLocation() - PointOfAction).Rotation();
-				auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjClass, PointOfAction, Direction);
+
+				FActorSpawnParameters Params;
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+				auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjClass, PointOfAction, Direction, Params);
 				Projectile->Accuracy = FMath::Max(Projectile->Accuracy, BaseAccuracy);
 				Projectile->BaseCriticalChance = FMath::Max(Projectile->BaseCriticalChance, BaseCriticalChance);
 				Projectile->BaseCriticalMultiplier = FMath::Max(Projectile->BaseCriticalMultiplier, BaseCriticalMultiplier);

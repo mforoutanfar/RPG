@@ -59,7 +59,7 @@ void ARPGPickUpItem::SetRandomPrice()
 {
 	if (ItemInformation.ItemCategory == COIN)
 	{
-		ItemInformation.Price = FMath::RandRange(50, 200);
+		ItemInformation.Price = FMath::RandRange(50, 100);
 	}
 }
 
