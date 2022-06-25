@@ -277,11 +277,15 @@ FRPGAttackResults ARPGCreature::Attack()
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 				auto Projectile = GetWorld()->SpawnActor<ARPG_Projectile>(ProjClass, PointOfAction, Direction, Params);
-				Projectile->Accuracy = FMath::Max(Projectile->Accuracy, BaseAccuracy);
-				Projectile->BaseCriticalChance = FMath::Max(Projectile->BaseCriticalChance, BaseCriticalChance);
-				Projectile->BaseCriticalMultiplier = FMath::Max(Projectile->BaseCriticalMultiplier, BaseCriticalMultiplier);
+				//TODO: Projectile is sometimes null for some reason.
+				if (Projectile)
+				{
+					Projectile->Accuracy = FMath::Max(Projectile->Accuracy, BaseAccuracy);
+					Projectile->BaseCriticalChance = FMath::Max(Projectile->BaseCriticalChance, BaseCriticalChance);
+					Projectile->BaseCriticalMultiplier = FMath::Max(Projectile->BaseCriticalMultiplier, BaseCriticalMultiplier);
 
-				AttackData.Ranged = true;
+					AttackData.Ranged = true;
+				}
 			}
 		}
 	}
